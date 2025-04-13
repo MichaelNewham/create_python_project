@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Create Python Project",
+            "type": "python",
+            "request": "launch",
+            "module": "create_python_project.create_python_project",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Run with Arguments",
+            "type": "python",
+            "request": "launch",
+            "module": "create_python_project.create_python_project",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--name", "example_project",
+                "--description", "Example project created with the debugger"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        }
+    ]
+}

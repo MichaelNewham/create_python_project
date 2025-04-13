@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Create Python Project",
+            "type": "shell",
+            "command": "poetry run python ${workspaceFolder}/create_python_project/create_python_project.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "poetry install",
+            "problemMatcher": []
+        },
+        {
+            "label": "Install Development Dependencies",
+            "type": "shell",
+            "command": "poetry install --with dev",
+            "problemMatcher": []
+        },
+        {
+            "label": "Format Code with Black",
+            "type": "shell",
+            "command": "poetry run black ${workspaceFolder}/create_python_project",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Linting",
+            "type": "shell",
+            "command": "poetry run pylint ${workspaceFolder}/create_python_project",
+            "problemMatcher": []
+        },
+        {
+            "label": "Setup Poetry Environment",
+            "type": "shell",
+            "command": "poetry install",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Secret Detection",
+            "type": "shell",
+            "command": "poetry run detect-secrets scan --all-files",
+            "problemMatcher": []
+        }
+    ]
+}

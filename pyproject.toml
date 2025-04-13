@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "create-python-project"
+version = "0.1.0"
+description = "All-in-one Python project creator with intelligent setup"
+authors = ["Michael Newham <mail2mick@michaelnewham.me>"]
+readme = "README.md"
+packages = [{include = "create_python_project"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+black = "^24.0.0"
+pylint = "^3.0.0"
+detect-secrets = "^1.5.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+create-python-project = "create_python_project.create_python_project:main"
