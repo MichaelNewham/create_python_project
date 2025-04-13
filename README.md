@@ -1,4 +1,4 @@
-# Create Python Project
+# Create Python Project ⭐
 
 An all-in-one Python project creator with intelligent setup based on project description.
 
