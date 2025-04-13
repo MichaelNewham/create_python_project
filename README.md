@@ -2,6 +2,8 @@
 
 An all-in-one Python project creator with intelligent setup based on project description.
 
+***
+
 ## Features
 
 - Interactive GUI-based setup using Zenity dialogs
