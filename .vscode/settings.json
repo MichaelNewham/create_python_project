@@ -13,12 +13,31 @@
     ],
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit"
         }
     },
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
-    "python.formatting.provider": "black",
-    "editor.formatOnSave": true
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": [
+        "--config-file=${workspaceFolder}/.config/mypy.ini"
+    ],
+    "python.formatting.provider": "none",
+    "mypy.dmypyExecutable": "${workspaceFolder}/.venv/bin/dmypy",
+    "mypy.runUsingActiveInterpreter": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/.venv": true,
+        "**/node_modules": true
+    },
+    "editor.rulers": [88],
+    "editor.formatOnSave": true,
+    "python.analysis.typeCheckingMode": "basic"
 }

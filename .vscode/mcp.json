@@ -5,6 +5,18 @@
       "id": "github_token",
       "description": "GitHub Personal Access Token",
       "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "perplexity-key",
+      "description": "Perplexity API Key",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "perplexity-model",
+      "description": "Perplexity Model Name (e.g., from .env PERPLEXITY_MODEL)",
+      "default": "sonar"
     }
   ],
   "servers": {
@@ -25,6 +37,16 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "Perplexity": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "server-perplexity-ask"],
+      "env": {
+        "PERPLEXITY_API_KEY": "${input:perplexity-key}",
+        "PERPLEXITY_MODEL": "sonar"
+      },
+      "envFile": "${workspaceFolder}/.env"
     }
   }
 }

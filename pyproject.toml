@@ -4,17 +4,30 @@ version = "0.1.0"
 description = "All-in-one Python project creator with intelligent setup"
 authors = ["Michael Newham <mail2mick@michaelnewham.me>"]
 readme = "README.md"
-packages = [{include = "create_python_project"}]
+packages = [{include = "create_python_project", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11"
 python-dotenv = "^1.0.0"
+setuptools = "^80.1.0"
+openai = "^1.78.0"
+requests = "^2.32.3"
+anthropic = "^0.51.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 black = "^24.0.0"
 pylint = "^3.0.0"
 detect-secrets = "^1.5.0"
+pdoc = "^15.0.3"
+pytest-cov = "^6.1.1"
+pdoc3 = "^0.11.6"
+mypy = "^1.15.0"
+types-requests = "^2.32.0.20250328"
+types-wtforms = "^3.2.1.20250401"
+types-python-jose = "^3.4.0.20250224"
+types-passlib = "^1.7.7.20250408"
+pre-commit = "^4.2.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
