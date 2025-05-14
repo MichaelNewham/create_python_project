@@ -1,4 +1,4 @@
-Documentation update on 2025-05-14 17:33:59
+Documentation update on 2025-05-14 22:17:41
 ----------------------------------------
 Files modified during this documentation update:
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
@@ -10,9 +10,10 @@ Files modified during this documentation update:
 /home/michaelnewham/bin/python_projects/create_python_project/src/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/tests/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/scripts/aboutthisfolder.md
+/home/michaelnewham/bin/python_projects/create_python_project/scripts/ai_commit_workflow.sh
 /home/michaelnewham/bin/python_projects/create_python_project/.config/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/.vscode/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/sketches/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/README.md
 ----------------------------------------
-Total files updated: 13
+Total files updated: 14

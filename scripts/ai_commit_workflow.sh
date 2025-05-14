@@ -34,6 +34,38 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Check for required commands
+check_required_commands() {
+    local missing_commands=()
+
+    # Check for pre-commit
+    if ! command_exists pre-commit; then
+        missing_commands+=("pre-commit")
+    fi
+
+    # Check for poetry
+    if ! command_exists poetry; then
+        missing_commands+=("poetry")
+    fi
+
+    # If any commands are missing, print an error and exit
+    if [ ${#missing_commands[@]} -gt 0 ]; then
+        print_message "$RED" "❌ The following required commands are missing:"
+        for cmd in "${missing_commands[@]}"; do
+            print_message "$RED" "  - $cmd"
+        done
+        print_message "$YELLOW" "Please install the missing commands and try again."
+        exit 1
+    fi
+
+    # Check if Python dependencies are installed in Poetry environment
+    print_message "$YELLOW" "Checking Python dependencies in Poetry environment..."
+    if ! poetry run python -c "import pylint" 2>/dev/null; then
+        print_message "$YELLOW" "Installing pylint in Poetry environment..."
+        poetry add --group dev pylint
+    fi
+}
+
 # Function to generate AI commit message based on changes
 generate_ai_commit_message() {
     print_message "$BLUE" "🤖 Generating AI commit message..."
@@ -189,6 +221,9 @@ print_message "$GREEN" "========================================================
 print_message "$GREEN" "                  AI-ASSISTED COMMIT WORKFLOW                   "
 print_message "$GREEN" "================================================================"
 
+# Check for required commands
+check_required_commands
+
 # Step 1: Clean up and add specific files for this commit
 print_message "$BLUE" "📋 Step 1: Cleaning up and adding specific files for this commit"
 
@@ -233,44 +268,149 @@ print_message "$BLUE" "📎 Adding documentation changes to git"
 git add ai-docs/git_workflow.md
 git add scripts/aboutthisfolder.md
 
-# Step 3: Skip pre-commit checks for now
-print_message "$BLUE" "🔍 Step 3: Skipping pre-commit checks for now"
-print_message "$GREEN" "Pre-commit checks skipped"
+# Step 3: Run full linting and code quality checks
+print_message "$BLUE" "🔍 Step 3: Running full linting and code quality checks"
 
-# # The following is the original pre-commit code, commented out for now
-# print_message "$BLUE" "🔍 Step 3: Running pre-commit checks"
-#
-# # First, remove any backup or temporary files that might cause issues
-# print_message "$YELLOW" "Removing backup and temporary files..."
-# rm -f ai-docs/*.bak ai-docs/*.tmp mypy_report.txt pylint_report.txt
-#
-# # Create a temporary pre-commit config without the documentation hook if needed
-# if [ -f ".pre-commit-config.yaml.no-docs" ]; then
-#     cp .pre-commit-config.yaml .pre-commit-config.yaml.bak
-#     cp .pre-commit-config.yaml.no-docs .pre-commit-config.yaml
-#     RESTORE_CONFIG=true
-# else
-#     RESTORE_CONFIG=false
-# fi
-#
-# # Run pre-commit
-# print_message "$YELLOW" "Running pre-commit hooks..."
-# if ! pre-commit run --files scripts/ai_commit_workflow.sh .vscode/tasks.json ai-docs/git_workflow.md scripts/aboutthisfolder.md; then
-#     # Restore original pre-commit config if needed
-#     if [ "$RESTORE_CONFIG" = "true" ]; then
-#         mv .pre-commit-config.yaml.bak .pre-commit-config.yaml
-#     fi
-#
-#     print_message "$RED" "❌ Pre-commit checks failed. Please fix the issues before committing."
-#     exit 1
-# fi
-#
-# # Restore original pre-commit config if needed
-# if [ "$RESTORE_CONFIG" = "true" ]; then
-#     mv .pre-commit-config.yaml.bak .pre-commit-config.yaml
-# fi
-#
-# print_message "$GREEN" "Pre-commit checks passed"
+# First, remove any backup or temporary files that might cause issues
+print_message "$YELLOW" "Removing backup and temporary files..."
+rm -f ai-docs/*.bak ai-docs/*.tmp mypy_report.txt pylint_report.txt
+
+# Create a temporary pre-commit config without the documentation hook
+if [ -f ".pre-commit-config.yaml.no-docs" ]; then
+    cp .pre-commit-config.yaml .pre-commit-config.yaml.bak
+    cp .pre-commit-config.yaml.no-docs .pre-commit-config.yaml
+    RESTORE_CONFIG=true
+else
+    print_message "$YELLOW" "Warning: .pre-commit-config.yaml.no-docs not found. Using default config."
+    RESTORE_CONFIG=false
+fi
+
+# Function to run a specific linter
+run_linter() {
+    local linter=$1
+    local description=$2
+    local success=false
+    local attempt=1
+    local max_attempts=2
+
+    while [ $attempt -le $max_attempts ] && [ "$success" = "false" ]; do
+        print_message "$YELLOW" "Running $description (attempt $attempt/$max_attempts)..."
+
+        if poetry run pre-commit run $linter --all-files; then
+            print_message "$GREEN" "✅ $description passed!"
+            success=true
+        else
+            if [ $attempt -lt $max_attempts ]; then
+                print_message "$YELLOW" "⚠️ $description failed. Attempting to fix issues automatically..."
+
+                case $linter in
+                    black)
+                        poetry run black .
+                        ;;
+                    isort)
+                        poetry run isort .
+                        ;;
+                    ruff)
+                        poetry run ruff --fix .
+                        ;;
+                    flake8)
+                        # No auto-fix for flake8
+                        ;;
+                    mypy)
+                        # No auto-fix for mypy
+                        ;;
+                    pylint)
+                        # No auto-fix for pylint
+                        ;;
+                esac
+
+                # Re-add files after auto-fixing
+                git add .
+            else
+                print_message "$RED" "❌ $description failed after $max_attempts attempts."
+                return 1
+            fi
+        fi
+
+        attempt=$((attempt + 1))
+    done
+
+    return 0
+}
+
+# Run each linter individually
+LINTING_FAILED=false
+
+# 1. Black (code formatting)
+if ! run_linter "black" "Black code formatting"; then
+    LINTING_FAILED=true
+fi
+
+# 2. isort (import sorting)
+if ! run_linter "isort" "isort import sorting"; then
+    LINTING_FAILED=true
+fi
+
+# 3. ruff (linting)
+if ! run_linter "ruff" "Ruff linting"; then
+    LINTING_FAILED=true
+fi
+
+# 4. flake8 (linting)
+if ! run_linter "flake8" "Flake8 linting"; then
+    LINTING_FAILED=true
+fi
+
+# 5. mypy (type checking)
+if ! run_linter "mypy" "mypy type checking"; then
+    LINTING_FAILED=true
+fi
+
+# 6. pylint (comprehensive linting)
+print_message "$YELLOW" "Running Pylint comprehensive linting..."
+pylint_output=$(poetry run pylint --rcfile=.config/pylintrc --ignore=.venv,venv,build,dist src tests scripts 2>&1)
+pylint_exit_code=$?
+
+# Extract the score from pylint output
+pylint_score=$(echo "$pylint_output" | grep -oP 'Your code has been rated at \K[0-9.]+')
+
+if [ -z "$pylint_score" ]; then
+    pylint_score="0.0"
+fi
+
+print_message "$YELLOW" "Pylint score: $pylint_score/10.0"
+
+# Check if pylint score is acceptable (>= 9.0)
+# Using awk for floating-point comparison instead of bc
+if awk "BEGIN {exit !($pylint_score >= 9.0)}"; then
+    print_message "$GREEN" "✅ Pylint check passed (score >= 9.0)!"
+else
+    print_message "$RED" "❌ Pylint score is below 9.0."
+    LINTING_FAILED=true
+fi
+
+# Restore original pre-commit config if needed
+if [ "$RESTORE_CONFIG" = "true" ]; then
+    mv .pre-commit-config.yaml.bak .pre-commit-config.yaml
+fi
+
+# Handle linting failures
+if [ "$LINTING_FAILED" = "true" ]; then
+    print_message "$RED" "❌ Some linting checks failed."
+    print_message "$YELLOW" "You can:"
+    print_message "$YELLOW" "1. Fix the issues and run the workflow again"
+    print_message "$YELLOW" "2. Continue anyway (not recommended)"
+
+    read -p "Do you want to continue anyway? (y/n): " ignore_linting
+    if [[ "$ignore_linting" != "y" && "$ignore_linting" != "Y" ]]; then
+        print_message "$RED" "Aborting commit due to linting failures."
+        exit 1
+    else
+        print_message "$YELLOW" "⚠️ Continuing despite linting failures."
+    fi
+else
+    print_message "$GREEN" "✅ All linting and code quality checks passed!"
+fi
 
 # Step 4: Generate AI commit message
 print_message "$BLUE" "💭 Step 4: Generating commit message"
@@ -281,7 +421,8 @@ echo "$COMMIT_MESSAGE" | sed 's/^/    /'
 echo ""
 
 # Ask user if they want to edit the commit message
-read -p "Do you want to edit this commit message? (y/n): " edit_message
+print_message "$YELLOW" "Do you want to edit this commit message? (y/n): "
+read -r edit_message
 if [[ "$edit_message" == "y" || "$edit_message" == "Y" ]]; then
     # Create a temporary file with the commit message
     TEMP_FILE=$(mktemp)
@@ -321,7 +462,17 @@ else
     POST_COMMIT_DISABLED=false
 fi
 
-# Commit changes
+# Run documentation update manually first
+print_message "$YELLOW" "Running documentation update before commit..."
+if [ -f "./scripts/update_documentation.sh" ]; then
+    ./scripts/update_documentation.sh
+    # Add any files that were modified by the documentation update
+    git add .
+fi
+
+# Commit changes with --no-verify to bypass pre-commit hooks
+# This is necessary because the documentation hook would run again otherwise
+print_message "$YELLOW" "Committing with --no-verify to avoid documentation hook loop..."
 git commit --no-verify -m "$COMMIT_MESSAGE"
 
 # Restore post-commit hook if it was disabled
