@@ -336,18 +336,64 @@ print_message "$BLUE" "🚀 Step 6: Pushing changes"
 # Get list of remotes
 REMOTES=$(git remote)
 
+# Function to handle pushing to a remote
+push_to_remote() {
+    local remote=$1
+    local force_push=$2
+
+    if [[ "$force_push" == "true" ]]; then
+        print_message "$PURPLE" "Force pushing to $remote..."
+        git push --force $remote || {
+            print_message "$YELLOW" "⚠️ Force push to $remote failed. This might be due to branch protection."
+            print_message "$YELLOW" "Trying normal push instead..."
+            git push $remote || print_message "$YELLOW" "⚠️ Normal push to $remote also failed, continuing anyway..."
+        }
+    else
+        print_message "$PURPLE" "Pushing to $remote..."
+        git push $remote || print_message "$YELLOW" "⚠️ Push to $remote failed, continuing anyway..."
+    }
+}
+
+# Ask if force push is needed
+print_message "$YELLOW" "Do you need to force push? (Only use if you've rewritten git history)"
+read -p "Force push? (y/n): " force_push_choice
+if [[ "$force_push_choice" == "y" || "$force_push_choice" == "Y" ]]; then
+    FORCE_PUSH=true
+else
+    FORCE_PUSH=false
+fi
+
 # Check if both GitLab and GitHub remotes exist
 if echo "$REMOTES" | grep -q "gitlab" && echo "$REMOTES" | grep -q "github"; then
-    # Push to both GitLab and GitHub
-    print_message "$PURPLE" "Pushing to GitLab..."
-    git push gitlab || print_message "$YELLOW" "⚠️ Push to GitLab failed, continuing anyway..."
+    # Push to GitHub first (usually less restrictive)
+    push_to_remote "github" "$FORCE_PUSH"
 
-    print_message "$PURPLE" "Pushing to GitHub..."
-    git push github || print_message "$YELLOW" "⚠️ Push to GitHub failed, continuing anyway..."
+    # For GitLab, ask if it has branch protection
+    if [[ "$FORCE_PUSH" == "true" ]]; then
+        print_message "$YELLOW" "GitLab often has branch protection enabled on main branches."
+        read -p "Does GitLab have branch protection enabled? (y/n): " gitlab_protected
+
+        if [[ "$gitlab_protected" == "y" || "$gitlab_protected" == "Y" ]]; then
+            print_message "$YELLOW" "Skipping force push to GitLab. You have these options:"
+            print_message "$YELLOW" "1. Temporarily disable branch protection in GitLab settings"
+            print_message "$YELLOW" "2. Create a new branch and merge it via GitLab's interface"
+            print_message "$YELLOW" "3. Push to GitLab without force (may fail if history was rewritten)"
+
+            read -p "Try normal push to GitLab anyway? (y/n): " try_gitlab_push
+            if [[ "$try_gitlab_push" == "y" || "$try_gitlab_push" == "Y" ]]; then
+                push_to_remote "gitlab" "false"
+            else
+                print_message "$YELLOW" "Skipping push to GitLab"
+            fi
+        else
+            push_to_remote "gitlab" "$FORCE_PUSH"
+        fi
+    else
+        push_to_remote "gitlab" "false"
+    fi
 else
-    # Push to origin or use the post_commit_push.sh script
-    print_message "$PURPLE" "Pushing to origin..."
-    git push origin || print_message "$YELLOW" "⚠️ Push to origin failed, continuing anyway..."
+    # Push to origin
+    push_to_remote "origin" "$FORCE_PUSH"
 fi
 
 print_message "$GREEN" "✨ Push completed (any errors are shown above)"
