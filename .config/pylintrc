@@ -10,6 +10,7 @@ enable=syntax-error,unsubscriptable-object,undefined-variable
 output-format=text
 reports=no
 evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+fail-under=9.0
 
 [BASIC]
 good-names=i,j,k,ex,Run,_,id

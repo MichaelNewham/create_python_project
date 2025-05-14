@@ -22,9 +22,9 @@ def enhanced_input(prompt: str, default: Optional[str] = None) -> str:
     """
     if default is None:
         return input(prompt)
-    else:
-        # Note the space after the prompt and before the brackets
-        return input(f"{prompt} [{default}]: ") or default
+
+    # Note the space after the prompt and before the brackets
+    return input(f"{prompt} [{default}]: ") or default
 
 
 def select_from_list(

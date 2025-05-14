@@ -309,9 +309,26 @@ else
     print_message "$GREEN" "Using AI-generated commit message."
 fi
 
-# Step 5: Commit changes (bypassing pre-commit hooks)
-print_message "$BLUE" "✅ Step 5: Committing changes (bypassing pre-commit hooks)"
+# Step 5: Commit changes (bypassing hooks)
+print_message "$BLUE" "✅ Step 5: Committing changes (bypassing hooks)"
+
+# Temporarily disable post-commit hook to prevent documentation update loop
+if [ -f ".git/hooks/post-commit" ]; then
+    print_message "$YELLOW" "Temporarily disabling post-commit hook..."
+    mv .git/hooks/post-commit .git/hooks/post-commit.bak
+    POST_COMMIT_DISABLED=true
+else
+    POST_COMMIT_DISABLED=false
+fi
+
+# Commit changes
 git commit --no-verify -m "$COMMIT_MESSAGE"
+
+# Restore post-commit hook if it was disabled
+if [ "$POST_COMMIT_DISABLED" = "true" ]; then
+    print_message "$YELLOW" "Restoring post-commit hook..."
+    mv .git/hooks/post-commit.bak .git/hooks/post-commit
+fi
 
 # Step 6: Push changes
 print_message "$BLUE" "🚀 Step 6: Pushing changes"
@@ -323,14 +340,17 @@ REMOTES=$(git remote)
 if echo "$REMOTES" | grep -q "gitlab" && echo "$REMOTES" | grep -q "github"; then
     # Push to both GitLab and GitHub
     print_message "$PURPLE" "Pushing to GitLab..."
-    git push gitlab
+    git push gitlab || print_message "$YELLOW" "⚠️ Push to GitLab failed, continuing anyway..."
 
     print_message "$PURPLE" "Pushing to GitHub..."
-    git push github
+    git push github || print_message "$YELLOW" "⚠️ Push to GitHub failed, continuing anyway..."
 else
-    # Use the post_commit_push.sh script which handles multiple remotes
-    ./scripts/post_commit_push.sh
+    # Push to origin or use the post_commit_push.sh script
+    print_message "$PURPLE" "Pushing to origin..."
+    git push origin || print_message "$YELLOW" "⚠️ Push to origin failed, continuing anyway..."
 fi
+
+print_message "$GREEN" "✨ Push completed (any errors are shown above)"
 
 print_message "$GREEN" "================================================================"
 print_message "$GREEN" "✨ AI-assisted commit workflow completed successfully!"
