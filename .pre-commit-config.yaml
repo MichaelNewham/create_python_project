@@ -1,23 +1,62 @@
+default_stages: [pre-commit]
 repos:
+  # Stage 1: Code quality checks - these run only on staged files
   - repo: https://github.com/psf/black
     rev: 23.9.1
     hooks:
       - id: black
+        stages: [pre-commit]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.8
     hooks:
       - id: ruff
         args: [--fix]
+        stages: [pre-commit]
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0
     hooks:
       - id: mypy
         args: [--ignore-missing-imports, --config-file=.config/mypy.ini]
+        stages: [pre-commit]
+
   - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
       - id: flake8
+        stages: [pre-commit]
+
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
       - id: isort
+        stages: [pre-commit]
+
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.3.6
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args: [
+          "--rcfile=.config/pylintrc",
+          "--ignore=.venv,venv,build,dist"
+        ]
+        stages: [pre-commit]
+
+  # Stage 2: Documentation generation - runs only after all other hooks pass
+  - repo: local
+    hooks:
+      - id: update-documentation
+        name: Update Project Documentation
+        entry: ./scripts/update_documentation.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+        verbose: true
+        # This hook is expected to modify files and will always "fail" in pre-commit's context
+        # The failure is expected and can be ignored with --no-verify if needed
+        stages: [pre-commit]

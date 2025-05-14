@@ -1,25 +1,26 @@
-# AI Documentation for create_python_project
+<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md -->
+# Ai-docs Folder
 
-This directory contains AI-related documentation for the project.
+AI documentation for the Create Python Project.
 
 ## Purpose
 
-The `ai-docs` directory is used to store:
+Contains AI-related documentation, API documentation, and development notes.
 
-1. AI model specifications
-2. Prompt engineering documentation
-3. AI integration guides
-4. Model performance metrics
-5. AI-related research notes
-6. Conversation logs with AI assistants
+## Structure
 
-## Usage with Claude Code
+```
+ai-docs/
+├── aboutthisfolder.md
+└── api/
+├── api_documentation.md
+├── convo.md
+├── convo.md.bak
+├── git_workflow.md
+├── updated_files.txt
 
-Claude Code will automatically include this directory in its context when analyzing the project.
-This helps Claude understand the AI components of your project better.
+```
 
-For more information on Claude Code, see: https://docs.anthropic.com/en/docs/claude-code/overview
+## Last Updated
 
-## Key Files
-
-- `convo.md`: Contains the conversation history with AI assistants, including project requirements, decisions, and next steps.
+This documentation was automatically generated on: 2025-05-14 17:57:26

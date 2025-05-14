@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>create_python_project.utils.ai_integration API documentation</title>
+<meta name="description" content="AI Integration Module …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>create_python_project.utils.ai_integration</code></h1>
+</header>
+<section id="section-intro">
+<p>AI Integration Module</p>
+<p>This module handles integration with AI providers for project generation.
+It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="create_python_project.utils.ai_integration.get_available_ai_providers"><code class="name flex">
+<span>def <span class="ident">get_available_ai_providers</span></span>(<span>) ‑> Dict[str, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_available_ai_providers() -&gt; Dict[str, str]:
+    &#34;&#34;&#34;
+    Get a list of available AI providers based on environment variables.
+
+    Returns:
+        Dict mapping provider names to model names
+    &#34;&#34;&#34;
+    providers = {}
+
+    # Check for OpenAI
+    if os.environ.get(&#34;OPENAI_API_KEY&#34;):
+        model = os.environ.get(&#34;OPENAI_MODEL&#34;, &#34;o4-mini-2025-04-16&#34;)
+        providers[&#34;OpenAI&#34;] = model
+
+    # Check for Anthropic
+    if os.environ.get(&#34;ANTHROPIC_API_KEY&#34;):
+        model = os.environ.get(&#34;ANTHROPIC_MODEL&#34;, &#34;claude-3-7-sonnet-20250219&#34;)
+        providers[&#34;Anthropic&#34;] = model
+
+    # Check for Perplexity
+    if os.environ.get(&#34;PERPLEXITY_API_KEY&#34;):
+        model = os.environ.get(&#34;PERPLEXITY_MODEL&#34;, &#34;sonar&#34;)
+        providers[&#34;Perplexity&#34;] = model
+
+    # Check for DeepSeek
+    if os.environ.get(&#34;DEEPSEEK_API_KEY&#34;):
+        model = os.environ.get(&#34;DEEPSEEK_MODEL&#34;, &#34;deepseek-chat&#34;)
+        providers[&#34;DeepSeek&#34;] = model
+
+    # Check for Gemini (Google)
+    if os.environ.get(&#34;GOOGLE_API_KEY&#34;):
+        model = os.environ.get(&#34;GEMINI_MODEL&#34;, &#34;gemini-2.5-pro-preview-05-06&#34;)
+        providers[&#34;Gemini&#34;] = model
+
+    return providers</code></pre>
+</details>
+<div class="desc"><p>Get a list of available AI providers based on environment variables.</p>
+<h2 id="returns">Returns</h2>
+<p>Dict mapping provider names to model names</p></div>
+</dd>
+<dt id="create_python_project.utils.ai_integration.select_ai_provider"><code class="name flex">
+<span>def <span class="ident">select_ai_provider</span></span>(<span>providers: Dict[str, str]) ‑> Tuple[bool, <a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a> | None]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select_ai_provider(providers: Dict[str, str]) -&gt; Tuple[bool, Optional[AIProvider]]:
+    &#34;&#34;&#34;
+    Select an AI provider from the available providers.
+
+    Args:
+        providers: Dictionary of available providers
+
+    Returns:
+        Tuple containing success status and selected provider
+    &#34;&#34;&#34;
+    if not providers:
+        return False, None
+
+    console.print(&#34;\n[bold magenta]Step 2: AI Integration[/bold magenta]&#34;)
+    console.print(&#34;Select an AI provider:&#34;)
+    providers_list = list(providers.keys())
+    for i, provider in enumerate(providers_list, 1):
+        model = providers[provider]
+
+        # Create the appropriate provider instance to get display name
+        provider_instance: Optional[AIProvider] = None
+        if provider == &#34;OpenAI&#34;:
+            provider_instance = OpenAIProvider(model=model)
+        elif provider == &#34;Anthropic&#34;:
+            provider_instance = AnthropicProvider(model=model)
+        elif provider == &#34;Perplexity&#34;:
+            provider_instance = PerplexityProvider(model=model)
+        elif provider == &#34;DeepSeek&#34;:
+            provider_instance = DeepSeekProvider(model=model)
+        elif provider == &#34;Gemini&#34;:
+            provider_instance = GeminiProvider(model=model)
+
+        display_name = model
+        if provider_instance:
+            display_name = provider_instance.display_name
+
+        console.print(f&#34;[cyan]{i}.[/cyan] {provider} ({display_name})&#34;)
+
+    try:
+        default = 1
+        selection_str = Prompt.ask(&#34;Enter your choice&#34;, default=str(default))
+        selection = int(selection_str) if selection_str else default
+
+        if selection &lt; 1 or selection &gt; len(providers_list):
+            console.print(
+                f&#34;Invalid selection: {selection}. Must be between 1 and {len(providers_list)}&#34;,
+                style=&#34;bold red&#34;,
+            )
+            return False, None
+
+        provider_name = providers_list[selection - 1]
+        model = providers[provider_name]
+
+        # Create the appropriate provider instance
+        selected_provider: Optional[AIProvider] = None
+
+        if provider_name == &#34;OpenAI&#34;:
+            selected_provider = OpenAIProvider(model=model)
+        elif provider_name == &#34;Anthropic&#34;:
+            selected_provider = AnthropicProvider(model=model)
+        elif provider_name == &#34;Perplexity&#34;:
+            selected_provider = PerplexityProvider(model=model)
+        elif provider_name == &#34;DeepSeek&#34;:
+            selected_provider = DeepSeekProvider(model=model)
+        elif provider_name == &#34;Gemini&#34;:
+            selected_provider = GeminiProvider(model=model)
+
+        if selected_provider:
+            console.print(
+                f&#34;\nUsing {provider_name} with model {selected_provider.display_name}&#34;
+            )
+            return True, selected_provider
+
+        # Fallback for unimplemented providers
+        console.print(
+            f&#34;Support for {provider_name} is not fully implemented yet.&#34;,
+            style=&#34;bold red&#34;,
+        )
+        return False, None
+    except Exception as e:
+        console.print(f&#34;Error selecting AI provider: {str(e)}&#34;, style=&#34;bold red&#34;)
+        return False, None</code></pre>
+</details>
+<div class="desc"><p>Select an AI provider from the available providers.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>providers</code></strong></dt>
+<dd>Dictionary of available providers</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple containing success status and selected provider</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="create_python_project.utils.ai_integration.AIProvider"><code class="flex name class">
+<span>class <span class="ident">AIProvider</span></span>
+<span>(</span><span>api_key: str | None = None, model: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AIProvider:
+    &#34;&#34;&#34;Base class for AI providers.&#34;&#34;&#34;
+
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
+        &#34;&#34;&#34;Initialize the AI provider.&#34;&#34;&#34;
+        self.api_key = api_key or os.environ.get(self._get_api_key_env_var(), &#34;&#34;)
+        self.model = model or os.environ.get(self._get_model_env_var(), &#34;&#34;)
+        self.name = self.__class__.__name__
+        self.display_name = self._get_display_name()
+
+    def _get_api_key_env_var(self) -&gt; str:
+        &#34;&#34;&#34;Get the environment variable name for the API key.&#34;&#34;&#34;
+        raise NotImplementedError
+
+    def _get_model_env_var(self) -&gt; str:
+        &#34;&#34;&#34;Get the environment variable name for the model.&#34;&#34;&#34;
+        raise NotImplementedError
+
+    def _get_display_name(self) -&gt; str:
+        &#34;&#34;&#34;Get a user-friendly display name for the model.&#34;&#34;&#34;
+        raise NotImplementedError
+
+    def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+        &#34;&#34;&#34;Generate a response from the AI provider.&#34;&#34;&#34;
+        raise NotImplementedError</code></pre>
+</details>
+<div class="desc"><p>Base class for AI providers.</p>
+<p>Initialize the AI provider.</p></div>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="create_python_project.utils.ai_integration.AnthropicProvider" href="#create_python_project.utils.ai_integration.AnthropicProvider">AnthropicProvider</a></li>
+<li><a title="create_python_project.utils.ai_integration.DeepSeekProvider" href="#create_python_project.utils.ai_integration.DeepSeekProvider">DeepSeekProvider</a></li>
+<li><a title="create_python_project.utils.ai_integration.GeminiProvider" href="#create_python_project.utils.ai_integration.GeminiProvider">GeminiProvider</a></li>
+<li><a title="create_python_project.utils.ai_integration.OpenAIProvider" href="#create_python_project.utils.ai_integration.OpenAIProvider">OpenAIProvider</a></li>
+<li><a title="create_python_project.utils.ai_integration.PerplexityProvider" href="#create_python_project.utils.ai_integration.PerplexityProvider">PerplexityProvider</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="create_python_project.utils.ai_integration.AIProvider.generate_response"><code class="name flex">
+<span>def <span class="ident">generate_response</span></span>(<span>self, prompt: str) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;Generate a response from the AI provider.&#34;&#34;&#34;
+    raise NotImplementedError</code></pre>
+</details>
+<div class="desc"><p>Generate a response from the AI provider.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="create_python_project.utils.ai_integration.AnthropicProvider"><code class="flex name class">
+<span>class <span class="ident">AnthropicProvider</span></span>
+<span>(</span><span>api_key: str | None = None, model: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnthropicProvider(AIProvider):
+    &#34;&#34;&#34;Provider for Anthropic API.&#34;&#34;&#34;
+
+    def _get_api_key_env_var(self) -&gt; str:
+        return &#34;ANTHROPIC_API_KEY&#34;
+
+    def _get_model_env_var(self) -&gt; str:
+        return &#34;ANTHROPIC_MODEL&#34;
+
+    def _get_display_name(self) -&gt; str:
+        &#34;&#34;&#34;Get a user-friendly display name for the model.&#34;&#34;&#34;
+        model = self.model or &#34;claude-3-7-sonnet-20250219&#34;
+        if &#34;claude-3-haiku&#34; in model.lower():
+            return &#34;Claude 3 Haiku&#34;
+        elif &#34;claude-3-sonnet&#34; in model.lower() or &#34;claude-3.7-sonnet&#34; in model.lower():
+            return &#34;Claude 3.7 Sonnet&#34;
+        elif &#34;claude-3-opus&#34; in model.lower() or &#34;claude-3.5-opus&#34; in model.lower():
+            return &#34;Claude 3.5 Opus&#34;
+        else:
+            return model
+
+    def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+        &#34;&#34;&#34;Generate a response using Anthropic API.&#34;&#34;&#34;
+        try:
+            if anthropic is None:
+                return (
+                    False,
+                    &#34;Anthropic package not installed. Run: pip install anthropic&#34;,
+                )
+
+            client = anthropic.Anthropic(api_key=self.api_key)
+
+            system_prompt = (
+                &#34;You are a helpful assistant that provides concise Python &#34;
+                &#34;project guidance.&#34;
+            )
+
+            message = client.messages.create(
+                model=self.model or &#34;claude-3-7-sonnet-20250219&#34;,
+                max_tokens=1000,
+                system=system_prompt,
+                messages=[{&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt}],
+            )
+
+            # Safely extract text to avoid union type errors
+            content = message.content
+            if content and len(content) &gt; 0:
+                if isinstance(content[0], dict) and &#34;text&#34; in content[0]:
+                    return True, content[0][&#34;text&#34;]
+
+            return True, str(content)
+        except Exception as e:
+            return False, f&#34;Anthropic API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Provider for Anthropic API.</p>
+<p>Initialize the AI provider.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="create_python_project.utils.ai_integration.AnthropicProvider.generate_response"><code class="name flex">
+<span>def <span class="ident">generate_response</span></span>(<span>self, prompt: str) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;Generate a response using Anthropic API.&#34;&#34;&#34;
+    try:
+        if anthropic is None:
+            return (
+                False,
+                &#34;Anthropic package not installed. Run: pip install anthropic&#34;,
+            )
+
+        client = anthropic.Anthropic(api_key=self.api_key)
+
+        system_prompt = (
+            &#34;You are a helpful assistant that provides concise Python &#34;
+            &#34;project guidance.&#34;
+        )
+
+        message = client.messages.create(
+            model=self.model or &#34;claude-3-7-sonnet-20250219&#34;,
+            max_tokens=1000,
+            system=system_prompt,
+            messages=[{&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt}],
+        )
+
+        # Safely extract text to avoid union type errors
+        content = message.content
+        if content and len(content) &gt; 0:
+            if isinstance(content[0], dict) and &#34;text&#34; in content[0]:
+                return True, content[0][&#34;text&#34;]
+
+        return True, str(content)
+    except Exception as e:
+        return False, f&#34;Anthropic API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a response using Anthropic API.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="create_python_project.utils.ai_integration.DeepSeekProvider"><code class="flex name class">
+<span>class <span class="ident">DeepSeekProvider</span></span>
+<span>(</span><span>api_key: str | None = None, model: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeepSeekProvider(AIProvider):
+    &#34;&#34;&#34;Provider for DeepSeek API.&#34;&#34;&#34;
+
+    def _get_api_key_env_var(self) -&gt; str:
+        return &#34;DEEPSEEK_API_KEY&#34;
+
+    def _get_model_env_var(self) -&gt; str:
+        return &#34;DEEPSEEK_MODEL&#34;
+
+    def _get_display_name(self) -&gt; str:
+        &#34;&#34;&#34;Get a user-friendly display name for the model.&#34;&#34;&#34;
+        model = self.model or &#34;deepseek-chat&#34;
+        if &#34;deepseek-coder&#34; in model.lower():
+            return &#34;DeepSeek Coder&#34;
+        elif &#34;deepseek-chat&#34; in model.lower():
+            return &#34;DeepSeek Chat&#34;
+        elif &#34;deepseek-math&#34; in model.lower():
+            return &#34;DeepSeek Math&#34;
+        else:
+            return model
+
+    def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+        &#34;&#34;&#34;Generate a response using DeepSeek API.&#34;&#34;&#34;
+        try:
+            url = &#34;https://api.deepseek.com/v1/chat/completions&#34;
+            headers = {
+                &#34;Authorization&#34;: f&#34;Bearer {self.api_key}&#34;,
+                &#34;Content-Type&#34;: &#34;application/json&#34;,
+            }
+
+            payload = {
+                &#34;model&#34;: self.model or &#34;deepseek-chat&#34;,
+                &#34;messages&#34;: [
+                    {
+                        &#34;role&#34;: &#34;system&#34;,
+                        &#34;content&#34;: &#34;You are a helpful assistant that provides concise Python project guidance.&#34;,
+                    },
+                    {&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt},
+                ],
+                &#34;max_tokens&#34;: 1000,
+            }
+
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+
+            result = response.json()
+            return True, result.get(&#34;choices&#34;, [{}])[0].get(&#34;message&#34;, {}).get(
+                &#34;content&#34;, &#34;&#34;
+            )
+        except Exception as e:
+            return False, f&#34;DeepSeek API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Provider for DeepSeek API.</p>
+<p>Initialize the AI provider.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="create_python_project.utils.ai_integration.DeepSeekProvider.generate_response"><code class="name flex">
+<span>def <span class="ident">generate_response</span></span>(<span>self, prompt: str) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;Generate a response using DeepSeek API.&#34;&#34;&#34;
+    try:
+        url = &#34;https://api.deepseek.com/v1/chat/completions&#34;
+        headers = {
+            &#34;Authorization&#34;: f&#34;Bearer {self.api_key}&#34;,
+            &#34;Content-Type&#34;: &#34;application/json&#34;,
+        }
+
+        payload = {
+            &#34;model&#34;: self.model or &#34;deepseek-chat&#34;,
+            &#34;messages&#34;: [
+                {
+                    &#34;role&#34;: &#34;system&#34;,
+                    &#34;content&#34;: &#34;You are a helpful assistant that provides concise Python project guidance.&#34;,
+                },
+                {&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt},
+            ],
+            &#34;max_tokens&#34;: 1000,
+        }
+
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+
+        result = response.json()
+        return True, result.get(&#34;choices&#34;, [{}])[0].get(&#34;message&#34;, {}).get(
+            &#34;content&#34;, &#34;&#34;
+        )
+    except Exception as e:
+        return False, f&#34;DeepSeek API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a response using DeepSeek API.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="create_python_project.utils.ai_integration.GeminiProvider"><code class="flex name class">
+<span>class <span class="ident">GeminiProvider</span></span>
+<span>(</span><span>api_key: str | None = None, model: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GeminiProvider(AIProvider):
+    &#34;&#34;&#34;Provider for Google Gemini API.&#34;&#34;&#34;
+
+    def _get_api_key_env_var(self) -&gt; str:
+        return &#34;GOOGLE_API_KEY&#34;
+
+    def _get_model_env_var(self) -&gt; str:
+        return &#34;GEMINI_MODEL&#34;
+
+    def _get_display_name(self) -&gt; str:
+        &#34;&#34;&#34;Get a user-friendly display name for the model.&#34;&#34;&#34;
+        model = self.model or &#34;gemini-2.5-pro-preview-05-06&#34;
+        if &#34;gemini-pro&#34; in model.lower():
+            return &#34;Gemini Pro&#34;
+        elif &#34;gemini-2.5-pro&#34; in model.lower():
+            return &#34;Gemini 2.5 Pro&#34;
+        elif &#34;gemini-1.5-pro&#34; in model.lower():
+            return &#34;Gemini 1.5 Pro&#34;
+        else:
+            return model
+
+    def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+        &#34;&#34;&#34;Generate a response using Google Gemini API.&#34;&#34;&#34;
+        try:
+            if genai is None:
+                return (
+                    False,
+                    &#34;Google Generative AI package not installed. Run: pip install google-generativeai&#34;,
+                )
+
+            genai.configure(api_key=self.api_key)
+            model = genai.GenerativeModel(self.model or &#34;gemini-2.5-pro-preview-05-06&#34;)
+
+            response = model.generate_content(
+                contents=[{&#34;role&#34;: &#34;user&#34;, &#34;parts&#34;: [prompt]}],
+            )
+
+            # Safely access text attribute
+            if hasattr(response, &#34;text&#34;):
+                return True, response.text
+            else:
+                parts = getattr(response, &#34;parts&#34;, [])
+                if parts and len(parts) &gt; 0:
+                    return True, str(parts[0])
+                return True, str(response)
+        except Exception as e:
+            return False, f&#34;Gemini API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Provider for Google Gemini API.</p>
+<p>Initialize the AI provider.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="create_python_project.utils.ai_integration.GeminiProvider.generate_response"><code class="name flex">
+<span>def <span class="ident">generate_response</span></span>(<span>self, prompt: str) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;Generate a response using Google Gemini API.&#34;&#34;&#34;
+    try:
+        if genai is None:
+            return (
+                False,
+                &#34;Google Generative AI package not installed. Run: pip install google-generativeai&#34;,
+            )
+
+        genai.configure(api_key=self.api_key)
+        model = genai.GenerativeModel(self.model or &#34;gemini-2.5-pro-preview-05-06&#34;)
+
+        response = model.generate_content(
+            contents=[{&#34;role&#34;: &#34;user&#34;, &#34;parts&#34;: [prompt]}],
+        )
+
+        # Safely access text attribute
+        if hasattr(response, &#34;text&#34;):
+            return True, response.text
+        else:
+            parts = getattr(response, &#34;parts&#34;, [])
+            if parts and len(parts) &gt; 0:
+                return True, str(parts[0])
+            return True, str(response)
+    except Exception as e:
+        return False, f&#34;Gemini API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a response using Google Gemini API.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="create_python_project.utils.ai_integration.OpenAIProvider"><code class="flex name class">
+<span>class <span class="ident">OpenAIProvider</span></span>
+<span>(</span><span>api_key: str | None = None, model: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OpenAIProvider(AIProvider):
+    &#34;&#34;&#34;Provider for OpenAI API.&#34;&#34;&#34;
+
+    def _get_api_key_env_var(self) -&gt; str:
+        return &#34;OPENAI_API_KEY&#34;
+
+    def _get_model_env_var(self) -&gt; str:
+        return &#34;OPENAI_MODEL&#34;
+
+    def _get_display_name(self) -&gt; str:
+        &#34;&#34;&#34;Get a user-friendly display name for the model.&#34;&#34;&#34;
+        model = self.model or &#34;o4-mini-2025-04-16&#34;
+        if &#34;o4-mini&#34; in model.lower():
+            return &#34;GPT-4o-mini&#34;
+        elif &#34;o4&#34; in model.lower():
+            return &#34;GPT-4o&#34;
+        elif &#34;gpt-4&#34; in model.lower():
+            return &#34;GPT-4&#34;
+        elif &#34;gpt-3.5&#34; in model.lower():
+            return &#34;GPT-3.5 Turbo&#34;
+        else:
+            return model
+
+    def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+        &#34;&#34;&#34;Generate a response using OpenAI API.&#34;&#34;&#34;
+        try:
+            if openai is None:
+                return False, &#34;OpenAI package not installed. Run: pip install openai&#34;
+
+            openai.api_key = self.api_key
+
+            response = openai.chat.completions.create(
+                model=self.model or &#34;o4-mini-2025-04-16&#34;,
+                messages=[
+                    {
+                        &#34;role&#34;: &#34;system&#34;,
+                        &#34;content&#34;: &#34;You are a helpful assistant that provides concise Python project guidance.&#34;,
+                    },
+                    {&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt},
+                ],
+                temperature=0.7,
+                max_tokens=1000,
+            )
+
+            # Ensure we&#39;re returning a string
+            content = str(response.choices[0].message.content or &#34;&#34;)
+            return True, content
+        except Exception as e:
+            return False, f&#34;OpenAI API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Provider for OpenAI API.</p>
+<p>Initialize the AI provider.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="create_python_project.utils.ai_integration.OpenAIProvider.generate_response"><code class="name flex">
+<span>def <span class="ident">generate_response</span></span>(<span>self, prompt: str) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;Generate a response using OpenAI API.&#34;&#34;&#34;
+    try:
+        if openai is None:
+            return False, &#34;OpenAI package not installed. Run: pip install openai&#34;
+
+        openai.api_key = self.api_key
+
+        response = openai.chat.completions.create(
+            model=self.model or &#34;o4-mini-2025-04-16&#34;,
+            messages=[
+                {
+                    &#34;role&#34;: &#34;system&#34;,
+                    &#34;content&#34;: &#34;You are a helpful assistant that provides concise Python project guidance.&#34;,
+                },
+                {&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt},
+            ],
+            temperature=0.7,
+            max_tokens=1000,
+        )
+
+        # Ensure we&#39;re returning a string
+        content = str(response.choices[0].message.content or &#34;&#34;)
+        return True, content
+    except Exception as e:
+        return False, f&#34;OpenAI API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a response using OpenAI API.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="create_python_project.utils.ai_integration.PerplexityProvider"><code class="flex name class">
+<span>class <span class="ident">PerplexityProvider</span></span>
+<span>(</span><span>api_key: str | None = None, model: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PerplexityProvider(AIProvider):
+    &#34;&#34;&#34;Provider for Perplexity API.&#34;&#34;&#34;
+
+    def _get_api_key_env_var(self) -&gt; str:
+        return &#34;PERPLEXITY_API_KEY&#34;
+
+    def _get_model_env_var(self) -&gt; str:
+        return &#34;PERPLEXITY_MODEL&#34;
+
+    def _get_display_name(self) -&gt; str:
+        &#34;&#34;&#34;Get a user-friendly display name for the model.&#34;&#34;&#34;
+        model = self.model or &#34;sonar&#34;
+        if &#34;sonar-small&#34; in model.lower():
+            return &#34;Sonar Small&#34;
+        elif &#34;sonar-medium&#34; in model.lower() or model.lower() == &#34;sonar&#34;:
+            return &#34;Sonar&#34;
+        elif &#34;sonar-large&#34; in model.lower():
+            return &#34;Sonar Large&#34;
+        else:
+            return model
+
+    def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+        &#34;&#34;&#34;Generate a response using Perplexity API.&#34;&#34;&#34;
+        try:
+            if not self.api_key:
+                return (
+                    False,
+                    &#34;Perplexity API key not found. Please check your PERPLEXITY_API_KEY environment variable.&#34;,
+                )
+
+            url = &#34;https://api.perplexity.ai/chat/completions&#34;
+            headers = {
+                &#34;Authorization&#34;: f&#34;Bearer {self.api_key}&#34;,
+                &#34;Content-Type&#34;: &#34;application/json&#34;,
+            }
+
+            payload = {
+                &#34;model&#34;: self.model or &#34;sonar&#34;,
+                &#34;messages&#34;: [
+                    {
+                        &#34;role&#34;: &#34;system&#34;,
+                        &#34;content&#34;: &#34;You are a helpful assistant that provides concise Python project guidance.&#34;,
+                    },
+                    {&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt},
+                ],
+                &#34;max_tokens&#34;: 1000,
+            }
+
+            # Log request details for debugging (without API key)
+            logging.debug(
+                f&#34;Sending request to Perplexity API with model: {payload[&#39;model&#39;]}&#34;
+            )
+
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+
+            # Check for HTTP errors
+            response.raise_for_status()
+
+            result = response.json()
+            logging.debug(f&#34;Received response from Perplexity API: {result}&#34;)
+
+            if &#34;choices&#34; not in result or not result.get(&#34;choices&#34;):
+                return (
+                    False,
+                    &#34;Perplexity API returned an empty response. Please try again.&#34;,
+                )
+
+            content = (
+                result.get(&#34;choices&#34;, [{}])[0].get(&#34;message&#34;, {}).get(&#34;content&#34;, &#34;&#34;)
+            )
+            if not content:
+                return False, &#34;Perplexity API returned no content. Please try again.&#34;
+
+            return True, content
+        except requests.exceptions.Timeout:
+            return False, &#34;Perplexity API request timed out. Please try again later.&#34;
+        except requests.exceptions.RequestException as e:
+            return False, f&#34;Perplexity API request error: {str(e)}&#34;
+        except ValueError as e:
+            return False, f&#34;Perplexity API JSON parsing error: {str(e)}&#34;
+        except Exception as e:
+            return False, f&#34;Perplexity API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Provider for Perplexity API.</p>
+<p>Initialize the AI provider.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="create_python_project.utils.ai_integration.PerplexityProvider.generate_response"><code class="name flex">
+<span>def <span class="ident">generate_response</span></span>(<span>self, prompt: str) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_response(self, prompt: str) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;Generate a response using Perplexity API.&#34;&#34;&#34;
+    try:
+        if not self.api_key:
+            return (
+                False,
+                &#34;Perplexity API key not found. Please check your PERPLEXITY_API_KEY environment variable.&#34;,
+            )
+
+        url = &#34;https://api.perplexity.ai/chat/completions&#34;
+        headers = {
+            &#34;Authorization&#34;: f&#34;Bearer {self.api_key}&#34;,
+            &#34;Content-Type&#34;: &#34;application/json&#34;,
+        }
+
+        payload = {
+            &#34;model&#34;: self.model or &#34;sonar&#34;,
+            &#34;messages&#34;: [
+                {
+                    &#34;role&#34;: &#34;system&#34;,
+                    &#34;content&#34;: &#34;You are a helpful assistant that provides concise Python project guidance.&#34;,
+                },
+                {&#34;role&#34;: &#34;user&#34;, &#34;content&#34;: prompt},
+            ],
+            &#34;max_tokens&#34;: 1000,
+        }
+
+        # Log request details for debugging (without API key)
+        logging.debug(
+            f&#34;Sending request to Perplexity API with model: {payload[&#39;model&#39;]}&#34;
+        )
+
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+
+        # Check for HTTP errors
+        response.raise_for_status()
+
+        result = response.json()
+        logging.debug(f&#34;Received response from Perplexity API: {result}&#34;)
+
+        if &#34;choices&#34; not in result or not result.get(&#34;choices&#34;):
+            return (
+                False,
+                &#34;Perplexity API returned an empty response. Please try again.&#34;,
+            )
+
+        content = (
+            result.get(&#34;choices&#34;, [{}])[0].get(&#34;message&#34;, {}).get(&#34;content&#34;, &#34;&#34;)
+        )
+        if not content:
+            return False, &#34;Perplexity API returned no content. Please try again.&#34;
+
+        return True, content
+    except requests.exceptions.Timeout:
+        return False, &#34;Perplexity API request timed out. Please try again later.&#34;
+    except requests.exceptions.RequestException as e:
+        return False, f&#34;Perplexity API request error: {str(e)}&#34;
+    except ValueError as e:
+        return False, f&#34;Perplexity API JSON parsing error: {str(e)}&#34;
+    except Exception as e:
+        return False, f&#34;Perplexity API error: {str(e)}&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a response using Perplexity API.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="create_python_project.utils" href="index.html">create_python_project.utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.get_available_ai_providers" href="#create_python_project.utils.ai_integration.get_available_ai_providers">get_available_ai_providers</a></code></li>
+<li><code><a title="create_python_project.utils.ai_integration.select_ai_provider" href="#create_python_project.utils.ai_integration.select_ai_provider">select_ai_provider</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="create_python_project.utils.ai_integration.AIProvider" href="#create_python_project.utils.ai_integration.AIProvider">AIProvider</a></code></h4>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.AIProvider.generate_response" href="#create_python_project.utils.ai_integration.AIProvider.generate_response">generate_response</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="create_python_project.utils.ai_integration.AnthropicProvider" href="#create_python_project.utils.ai_integration.AnthropicProvider">AnthropicProvider</a></code></h4>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.AnthropicProvider.generate_response" href="#create_python_project.utils.ai_integration.AnthropicProvider.generate_response">generate_response</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="create_python_project.utils.ai_integration.DeepSeekProvider" href="#create_python_project.utils.ai_integration.DeepSeekProvider">DeepSeekProvider</a></code></h4>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.DeepSeekProvider.generate_response" href="#create_python_project.utils.ai_integration.DeepSeekProvider.generate_response">generate_response</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="create_python_project.utils.ai_integration.GeminiProvider" href="#create_python_project.utils.ai_integration.GeminiProvider">GeminiProvider</a></code></h4>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.GeminiProvider.generate_response" href="#create_python_project.utils.ai_integration.GeminiProvider.generate_response">generate_response</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="create_python_project.utils.ai_integration.OpenAIProvider" href="#create_python_project.utils.ai_integration.OpenAIProvider">OpenAIProvider</a></code></h4>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.OpenAIProvider.generate_response" href="#create_python_project.utils.ai_integration.OpenAIProvider.generate_response">generate_response</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="create_python_project.utils.ai_integration.PerplexityProvider" href="#create_python_project.utils.ai_integration.PerplexityProvider">PerplexityProvider</a></code></h4>
+<ul class="">
+<li><code><a title="create_python_project.utils.ai_integration.PerplexityProvider.generate_response" href="#create_python_project.utils.ai_integration.PerplexityProvider.generate_response">generate_response</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
