@@ -212,8 +212,25 @@ except Exception as e:
         commit_message="Update project files"
     fi
 
-    # Return the commit message without the colored output
-    echo "$commit_message"
+    # Filter out debug messages and return the clean commit message
+    # Remove lines containing debug messages and AI responses that aren't proper commit messages
+    filtered_message=$(echo "$commit_message" |
+        grep -v "Generating AI commit message" |
+        grep -v "Using project's AI integration utilities" |
+        grep -v "Certainly!" |
+        grep -v "I'll need" |
+        grep -v "In order to generate" |
+        grep -v "I need more information" |
+        grep -v "Please provide more details")
+
+    # If filtering removed everything or the message is asking for more information, use a default message
+    if [ -z "$filtered_message" ] || echo "$filtered_message" | grep -q "need more information"; then
+        echo "Update project files"
+    else
+        # Trim leading and trailing whitespace
+        filtered_message=$(echo "$filtered_message" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+        echo "$filtered_message"
+    fi
 }
 
 # Banner
