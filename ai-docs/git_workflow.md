@@ -130,3 +130,7 @@ If you encounter issues with the workflow:
 ## Last Updated
 
 This documentation was updated on: 2025-05-14
+
+---
+
+**Note:** This file has been automatically truncated to 150 lines maximum.
