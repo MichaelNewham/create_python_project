@@ -12,14 +12,20 @@ Contains AI-related documentation, API documentation, and development notes.
 ```
 ai-docs/
 ├── aboutthisfolder.md
-└── api/
+├── api/
+│   ├── create_python_project/
+│   │   ├── create_python_project.html
+│   │   ├── index.html
+│   │   └── utils/
+│   ├── doc_updates.log
+│   └── project_structure.md
 ├── api_documentation.md
 ├── convo.md
+├── convo.md.bak
 ├── git_workflow.md
-├── updated_files.txt
-
+└── updated_files.txt
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-14 22:17:41
+This documentation was automatically generated on: 2025-05-15 00:19:46

@@ -39,6 +39,5 @@
         "**/node_modules": true
     },
     "editor.rulers": [88],
-    "editor.formatOnSave": true,
     "python.analysis.typeCheckingMode": "basic"
 }

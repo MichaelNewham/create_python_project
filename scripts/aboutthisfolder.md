@@ -22,10 +22,9 @@ scripts/
 ├── remove_large_file.sh
 ├── run_mypy.sh
 ├── truncate_md_files.sh
-├── update_documentation.sh
-
+└── update_documentation.sh
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-14 22:17:41
+This documentation was automatically generated on: 2025-05-15 00:19:46

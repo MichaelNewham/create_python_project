@@ -22,26 +22,6 @@
             }
         },
         {
-            "label": "Commit with Docs (Skip Pylint)",
-            "type": "shell",
-            "command": "${workspaceFolder}/scripts/commit_with_docs.sh \"${input:commitMessage}\"",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "label": "Commit with Docs (Fixed)",
-            "type": "shell",
-            "command": "${workspaceFolder}/scripts/commit_with_docs_fix.sh \"${input:commitMessage}\"",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
             "label": "Run Main App",
             "type": "shell",
             "command": "poetry run python -m create_python_project.create_python_project",
@@ -52,13 +32,7 @@
             }
         },
         {
-            "label": "Install Deps",
-            "type": "shell",
-            "command": "poetry install",
-            "problemMatcher": []
-        },
-        {
-            "label": "Install Dev Deps",
+            "label": "Install All Dependencies",
             "type": "shell",
             "command": "poetry install --with dev",
             "problemMatcher": []
@@ -79,12 +53,6 @@
             "label": "Check Types",
             "type": "shell",
             "command": "poetry run mypy --config-file=${workspaceFolder}/.config/mypy.ini ${workspaceFolder}/src/create_python_project",
-            "problemMatcher": []
-        },
-        {
-            "label": "Setup Poetry",
-            "type": "shell",
-            "command": "poetry install",
             "problemMatcher": []
         },
         {
@@ -113,22 +81,6 @@
             "command": "poetry build",
             "problemMatcher": [],
             "group": "build"
-        },
-        {
-            "label": "Check All Code",
-            "type": "shell",
-            "command": "pre-commit run --all-files",
-            "problemMatcher": []
-        },
-        {
-            "label": "Check, Commit, Push",
-            "type": "shell",
-            "command": "bash -c 'cd ${workspaceFolder} && git add . && ./scripts/update_documentation.sh && git add . && cp .pre-commit-config.yaml.no-docs .pre-commit-config.yaml.temp && pre-commit run --all-files --config .pre-commit-config.yaml.temp && if [ $? -eq 0 ]; then rm .pre-commit-config.yaml.temp && git commit -m \"${input:commitMessage}\" && ./scripts/post_commit_push.sh; else rm .pre-commit-config.yaml.temp && echo \"\\n❌ Error: Pre-commit hooks failed. Please fix the issues before committing.\"; exit 1; fi'",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
         },
         {
             "label": "Test Checks Only",

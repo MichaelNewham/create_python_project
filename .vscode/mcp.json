@@ -44,7 +44,7 @@
       "args": ["-y", "server-perplexity-ask"],
       "env": {
         "PERPLEXITY_API_KEY": "${input:perplexity-key}",
-        "PERPLEXITY_MODEL": "sonar"
+        "PERPLEXITY_MODEL": "${input:perplexity-model}"
       },
       "envFile": "${workspaceFolder}/.env"
     }
