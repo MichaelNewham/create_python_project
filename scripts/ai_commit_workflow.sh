@@ -343,15 +343,19 @@ push_to_remote() {
 
     if [[ "$force_push" == "true" ]]; then
         print_message "$PURPLE" "Force pushing to $remote..."
-        git push --force $remote || {
+        if ! git push --force $remote; then
             print_message "$YELLOW" "⚠️ Force push to $remote failed. This might be due to branch protection."
             print_message "$YELLOW" "Trying normal push instead..."
-            git push $remote || print_message "$YELLOW" "⚠️ Normal push to $remote also failed, continuing anyway..."
-        }
+            if ! git push $remote; then
+                print_message "$YELLOW" "⚠️ Normal push to $remote also failed, continuing anyway..."
+            fi
+        fi
     else
         print_message "$PURPLE" "Pushing to $remote..."
-        git push $remote || print_message "$YELLOW" "⚠️ Push to $remote failed, continuing anyway..."
-    }
+        if ! git push $remote; then
+            print_message "$YELLOW" "⚠️ Push to $remote failed, continuing anyway..."
+        fi
+    fi
 }
 
 # Ask if force push is needed
