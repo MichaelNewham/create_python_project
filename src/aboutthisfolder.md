@@ -12,10 +12,20 @@ Contains the main application code, utilities, and implementation of all feature
 ```
 src/
 ├── aboutthisfolder.md
-└── create_python_project/
-
+└── create_python_project
+    ├── create_python_project.py
+    ├── __init__.py
+    └── utils
+        ├── ai_integration.py
+        ├── ai_prompts.py
+        ├── cli.py
+        ├── config.py
+        ├── core_project_builder.py
+        ├── __init__.py
+        ├── logging.py
+        └── templates.py
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-14 22:17:41
+This documentation was automatically generated on: 2025-05-15 00:19:46

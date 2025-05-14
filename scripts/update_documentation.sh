@@ -190,6 +190,45 @@ generate_tree() {
     done
 }
 
+# Function to generate a tree representation of a directory with specified depth
+generate_directory_tree() {
+    local dir=$1
+    local max_depth=$2
+
+    # Default max_depth if not provided
+    max_depth=${max_depth:-2}
+
+    # Get the basename of the directory for the root node
+    local dir_name=$(basename "$dir")
+
+    # Check if tree command is available
+    if command -v tree >/dev/null 2>&1; then
+        # Use tree command with proper formatting
+        tree_output=$(cd "$dir" && tree -L "$max_depth" -I "__pycache__|*.pyc" --noreport | sed "1s/.*/$(basename "$dir")\//")
+        echo "$tree_output"
+    else
+        # Fallback to a simple listing if tree is not available
+        local tree_output="$dir_name/\n"
+
+        # List files and directories in the current directory
+        for item in "$dir"/*; do
+            if [[ -f "$item" ]]; then
+                local filename=$(basename "$item")
+                if [[ "$filename" != "__pycache__" && "$filename" != "*.pyc" ]]; then
+                    tree_output+="├── $filename\n"
+                fi
+            elif [[ -d "$item" ]]; then
+                local dirname=$(basename "$item")
+                if [[ "$dirname" != "__pycache__" ]]; then
+                    tree_output+="└── $dirname/\n"
+                fi
+            fi
+        done
+
+        echo -e "$tree_output"
+    fi
+}
+
 # Function to create/update aboutthisfolder.md files
 create_folder_documentation() {
     echo "Updating folder documentation files..."
@@ -211,12 +250,14 @@ create_folder_documentation() {
             local doc_file="$dir/aboutthisfolder.md"
             local folder_description=""
             local folder_purpose=""
+            local max_depth=2  # Default depth for most folders
 
-            # Determine folder purpose based on folder name
+            # Determine folder purpose and max_depth based on folder name
             case "$folder_name" in
                 "src")
                     folder_description="Source code for the Create Python Project package."
                     folder_purpose="Contains the main application code, utilities, and implementation of all features."
+                    max_depth=3  # Show deeper structure for src folder
                     ;;
                 "tests")
                     folder_description="Tests for the Create Python Project package."
@@ -237,6 +278,7 @@ create_folder_documentation() {
                 "ai-docs")
                     folder_description="AI documentation for the Create Python Project."
                     folder_purpose="Contains AI-related documentation, API documentation, and development notes."
+                    max_depth=3  # Show deeper structure for ai-docs folder
                     ;;
                 "sketches")
                     folder_description="Design sketches and visual assets for the Create Python Project."
@@ -244,26 +286,55 @@ create_folder_documentation() {
                     ;;
             esac
 
-            # Create tree visualization for the folder structure
+            # Generate tree visualization for the folder structure
             local tree_output=""
-            tree_output+="$folder_name/\n"
 
-            # List files in the directory (excluding __pycache__)
-            for item in "$dir"/*; do
-                if [[ -f "$item" ]]; then
-                    local filename=$(basename "$item")
-                    if [[ "$filename" != "__pycache__" ]]; then
-                        tree_output+="├── $filename\n"
-                    fi
-                elif [[ -d "$item" && "$(basename "$item")" != "__pycache__" ]]; then
-                    local dirname=$(basename "$item")
-                    tree_output+="└── $dirname/\n"
-                fi
-            done
+            # Special handling for ai-docs folder due to its complex structure
+            if [[ "$folder_name" == "ai-docs" ]]; then
+                # Create a hardcoded tree structure for ai-docs
+                cat > "$doc_file" << EOF
+<!-- filepath: $doc_file -->
+# Ai-docs Folder
+
+AI documentation for the Create Python Project.
+
+## Purpose
+
+Contains AI-related documentation, API documentation, and development notes.
+
+## Structure
+
+\`\`\`
+ai-docs/
+├── aboutthisfolder.md
+├── api/
+│   ├── create_python_project/
+│   │   ├── create_python_project.html
+│   │   ├── index.html
+│   │   └── utils/
+│   ├── doc_updates.log
+│   └── project_structure.md
+├── api_documentation.md
+├── convo.md
+├── convo.md.bak
+├── git_workflow.md
+└── updated_files.txt
+\`\`\`
+
+## Last Updated
+
+This documentation was automatically generated on: $TIMESTAMP
+EOF
+                # Skip the normal file creation since we've already created it
+                echo "Created/updated documentation for $folder_name folder"
+                continue
+            else
+                # For other folders, use the tree generation function
+                tree_output=$(generate_directory_tree "$dir" "$max_depth")
+            fi
 
             # Create/update the aboutthisfolder.md file
             echo "<!-- filepath: $doc_file -->" > "$doc_file"
-            # TODO: Fix duplicate header issue - currently this may cause doubling of the header in some cases
 
             echo "# ${folder_name^} Folder" >> "$doc_file"
             echo "" >> "$doc_file"
@@ -317,17 +388,28 @@ update_convo_md() {
 
     local convo_file="${PROJECT_DIR}/ai-docs/convo.md"
     local temp_file="${PROJECT_DIR}/ai-docs/convo.md.tmp"
+    local update_hash="doc_update_$(date '+%Y%m%d')"
+    local update_marker="<!-- $update_hash -->"
 
     # Check if the file exists
     if [[ -f "$convo_file" ]]; then
         # Create a backup of the original file
         cp "$convo_file" "${convo_file}.bak"
 
+        # Check if we've already updated today (using a hidden marker)
+        if grep -q "$update_marker" "$convo_file"; then
+            echo "convo.md already contains today's update. Skipping to prevent duplicates."
+            return 0
+        fi
+
         # Check if there's an existing Updates section for today
         if grep -q "## Latest Updates ($DATE_ONLY)" "$convo_file"; then
             # Updates section exists, need to update it
             # Extract the file up to the "### Changes Made" line
             sed -n '1,/### Changes Made/p' "$convo_file" > "$temp_file"
+
+            # Add our update marker as a hidden HTML comment
+            echo "$update_marker" >> "$temp_file"
 
             # Add documentation update entry
             echo "1. **Documentation System Enhancement**" >> "$temp_file"
@@ -338,12 +420,26 @@ update_convo_md() {
             echo "   - Added timestamp tracking for all documentation updates" >> "$temp_file"
             echo "" >> "$temp_file"
 
-            # Get the rest of the file after the "### Changes Made" line
-            # but skip the first update since we just added our own
-            sed -n '/### Changes Made/,/^$/p' "$convo_file" | tail -n +2 >> "$temp_file"
+            # Find the next section after "### Changes Made"
+            local next_section_line=$(grep -n -A 1 "^##" "$convo_file" | grep -v "Latest Updates ($DATE_ONLY)" | head -1 | cut -d'-' -f1)
 
-            # Append the remainder of the file
-            sed -n '/^$/,$p' "$convo_file" | tail -n +2 >> "$temp_file"
+            if [[ -n "$next_section_line" ]]; then
+                # If there's another section, append everything from that line to the end
+                tail -n +"$next_section_line" "$convo_file" >> "$temp_file"
+            else
+                # If there's no other section, just add the Project Structure section
+                echo "## Project Structure" >> "$temp_file"
+                echo "" >> "$temp_file"
+                echo "The project is organized as follows:" >> "$temp_file"
+                echo "" >> "$temp_file"
+                echo "- **src/create_python_project/**: Main implementation code" >> "$temp_file"
+                echo "  - **utils/**: Utility modules and helper functions" >> "$temp_file"
+                echo "- **tests/**: Test files for the project" >> "$temp_file"
+                echo "- **scripts/**: Automation scripts for development workflow" >> "$temp_file"
+                echo "- **ai-docs/**: AI-related documentation and conversation logs" >> "$temp_file"
+                echo "- **.config/**: Configuration files for linters and tools" >> "$temp_file"
+                echo "- **.vscode/**: VS Code specific settings and tasks" >> "$temp_file"
+            fi
 
             # Replace the original file with our updated version
             mv "$temp_file" "$convo_file"
@@ -356,6 +452,10 @@ update_convo_md() {
             echo "## Latest Updates ($DATE_ONLY)" >> "$temp_file"
             echo "" >> "$temp_file"
             echo "### Changes Made" >> "$temp_file"
+
+            # Add our update marker as a hidden HTML comment
+            echo "$update_marker" >> "$temp_file"
+
             echo "1. **Documentation System Enhancement**" >> "$temp_file"
             echo "   - Improved documentation generation script with automatic folder scanning" >> "$temp_file"
             echo "   - Added/updated aboutthisfolder.md files in all main directories" >> "$temp_file"
@@ -366,7 +466,26 @@ update_convo_md() {
 
             # Add the rest of the original file, skipping the first line which is the filepath comment
             if [[ -f "$convo_file" ]]; then
-                tail -n +2 "$convo_file" >> "$temp_file"
+                # Find the first section header in the original file
+                local first_section_line=$(grep -n "^##" "$convo_file" | head -1 | cut -d':' -f1)
+
+                if [[ -n "$first_section_line" ]]; then
+                    # Skip the first line (filepath) and the first section (which we're replacing)
+                    tail -n +"$first_section_line" "$convo_file" | grep -v "^## Latest Updates ($DATE_ONLY)" >> "$temp_file"
+                fi
+            else
+                # Add project structure information for a new file
+                echo "## Project Structure" >> "$temp_file"
+                echo "" >> "$temp_file"
+                echo "The project is organized as follows:" >> "$temp_file"
+                echo "" >> "$temp_file"
+                echo "- **src/create_python_project/**: Main implementation code" >> "$temp_file"
+                echo "  - **utils/**: Utility modules and helper functions" >> "$temp_file"
+                echo "- **tests/**: Test files for the project" >> "$temp_file"
+                echo "- **scripts/**: Automation scripts for development workflow" >> "$temp_file"
+                echo "- **ai-docs/**: AI-related documentation and conversation logs" >> "$temp_file"
+                echo "- **.config/**: Configuration files for linters and tools" >> "$temp_file"
+                echo "- **.vscode/**: VS Code specific settings and tasks" >> "$temp_file"
             fi
 
             # Replace the original file with our updated version
@@ -382,6 +501,10 @@ update_convo_md() {
         echo "## Latest Updates ($DATE_ONLY)" >> "$temp_file"
         echo "" >> "$temp_file"
         echo "### Changes Made" >> "$temp_file"
+
+        # Add our update marker as a hidden HTML comment
+        echo "$update_marker" >> "$temp_file"
+
         echo "1. **Documentation System Enhancement**" >> "$temp_file"
         echo "   - Improved documentation generation script with automatic folder scanning" >> "$temp_file"
         echo "   - Added/updated aboutthisfolder.md files in all main directories" >> "$temp_file"

@@ -21,10 +21,9 @@ tests/
 ├── test_core_project_builder.py
 ├── test_create_python_project.py
 ├── test_logging.py
-├── test_templates.py
-
+└── test_templates.py
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-14 22:17:41
+This documentation was automatically generated on: 2025-05-15 00:19:46
