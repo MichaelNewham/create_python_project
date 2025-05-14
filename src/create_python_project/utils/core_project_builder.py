@@ -166,7 +166,7 @@ build-backend = "poetry.core.masonry.api"
 
             # Create CLI module
             cli_file = os.path.join(package_dir, "cli.py")
-            with open(cli_file, "w") as file:
+            with open(cli_file, "w", encoding="utf-8") as file:
                 file.write(
                     f'''"""Command-line interface for {project_name}."""
 

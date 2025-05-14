@@ -76,7 +76,7 @@ def create_file_from_template(
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
         # Write the rendered content to the output file
-        with open(output_path, "w") as file:
+        with open(output_path, "w", encoding="utf-8") as file:
             file.write(rendered_content)
 
         return True, f"Created file at {output_path}"
@@ -168,12 +168,12 @@ def parse_arguments():
 def main():
     \"\"\"Main entry point for the application.\"\"\"
     args = parse_arguments()
-    
+
     if args.version:
         from $package_name import __version__
         print(f"$project_name version {__version__}")
         return 0
-    
+
     # Main application logic here
     print("Hello from $project_name!")
     return 0

@@ -26,7 +26,7 @@ def load_env_file(env_file: str = ".env") -> Dict[str, str]:
         return env_vars
 
     try:
-        with open(env_file, "r") as file:
+        with open(env_file, "r", encoding="utf-8") as file:
             for line in file:
                 line = line.strip()
 
@@ -68,7 +68,7 @@ def create_env_file(project_dir: str, variables: Dict[str, str]) -> Tuple[bool, 
     try:
         env_file_path = os.path.join(project_dir, ".env")
 
-        with open(env_file_path, "w") as file:
+        with open(env_file_path, "w", encoding="utf-8") as file:
             file.write("# Environment variables for the project\n\n")
 
             for key, value in variables.items():
@@ -80,7 +80,7 @@ def create_env_file(project_dir: str, variables: Dict[str, str]) -> Tuple[bool, 
 
         # Create a .env.example file without sensitive values
         example_path = os.path.join(project_dir, ".env.example")
-        with open(example_path, "w") as file:
+        with open(example_path, "w", encoding="utf-8") as file:
             file.write("# Example environment variables for the project\n")
             file.write("# Copy this file to .env and fill in the values\n\n")
 
@@ -93,13 +93,13 @@ def create_env_file(project_dir: str, variables: Dict[str, str]) -> Tuple[bool, 
         # Check if .gitignore exists and if .env is already in it
         gitignore_content = ""
         if os.path.exists(gitignore_path):
-            with open(gitignore_path, "r") as file:
+            with open(gitignore_path, "r", encoding="utf-8") as file:
                 gitignore_content = file.read()
 
         # Add .env to .gitignore if not already present
         updated = False
         if ".env" not in gitignore_content:
-            with open(gitignore_path, "a") as file:
+            with open(gitignore_path, "a", encoding="utf-8") as file:
                 if not gitignore_content.endswith("\n"):
                     file.write("\n")
                 file.write("\n# Environment variables\n.env\n")

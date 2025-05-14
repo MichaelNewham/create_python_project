@@ -231,7 +231,7 @@ class PerplexityProvider(AIProvider):
             response.raise_for_status()
 
             result = response.json()
-            logging.debug(f"Received response from Perplexity API: {result}")
+            logging.debug("Received response from Perplexity API: %s", result)
 
             if "choices" not in result or not result.get("choices"):
                 return (

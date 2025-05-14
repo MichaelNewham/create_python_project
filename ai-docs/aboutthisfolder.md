@@ -16,11 +16,13 @@ ai-docs/
 ├── api_documentation.md
 ├── convo.md
 ├── convo.md.bak
+├── convo.md.tmp
 ├── git_workflow.md
+├── sensitive_check_results.txt
 ├── updated_files.txt
 
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-14 17:57:26
+This documentation was automatically generated on: 2025-05-14 19:21:43
