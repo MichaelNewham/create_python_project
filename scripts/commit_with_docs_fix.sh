@@ -27,7 +27,7 @@ if [[ "$proceed" != "y" && "$proceed" != "Y" ]]; then
 else
     echo "Running documentation update..."
     ./scripts/update_documentation.sh
-    
+
     # Add documentation changes to git
     echo "Adding documentation changes to git"
     git add .
@@ -37,7 +37,7 @@ fi
 echo "3. Running pre-commit checks (without documentation hook)"
 # Use the modified pre-commit config
 cp .pre-commit-config.yaml .pre-commit-config.yaml.bak
-cp .pre-commit-config.yaml.no-docs .pre-commit-config.yaml
+cp .config/.pre-commit-config.yaml.no-docs .pre-commit-config.yaml
 
 # Run pre-commit
 pre-commit run --all-files

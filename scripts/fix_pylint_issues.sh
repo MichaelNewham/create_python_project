@@ -8,7 +8,7 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
 # Create a log file
-LOG_FILE="${PROJECT_DIR}/pylint_fixes.log"
+LOG_FILE="${PROJECT_DIR}/logs/pylint_fixes.log"
 echo "Starting pylint fixes at $(date)" > "$LOG_FILE"
 
 echo "Fixing pylint issues..."

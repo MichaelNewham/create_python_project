@@ -129,7 +129,6 @@ except Exception as e:
     print('Update project files')
     sys.exit(0)
 ")
-        echo "$commit_message"
     # Fallback to direct OpenAI API if project utilities aren't available
     elif command_exists python && python -c "import openai" >/dev/null 2>&1; then
         print_message "$CYAN" "Using direct OpenAI API..."
@@ -165,7 +164,6 @@ except Exception as e:
     print('Update project files')
     sys.exit(0)
 ")
-        echo "$commit_message"
     # Try Anthropic if OpenAI isn't available
     elif command_exists python && python -c "import anthropic" >/dev/null 2>&1; then
         print_message "$CYAN" "Using Anthropic API..."
@@ -208,12 +206,14 @@ except Exception as e:
     print('Update project files')
     sys.exit(0)
 ")
-        echo "$commit_message"
     else
         # Fallback to a simple commit message
         print_message "$YELLOW" "No AI providers available. Using default commit message."
-        echo "Update project files"
+        commit_message="Update project files"
     fi
+
+    # Return the commit message without the colored output
+    echo "$commit_message"
 }
 
 # Banner
@@ -276,12 +276,12 @@ print_message "$YELLOW" "Removing backup and temporary files..."
 rm -f ai-docs/*.bak ai-docs/*.tmp mypy_report.txt pylint_report.txt
 
 # Create a temporary pre-commit config without the documentation hook
-if [ -f ".pre-commit-config.yaml.no-docs" ]; then
+if [ -f ".config/.pre-commit-config.yaml.no-docs" ]; then
     cp .pre-commit-config.yaml .pre-commit-config.yaml.bak
-    cp .pre-commit-config.yaml.no-docs .pre-commit-config.yaml
+    cp .config/.pre-commit-config.yaml.no-docs .pre-commit-config.yaml
     RESTORE_CONFIG=true
 else
-    print_message "$YELLOW" "Warning: .pre-commit-config.yaml.no-docs not found. Using default config."
+    print_message "$YELLOW" "Warning: .config/.pre-commit-config.yaml.no-docs not found. Using default config."
     RESTORE_CONFIG=false
 fi
 
@@ -414,7 +414,11 @@ fi
 
 # Step 4: Generate AI commit message
 print_message "$BLUE" "💭 Step 4: Generating commit message"
+
+# Generate the commit message without the colored output
 COMMIT_MESSAGE=$(generate_ai_commit_message)
+
+# Display the commit message
 print_message "$GREEN" "Generated commit message: "
 echo ""
 echo "$COMMIT_MESSAGE" | sed 's/^/    /'

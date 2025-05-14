@@ -1,4 +1,1 @@
-[flake8]
-exclude = .venv,venv,__pycache__,build,dist
-max-line-length = 150
-extend-ignore = W293,E231,E222,E272,E713
+.config/.flake8
