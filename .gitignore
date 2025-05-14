@@ -67,3 +67,26 @@ venv.bak/
 
 # Logs
 *.log
+
+# Documentation build
+docs/
+.docs/
+
+# Temporary and backup files
+*.bak
+*.tmp
+*_report.txt
+.pre-commit-config.yaml.no-docs
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Pre-commit
+# .pre-commit-config.yaml  # Commented out to allow tracking the pre-commit config
+
+# IDE/Editor specific
+*.code-workspace
+
+# Augment specific
+.augmentignore

@@ -1,0 +1,35 @@
+# Configuration for post-commit actions
+
+# General settings
+settings:
+  # Whether to auto-stage documentation changes after they're generated
+  auto_stage: true
+  
+  # Whether to automatically create a commit for documentation changes
+  auto_commit: true
+  
+  # Whether to automatically push changes after commit
+  auto_push: true
+  
+  # Default commit message for documentation updates
+  doc_commit_message: "📚 Update documentation [Auto-generated]"
+
+# Remote repositories to push to
+remotes:
+  # Push to all remotes by default
+  push_all: true
+  
+  # Specific remotes (used if push_all is false)
+  specific:
+    - origin
+
+# Additional actions to run after commit
+actions:
+  # Run tests after commit
+  run_tests: false
+  
+  # Build package after commit
+  build_package: false
+  
+  # Send notification after successful push
+  notify: false

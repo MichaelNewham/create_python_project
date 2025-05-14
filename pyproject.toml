@@ -13,6 +13,8 @@ setuptools = "^80.1.0"
 openai = "^1.78.0"
 requests = "^2.32.3"
 anthropic = "^0.51.0"
+rich = "^14.0.0"
+prompt-toolkit = "^3.0.51"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -22,12 +24,14 @@ detect-secrets = "^1.5.0"
 pdoc = "^15.0.3"
 pytest-cov = "^6.1.1"
 pdoc3 = "^0.11.6"
-mypy = "^1.15.0"
 types-requests = "^2.32.0.20250328"
 types-wtforms = "^3.2.1.20250401"
 types-python-jose = "^3.4.0.20250224"
 types-passlib = "^1.7.7.20250408"
 pre-commit = "^4.2.0"
+mypy = "^1.15.0"
+ruff = "^0.11.9"
+flake8 = "^7.2.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -35,3 +39,26 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 create-python-project = "create_python_project.create_python_project:main"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = "google.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "anthropic.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "openai.*"
+ignore_missing_imports = true

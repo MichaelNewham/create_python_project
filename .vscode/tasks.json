@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Create Python Project",
+            "label": "AI Commit Workflow",
             "type": "shell",
-            "command": "poetry run python -m create_python_project.create_python_project",
+            "command": "${workspaceFolder}/scripts/ai_commit_workflow.sh",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -12,58 +12,98 @@
             }
         },
         {
-            "label": "Install Dependencies",
+            "label": "Force Commit with Docs",
+            "type": "shell",
+            "command": "bash -c 'cd ${workspaceFolder} && git add . && ./scripts/update_documentation.sh && git add . && git commit -m \"${input:commitMessage}\" && ./scripts/post_commit_push.sh'",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Commit with Docs (Skip Pylint)",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/commit_with_docs.sh \"${input:commitMessage}\"",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Commit with Docs (Fixed)",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/commit_with_docs_fix.sh \"${input:commitMessage}\"",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run Main App",
+            "type": "shell",
+            "command": "poetry run python -m create_python_project.create_python_project",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Install Deps",
             "type": "shell",
             "command": "poetry install",
             "problemMatcher": []
         },
         {
-            "label": "Install Development Dependencies",
+            "label": "Install Dev Deps",
             "type": "shell",
             "command": "poetry install --with dev",
             "problemMatcher": []
         },
         {
-            "label": "Format Code with Black",
+            "label": "Format Code",
             "type": "shell",
             "command": "poetry run black ${workspaceFolder}/src/create_python_project",
             "problemMatcher": []
         },
         {
-            "label": "Run Linting",
+            "label": "Run Pylint",
             "type": "shell",
             "command": "poetry run pylint ${workspaceFolder}/src/create_python_project",
             "problemMatcher": []
         },
         {
-            "label": "Run Type Checking",
+            "label": "Check Types",
             "type": "shell",
             "command": "poetry run mypy --config-file=${workspaceFolder}/.config/mypy.ini ${workspaceFolder}/src/create_python_project",
             "problemMatcher": []
         },
         {
-            "label": "Setup Poetry Environment",
+            "label": "Setup Poetry",
             "type": "shell",
             "command": "poetry install",
             "problemMatcher": []
         },
         {
-            "label": "Run Secret Detection",
+            "label": "Find Secrets",
             "type": "shell",
             "command": "poetry run detect-secrets scan --all-files",
             "problemMatcher": []
         },
         {
-            "label": "Run Tests with Coverage",
+            "label": "Test Coverage",
             "type": "shell",
             "command": "poetry run pytest --cov=create_python_project tests/",
             "problemMatcher": [],
             "group": "test"
         },
         {
-            "label": "Generate Documentation",
+            "label": "Update Docs",
             "type": "shell",
-            "command": "poetry run pdoc --html --output-dir docs/ create_python_project/",
+            "command": "${workspaceFolder}/scripts/update_documentation.sh",
             "problemMatcher": [],
             "group": "build"
         },
@@ -75,10 +115,38 @@
             "group": "build"
         },
         {
-            "label": "Run Pre-commit",
+            "label": "Check All Code",
             "type": "shell",
             "command": "pre-commit run --all-files",
             "problemMatcher": []
+        },
+        {
+            "label": "Check, Commit, Push",
+            "type": "shell",
+            "command": "bash -c 'cd ${workspaceFolder} && git add . && ./scripts/update_documentation.sh && git add . && cp .pre-commit-config.yaml.no-docs .pre-commit-config.yaml.temp && pre-commit run --all-files --config .pre-commit-config.yaml.temp && if [ $? -eq 0 ]; then rm .pre-commit-config.yaml.temp && git commit -m \"${input:commitMessage}\" && ./scripts/post_commit_push.sh; else rm .pre-commit-config.yaml.temp && echo \"\\n❌ Error: Pre-commit hooks failed. Please fix the issues before committing.\"; exit 1; fi'",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Test Checks Only",
+            "type": "shell",
+            "command": "bash -c 'cd ${workspaceFolder} && git add . && set -ex && pre-commit run --all-files && if [ $? -eq 0 ]; then echo \"Pre-commit hooks passed successfully!\"; else echo \"\\n❌ Error: Pre-commit hooks failed. Please fix the issues before committing.\"; exit 1; fi'",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "commitMessage",
+            "description": "Commit message",
+            "default": "Update project files",
+            "type": "promptString"
         }
     ]
 }

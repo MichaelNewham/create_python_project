@@ -6,16 +6,16 @@ An all-in-one Python project creator with intelligent setup based on project des
 
 ## Features
 
-- Interactive CLI-based setup with intelligent defaults
-- AI-powered project type detection based on project description
-- Compulsory AI integration with multiple providers (Anthropic, OpenAI, DeepSeek)
-- Support for multiple project types (Web, CLI, Automation, AI, Data)
+- Interactive CLI-based setup with rich colorful interface and intelligent defaults
+- AI-powered project type detection based on your project description
+- Multiple AI provider integrations including OpenAI, Anthropic, Perplexity, DeepSeek, and Gemini
+- Support for multiple project types (Web, Data Analysis, API Integration, etc.)
+- AI-recommended technology selection with customizable options
+- Project structure visualization with organized, best-practice directory layouts
 - VS Code integration with workspace files and task definitions
-- Claude Code integration with .claude configuration
-- Comprehensive logging setup with detailed error tracking
-- Automatic creation of project structure with best practices
-- AI conversation logs stored in ai-docs directory
-- Project specifications stored in specs directory
+- Comprehensive logging system with detailed error tracking
+- Docker, CI/CD, and pre-commit hook configuration options
+- Git repository setup with dual remote support (GitHub and GitLab)
 
 ## Installation
 
@@ -41,25 +41,33 @@ poetry run python -m create_python_project.create_python_project
 
 # Or after installing the package
 create-python-project
-
-# Optional parameters
-create-python-project --name "my-project" --dir "/path/to/save"
 ```
+
+The interactive process will guide you through:
+1. Setting up your project name and location
+2. Selecting an AI provider for recommendations
+3. Describing your project for AI analysis
+4. Selecting from AI-recommended technologies
+5. Configuring additional options (Docker, CI/CD, etc.)
+6. Creating the project with the optimal structure
 
 ## Development
 
 ```bash
-# Run tests
-pytest
+# Install all dependencies including development dependencies
+poetry install --with dev
 
-# Run linting
-pylint create_python_project
+# Run type checking to verify all issues are fixed
+poetry run mypy --config-file=.config/mypy.ini src/create_python_project
 
-# Run type checking
-mypy --config-file=.config/mypy.ini src/create_python_project
+# Test the application
+poetry run python -m create_python_project.create_python_project
 
-# Format code
-black create_python_project
+# Run AI integration tests
+poetry run pytest tests/test_ai_integration.py -v
+
+# Format code with Black
+poetry run black src/create_python_project
 ```
 
 ## Project Organization
@@ -76,54 +84,170 @@ The project follows a clean organization structure:
 
 ## Project Types
 
-- **Web**: Flask or FastAPI web applications
-- **CLI**: Command-line interface applications
+The tool supports various project types and automatically suggests the best match based on your description:
+
+- **Web Application**: FastAPI or Flask-based web applications
+- **Data Analysis/Visualization**: Projects using Pandas, NumPy, Plotly, etc.
+- **API Integration**: Integration with third-party APIs
+- **User Authentication**: Projects with authentication systems
+- **CLI Tools**: Command-line interface applications
 - **Automation**: Background services and automation scripts
-- **AI**: AI/ML applications with model integration
-- **Data**: Data processing and analysis
+- **AI/ML**: Machine learning applications with model integration
 
 ## Project Structure
 
-The generated project structure follows best practices and includes:
+The tool generates an optimized project structure based on your selected project types and technologies. For example, a web application with data visualization might include:
 
 ```
-project_name/
-├── project_name.code-workspace    # VS Code workspace file
-├── .claude                        # Claude Code configuration
-├── README.md                      # Project documentation
-├── pyproject.toml                 # Poetry package configuration
-├── .vscode/                       # VS Code configuration
-│   └── mcp.json                   # MCP configuration
-├── ai-docs/                       # AI documentation
-│   ├── aboutthisfolder.md         # Folder documentation
-│   └── convo.md                   # AI conversation logs
-├── specs/                         # Project specifications
-│   └── aboutthisfolder.md         # Folder documentation
-├── tests/                         # Test files
-│   ├── __init__.py                # Package marker
-│   └── aboutthisfolder.md         # Folder documentation
-└── src/                           # Source code
-    ├── aboutthisfolder.md         # Folder documentation
-    └── project_name/              # Main module
-        ├── __init__.py            # Package marker
-        └── utils/                 # Utility modules
-            ├── __init__.py        # Package marker
-            ├── logging.py         # Logging configuration
-            └── ai_provider.py     # AI provider integration
+my_project/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── api/          # API endpoints
+│   │   ├── core/         # Core functionality
+│   │   ├── db/           # Database models and connections
+│   │   ├── schemas/      # Data validation schemas
+│   │   └── services/     # Business logic
+│   ├── migrations/
+│   ├── tests/
+│   └── pyproject.toml
+├── frontend/             # If a frontend is included
+├── docker/               # Docker configuration
+├── docker-compose.yml
+├── .github/workflows/    # CI/CD configuration
+├── README.md
+└── .gitignore
 ```
+
+The structure adapts to your specific project needs and selected technologies.
 
 ## AI Integration
 
-The project includes built-in AI integration with:
+The project supports multiple AI providers for intelligent project setup:
 
-1. **AI Provider Module**: A utility module for interacting with AI services
-2. **Claude Code Integration**: Configuration for Claude Code in VS Code
-3. **Conversation Logs**: Storage for AI conversation history
-4. **Multiple Provider Support**:
-   - Anthropic (Claude models)
-   - OpenAI (GPT models)
-   - DeepSeek (DeepSeek models)
+1. **OpenAI**: GPT-4o-mini and other OpenAI models
+2. **Anthropic**: Claude 3.7 Sonnet and other Claude models
+3. **Perplexity**: Sonar model for project analysis
+4. **DeepSeek**: DeepSeek Chat model
+5. **Gemini**: Gemini 2.5 Pro and other Gemini models
+
+Each provider helps with:
+- Project type detection based on your description
+- Recommending appropriate technologies and libraries
+- Suggesting optimal project structure
+- Providing implementation guidance
 
 ## License
 
 MIT
+
+## Last Updated
+
+This project was last updated on: 2025-05-14 17:57:26
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 17:33:59
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 17:23:17
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 17:17:58
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 17:14:09
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 17:11:56
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 17:10:43
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:37:07
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:33:15
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:23:46
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:22:27
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:19:04
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:17:46
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:16:29
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:12:40
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:11:10
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:10:44
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 16:04:47
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:54:57
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:54:35
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:47:44
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:46:44
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:45:03
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:43:37
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:42:27
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-14 15:45:00
+
+Run `./scripts/update_documentation.sh` to update documentation.
+# This is a test change
+
+## Full Workflow Demonstration
+This line demonstrates the full workflow. Updated on: Wed 14 May 2025 16:12:23 IST
