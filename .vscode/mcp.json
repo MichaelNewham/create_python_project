@@ -17,6 +17,30 @@
       "id": "perplexity-model",
       "description": "Perplexity Model Name (e.g., from .env PERPLEXITY_MODEL)",
       "default": "sonar"
+    },
+    {
+      "type": "promptString",
+      "id": "anthropic_api_key",
+      "description": "Anthropic API Key (required for Task Master)",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "openai_api_key",
+      "description": "OpenAI API Key",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "deepseek_api_key",
+      "description": "DeepSeek API Key",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "google_api_key",
+      "description": "Google API Key",
+      "password": true
     }
   ],
   "servers": {
@@ -45,6 +69,18 @@
       "env": {
         "PERPLEXITY_API_KEY": "${input:perplexity-key}",
         "PERPLEXITY_MODEL": "${input:perplexity-model}"
+      },
+      "envFile": "${workspaceFolder}/.env"
+    },
+    "AI-Task-Master": {
+      "command": "npx",
+      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${input:anthropic_api_key}",
+        "PERPLEXITY_API_KEY": "${input:perplexity-key}",
+        "OPENAI_API_KEY": "${input:openai_api_key}",
+        "GOOGLE_API_KEY": "${input:google_api_key}",
+        "DEEPSEEK_API_KEY": "${input:deepseek_api_key}"
       },
       "envFile": "${workspaceFolder}/.env"
     }
