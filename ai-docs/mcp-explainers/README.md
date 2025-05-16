@@ -10,6 +10,7 @@ This directory contains documentation and explanatory guides for Model Context P
 - [Context7 Tools Guide](context7.md) - A guide to using Context7 for retrieving relevant documentation and code examples from libraries and frameworks.
 - [Perplexity Tools Guide](perplexity.md) - A guide to using Perplexity as an AI research assistant to find accurate, up-to-date information.
 - [PromptBoost Tools Guide](promptboost.md) - A guide to enhancing your prompts to get better AI-generated code and responses.
+- [Bright Data Tools Guide](brightdata.md) - A guide to using Bright Data for web scraping, data extraction, and browser automation with anti-bot detection capabilities.
 
 ## MCP Server & Tool Count Overview
 
@@ -23,6 +24,7 @@ Each guide corresponds to a specific capability or MCP server in our configurati
 | Context7 | context7 | 2 tools | Library and framework documentation |
 | Perplexity | Perplexity | 1 tool | AI research assistant |
 | PromptBoost | VS Code Extension | 1 tool | Improving prompt quality and effectiveness |
+| Bright Data | BrightData | 31 tools | Web scraping, data extraction, and browser automation |
 
 ## Tools Distribution
 
@@ -32,6 +34,7 @@ Each guide corresponds to a specific capability or MCP server in our configurati
 - **AI Task Master** (24 tools): Task initialization, management, dependencies, expansion, analysis
 - **VS Code Native/GitHub Copilot**: File operations, searching, testing, terminal operations (not configured in mcp.json)
 - **PromptBoost** (1 tool): `promptBoost` for enhancing prompts with better structure, specificity and technical context
+- **Bright Data** (31 tools): Web scraping, structured data extraction, search engine results, browser automation
 
 ## Purpose
 
@@ -45,4 +48,4 @@ Each guide provides:
 
 ## Last Updated
 
-This directory was last updated on: 2025-05-16
+This directory was last updated on: 2025-05-17

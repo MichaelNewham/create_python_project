@@ -41,6 +41,12 @@
       "id": "google_api_key",
       "description": "Google API Key",
       "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "brightdata_api_key",
+      "description": "Bright Data API Key",
+      "password": true
     }
   ],
   "servers": {
@@ -57,6 +63,16 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}"
       }
+    },
+    "BrightData": {
+      "command": "npx",
+      "args": ["@brightdata/mcp"],
+      "env": {
+        "API_TOKEN": "${config:mcp-secrets.brightdata.API_TOKEN}",
+        "WEB_UNLOCKER_ZONE": "${env:WEB_UNLOCKER_ZONE}",
+        "BROWSER_AUTH": "${env:BROWSER_AUTH}"
+      },
+      "envFile": "${workspaceFolder}/.env"
     },
     "context7": {
       "command": "npx",

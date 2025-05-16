@@ -39,5 +39,13 @@
         "**/node_modules": true
     },
     "editor.rulers": [88],
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    "cSpell.words": [
+        "dotenv"
+    ],
+    "mcp-secrets": {
+        "brightdata": {
+            "API_TOKEN": "949a2dab-c758-481b-8084-a27223aabf32"
+        }
+    }
 }
