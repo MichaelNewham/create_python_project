@@ -88,5 +88,19 @@ htmlcov/
 # IDE/Editor specific
 *.code-workspace
 
+# Node.js
+node_modules/
+package-lock.json
+
+# TaskMaster
+TaskMasterTasks/.cursor/
+TaskMasterTasks/.roo/
+TaskMasterTasks/.roomodes
+TaskMasterTasks/.windsurfrules
+TaskMasterTasks/.taskmasterconfig
+
+# Other cache and config directories
+.cursor/
+
 # Augment specific
 .augmentignore
