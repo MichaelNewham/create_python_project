@@ -17,7 +17,7 @@ try:
     load_dotenv(override=True)
 except ImportError:
     print(
-        "Warning: python-dotenv not installed. Environment variables from .env file will not be loaded."
+        "Warning: python-dotenv not installed. Install it using 'poetry add python-dotenv' to load environment variables from .env files."
     )
 
 # Better input handling with arrow keys
@@ -97,7 +97,7 @@ def get_project_info() -> Tuple[bool, Dict[str, str]]:
     )
     console.print(f"Enter project directory (default: {default_dir}): ", end="")
     # Use the default value as initial text to avoid repetition
-    project_dir = pt_prompt() or default_dir
+    project_dir = pt_prompt(default=default_dir) or default_dir
     project_info["project_dir"] = project_dir
 
     # Author information - make it clearly optional

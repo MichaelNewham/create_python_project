@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@brightdata/mcp": "^1.8.2",
     "task-master-ai": "^0.13.2"
   }
 }
