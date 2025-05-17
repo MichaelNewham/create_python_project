@@ -60,6 +60,20 @@ check_required_commands() {
 
     # Check if Python dependencies are installed in Poetry environment
     print_message "$YELLOW" "Checking Python dependencies in Poetry environment..."
+    
+    # Check for python-dotenv in Poetry environment
+    if ! poetry run python -c "import dotenv" 2>/dev/null && ! poetry run python -c "from dotenv import load_dotenv" 2>/dev/null; then
+        print_message "$YELLOW" "Installing python-dotenv in Poetry environment..."
+        poetry add --group dev python-dotenv
+    fi
+
+    # Check for requests in Poetry environment
+    if ! poetry run python -c "import requests" 2>/dev/null; then
+        print_message "$YELLOW" "Installing requests in Poetry environment..."
+        poetry add --group dev requests
+    fi
+
+    # Check for pylint in Poetry environment
     if ! poetry run python -c "import pylint" 2>/dev/null; then
         print_message "$YELLOW" "Installing pylint in Poetry environment..."
         poetry add --group dev pylint
@@ -99,8 +113,68 @@ The commit message should follow best practices:
 4. Focus on WHY the change was made, not just WHAT was changed
 5. Use imperative mood (\"Add feature\" not \"Added feature\")"
 
-    # Try to use the project's AI integration utilities first
-    if command_exists poetry && poetry run python -c "import sys; sys.path.append('${PROJECT_DIR}'); from create_python_project.utils.ai_integration import OpenAIProvider; print('OK')" 2>/dev/null | grep -q "OK"; then
+    # Try to use DeepSeek API first
+    if command_exists poetry; then
+        print_message "$CYAN" "Using DeepSeek API..."
+
+        # Use DeepSeek to generate commit message
+        local commit_message=$(poetry run python -c "
+import requests
+import os
+import sys
+import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Set up DeepSeek API
+api_key = os.environ.get('DEEPSEEK_API_KEY')
+model = os.environ.get('DEEPSEEK_MODEL', 'deepseek-chat')
+
+if not api_key:
+    print('No DeepSeek API key found. Update project files')
+    sys.exit(0)
+
+try:
+    # Set up the API request
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    }
+    
+    data = {
+        'model': model,
+        'messages': [
+            {'role': 'system', 'content': 'You are a helpful assistant that generates git commit messages.'},
+            {'role': 'user', 'content': '''$prompt'''}
+        ],
+        'max_tokens': 300
+    }
+    
+    # Make the API request
+    response = requests.post(
+        'https://api.deepseek.com/v1/chat/completions',
+        headers=headers,
+        data=json.dumps(data)
+    )
+    
+    if response.status_code == 200:
+        # Extract the commit message
+        result = response.json()
+        commit_message = result['choices'][0]['message']['content'].strip()
+        print(commit_message)
+    else:
+        print(f'Error from DeepSeek API: {response.status_code}')
+        print('Update project files')
+        
+except Exception as e:
+    print(f'Exception: {e}')
+    print('Update project files')
+    sys.exit(0)
+")
+    # Try to use the project's AI integration utilities if DeepSeek fails
+    elif command_exists poetry && poetry run python -c "import sys; sys.path.append('${PROJECT_DIR}'); from create_python_project.utils.ai_integration import OpenAIProvider; print('OK')" 2>/dev/null | grep -q "OK"; then
         # Display message to console only, not captured in variables
         print_message "$CYAN" "Using project's AI integration utilities..."
 
@@ -131,7 +205,7 @@ except Exception as e:
     print('Update project files')
     sys.exit(0)
 ")
-    # Fallback to direct OpenAI API if project utilities aren't available
+    # Fallback to direct OpenAI API if project utilities and DeepSeek aren't available
     elif command_exists python && python -c "import openai" >/dev/null 2>&1; then
         print_message "$CYAN" "Using direct OpenAI API..."
 
@@ -242,6 +316,24 @@ print_message "$GREEN" "========================================================
 
 # Check for required commands
 check_required_commands
+
+# Load environment variables from .env file
+if command_exists poetry && poetry run python -c "from dotenv import load_dotenv; load_dotenv(); print('OK')" 2>/dev/null | grep -q "OK"; then
+    print_message "$YELLOW" "Loaded environment variables from .env file."
+    
+    # Check if DeepSeek API key is set
+    DEEPSEEK_API_KEY=$(poetry run python -c "import os; from dotenv import load_dotenv; load_dotenv(); print(os.environ.get('DEEPSEEK_API_KEY', ''))")
+    DEEPSEEK_MODEL=$(poetry run python -c "import os; from dotenv import load_dotenv; load_dotenv(); print(os.environ.get('DEEPSEEK_MODEL', 'deepseek-chat'))")
+    
+    if [ -z "$DEEPSEEK_API_KEY" ]; then
+        print_message "$YELLOW" "⚠️ Warning: DeepSeek API key not found in .env file."
+    else
+        print_message "$GREEN" "✅ DeepSeek API key found."
+        print_message "$GREEN" "   Using model: $DEEPSEEK_MODEL"
+    fi
+else
+    print_message "$YELLOW" "⚠️ Warning: Could not load environment variables from .env file."
+fi
 
 # Step 1: Clean up and add specific files for this commit
 print_message "$BLUE" "📋 Step 1: Cleaning up and adding specific files for this commit"
