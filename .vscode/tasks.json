@@ -91,6 +91,26 @@
                 "kind": "test",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Force Push to All Remotes",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/force_push_to_remotes.sh \"${input:commitMessage}\"",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Check GitLab Connection",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/check_gitlab_connection.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
         }
     ],
     "inputs": [

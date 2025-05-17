@@ -76,26 +76,6 @@ The project follows a clean organization structure:
 
 ... (truncated for brevity) ...
 
-│   │   ├── core/         # Core functionality
-│   │   ├── db/           # Database models and connections
-│   │   ├── schemas/      # Data validation schemas
-│   │   └── services/     # Business logic
-│   ├── migrations/
-│   ├── tests/
-│   └── pyproject.toml
-├── frontend/             # If a frontend is included
-├── docker/               # Docker configuration
-├── docker-compose.yml
-├── .github/workflows/    # CI/CD configuration
-├── README.md
-└── .gitignore
-```
-
-The structure adapts to your specific project needs and selected technologies.
-
-## AI Integration
-
-The project supports multiple AI providers for intelligent project setup:
 
 1. **OpenAI**: GPT-4o-mini and other OpenAI models
 2. **Anthropic**: Claude 3.7 Sonnet and other Claude models
@@ -114,6 +94,26 @@ Each provider helps with:
 MIT
 
 ## Last Updated
+
+This project was last updated on: 2025-05-18 00:26:21
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-18 00:25:48
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-18 00:25:41
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-18 00:25:24
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-18 00:25:07
+
+Run `./scripts/update_documentation.sh` to update documentation.
 
 This project was last updated on: 2025-05-18 00:17:52
 
