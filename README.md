@@ -74,33 +74,8 @@ poetry run black src/create_python_project
 
 The project follows a clean organization structure:
 
-- `src/` - Source code
-- `tests/` - Test files
-- `ai-docs/` - AI documentation
-- `scripts/` - Utility scripts
-- `.config/` - Configuration files (mypy.ini, etc.)
-- `data/` - Sample data
-- `notebooks/` - Documentation notebooks
+... (truncated for brevity) ...
 
-## Project Types
-
-The tool supports various project types and automatically suggests the best match based on your description:
-
-- **Web Application**: FastAPI or Flask-based web applications
-- **Data Analysis/Visualization**: Projects using Pandas, NumPy, Plotly, etc.
-- **API Integration**: Integration with third-party APIs
-- **User Authentication**: Projects with authentication systems
-- **CLI Tools**: Command-line interface applications
-- **Automation**: Background services and automation scripts
-- **AI/ML**: Machine learning applications with model integration
-
-## Project Structure
-
-The tool generates an optimized project structure based on your selected project types and technologies. For example, a web application with data visualization might include:
-
-```
-my_project/
-├── backend/
 │   ├── app/
 │   │   ├── __init__.py
 │   │   ├── main.py
@@ -143,6 +118,34 @@ Each provider helps with:
 MIT
 
 ## Last Updated
+
+This project was last updated on: 2025-05-17 02:05:26
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-17 02:03:17
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-17 01:59:20
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-17 01:56:52
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-17 01:54:30
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-17 01:53:55
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
+This project was last updated on: 2025-05-17 01:51:53
+
+Run `./scripts/update_documentation.sh` to update documentation.
 
 ---
 

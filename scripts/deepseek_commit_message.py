@@ -43,7 +43,11 @@ def main():
             "messages": [
                 {
                     "role": "system",
-                    "content": "You are a git commit message generator. Output ONLY the commit message text with no explanations, no formatting, no markdown, and no additional text. Do not start with phrases like 'Here is a commit message' or explain your reasoning. Just output the exact text that should be used for the git commit.",
+                    "content": (
+                        "You are a git commit message generator. Output ONLY the commit message text with no explanations, "
+                        "no formatting, no markdown, and no additional text. Do not start with phrases like 'Here is a commit message' "
+                        "or explain your reasoning. Just output the exact text that should be used for the git commit."
+                    ),
                 },
                 {"role": "user", "content": prompt},
             ],
