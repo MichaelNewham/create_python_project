@@ -95,12 +95,8 @@ htmlcov/
 node_modules/
 package-lock.json
 
-# TaskMaster
-TaskMasterTasks/.cursor/
-TaskMasterTasks/.roo/
-TaskMasterTasks/.roomodes
-TaskMasterTasks/.windsurfrules
-TaskMasterTasks/.taskmasterconfig
+# TaskMaster - ignore the entire directory
+TaskMasterTasks/
 
 # Other cache and config directories
 .cursor/

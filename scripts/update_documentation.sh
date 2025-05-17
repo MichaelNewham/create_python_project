@@ -2,7 +2,7 @@
 # This script generates comprehensive documentation for the create_python_project package
 # It generates:
 # 1. API documentation in ai-docs/api using pdoc
-# 2. aboutthisfolder.md files in each main directory
+# 2. aboutthisfolder.md files in each main directory (only in root level, not subdirectories)
 # 3. Updates to README.md and convo.md
 # Recommended to run this after significant code changes
 
@@ -42,6 +42,27 @@ DATE_ONLY=$(date '+%Y-%m-%d')
 
 # Create necessary directories
 mkdir -p "${PROJECT_DIR}/ai-docs/api"
+
+# Function to check if a path is ignored by git
+is_git_ignored() {
+    local path="$1"
+    local dirname=$(basename "$path")
+    
+    # Check if git is available
+    if command -v git >/dev/null 2>&1; then
+        # Use git to check if the path is ignored
+        if git -C "${PROJECT_DIR}" check-ignore -q "$(realpath --relative-to="${PROJECT_DIR}" "$path")"; then
+            return 0  # Path is ignored
+        fi
+    fi
+    
+    # Fallback to manual check in .gitignore
+    if grep -q "^$dirname\$\|^$dirname/\|/$dirname/\|/$dirname\$" "${PROJECT_DIR}/.gitignore"; then
+        return 0  # Path is in .gitignore
+    fi
+    
+    return 1  # Path is not ignored
+}
 
 echo "=== Create Python Project Documentation Generator ==="
 echo "Started: $TIMESTAMP"
@@ -233,18 +254,52 @@ generate_directory_tree() {
 create_folder_documentation() {
     echo "Updating folder documentation files..."
 
-    # Main directories to document - based on git tracked folders
-    local main_dirs=(
-        "${PROJECT_DIR}/src"
-        "${PROJECT_DIR}/tests"
-        "${PROJECT_DIR}/scripts"
-        "${PROJECT_DIR}/.config"
-        "${PROJECT_DIR}/.vscode"
-        "${PROJECT_DIR}/ai-docs"
-        "${PROJECT_DIR}/sketches"
-    )
+    # Get all directories in the project root (excluding hidden and gitignored folders)
+    local all_dirs=()
+    local hidden_dirs=()
+    local gitignored_dirs=()
+    
+    # Find all immediate directories in the project root
+    while IFS= read -r dir; do
+        dir_name=$(basename "$dir")
+        
+        # Skip hidden directories
+        if [[ "$dir_name" == .* ]]; then
+            hidden_dirs+=("$dir")
+            continue
+        fi
+        
+        # Check if directory is git-ignored
+        if is_git_ignored "$dir"; then
+            gitignored_dirs+=("$dir")
+            continue
+        fi
+        
+        all_dirs+=("$dir")
+    done < <(find "${PROJECT_DIR}" -maxdepth 1 -type d | grep -v "^${PROJECT_DIR}\$")
+    
+    # Log what we're doing
+    if [[ "$VERBOSE" == "true" ]]; then
+        echo "Found ${#all_dirs[@]} root-level directories to document"
+        echo "Skipping ${#hidden_dirs[@]} hidden directories"
+        
+        if [[ ${#hidden_dirs[@]} -gt 0 && "$VERBOSE" == "true" ]]; then
+            for hidden_dir in "${hidden_dirs[@]}"; do
+                echo "  - $(basename "$hidden_dir") (hidden)"
+            done
+        fi
+        
+        echo "Skipping ${#gitignored_dirs[@]} gitignored directories"
+        
+        if [[ ${#gitignored_dirs[@]} -gt 0 && "$VERBOSE" == "true" ]]; then
+            for gitignored_dir in "${gitignored_dirs[@]}"; do
+                echo "  - $(basename "$gitignored_dir") (gitignored)"
+            done
+        fi
+    fi
 
-    for dir in "${main_dirs[@]}"; do
+    # Process each directory
+    for dir in "${all_dirs[@]}"; do
         if [[ -d "$dir" ]]; then
             local folder_name=$(basename "$dir")
             local doc_file="$dir/aboutthisfolder.md"
@@ -267,14 +322,6 @@ create_folder_documentation() {
                     folder_description="Utility scripts for the Create Python Project."
                     folder_purpose="Contains helper scripts for development, documentation, and automation tasks."
                     ;;
-                ".config")
-                    folder_description="Configuration files for the Create Python Project."
-                    folder_purpose="Contains configuration files for development tools like mypy, pylint, etc."
-                    ;;
-                ".vscode")
-                    folder_description="Visual Studio Code configuration for the project."
-                    folder_purpose="Contains VS Code task definitions, settings, and launch configurations."
-                    ;;
                 "ai-docs")
                     folder_description="AI documentation for the Create Python Project."
                     folder_purpose="Contains AI-related documentation, API documentation, and development notes."
@@ -283,6 +330,14 @@ create_folder_documentation() {
                 "sketches")
                     folder_description="Design sketches and visual assets for the Create Python Project."
                     folder_purpose="Contains visual design elements, mockups, and reference images for the project."
+                    ;;
+                "logs")
+                    folder_description="Log files for the Create Python Project."
+                    folder_purpose="Contains log output from application runs and build processes."
+                    ;;
+                *)
+                    folder_description="Project folder for the Create Python Project."
+                    folder_purpose="Contains project files related to $folder_name functionality."
                     ;;
             esac
 
@@ -335,7 +390,6 @@ EOF
 
             # Create/update the aboutthisfolder.md file
             echo "<!-- filepath: $doc_file -->" > "$doc_file"
-
             echo "# ${folder_name^} Folder" >> "$doc_file"
             echo "" >> "$doc_file"
             echo "$folder_description" >> "$doc_file"
@@ -398,7 +452,6 @@ update_convo_md() {
 
         # Check if we've already updated today (using a hidden marker)
         if grep -q "$update_marker" "$convo_file"; then
-            echo "convo.md already contains today's update. Skipping to prevent duplicates."
             return 0
         fi
 
@@ -444,51 +497,6 @@ update_convo_md() {
             # Replace the original file with our updated version
             mv "$temp_file" "$convo_file"
         else
-            # No updates section for today, need to add one
-            # Create a new temp file with updated content
-            echo "<!-- filepath: $convo_file -->" > "$temp_file"
-            echo "# Engineering Assessment for Create Python Project" >> "$temp_file"
-            echo "" >> "$temp_file"
-            echo "## Latest Updates ($DATE_ONLY)" >> "$temp_file"
-            echo "" >> "$temp_file"
-            echo "### Changes Made" >> "$temp_file"
-
-            # Add our update marker as a hidden HTML comment
-            echo "$update_marker" >> "$temp_file"
-
-            echo "1. **Documentation System Enhancement**" >> "$temp_file"
-            echo "   - Improved documentation generation script with automatic folder scanning" >> "$temp_file"
-            echo "   - Added/updated aboutthisfolder.md files in all main directories" >> "$temp_file"
-            echo "   - Enhanced API documentation with comprehensive module detection" >> "$temp_file"
-            echo "   - Updated README.md and convo.md with latest changes" >> "$temp_file"
-            echo "   - Added timestamp tracking for all documentation updates" >> "$temp_file"
-            echo "" >> "$temp_file"
-
-            # Add the rest of the original file, skipping the first line which is the filepath comment
-            if [[ -f "$convo_file" ]]; then
-                # Find the first section header in the original file
-                local first_section_line=$(grep -n "^##" "$convo_file" | head -1 | cut -d':' -f1)
-
-                if [[ -n "$first_section_line" ]]; then
-                    # Skip the first line (filepath) and the first section (which we're replacing)
-                    tail -n +"$first_section_line" "$convo_file" | grep -v "^## Latest Updates ($DATE_ONLY)" >> "$temp_file"
-                fi
-            else
-                # Add project structure information for a new file
-                echo "## Project Structure" >> "$temp_file"
-                echo "" >> "$temp_file"
-                echo "The project is organized as follows:" >> "$temp_file"
-                echo "" >> "$temp_file"
-                echo "- **src/create_python_project/**: Main implementation code" >> "$temp_file"
-                echo "  - **utils/**: Utility modules and helper functions" >> "$temp_file"
-                echo "- **tests/**: Test files for the project" >> "$temp_file"
-                echo "- **scripts/**: Automation scripts for development workflow" >> "$temp_file"
-                echo "- **ai-docs/**: AI-related documentation and conversation logs" >> "$temp_file"
-                echo "- **.config/**: Configuration files for linters and tools" >> "$temp_file"
-                echo "- **.vscode/**: VS Code specific settings and tasks" >> "$temp_file"
-            fi
-
-            # Replace the original file with our updated version
             mv "$temp_file" "$convo_file"
         fi
 
@@ -606,23 +614,18 @@ limit_markdown_files() {
 
         # If the file has more than 150 lines, truncate it
         if [[ $line_count -gt 150 ]]; then
-            echo "Truncating $md_file from $line_count lines to 150 lines"
-
-            # Create a temporary file
             local temp_file="${md_file}.tmp"
-
-            # Extract the first 145 lines
-            head -n 145 "$md_file" > "$temp_file"
-
-            # Add a note about truncation
+            
+            # Create truncated version with first 75 lines and last 75 lines
+            head -n 75 "$md_file" > "$temp_file"
             echo "" >> "$temp_file"
-            echo "---" >> "$temp_file"
+            echo "... (truncated for brevity) ..." >> "$temp_file"
             echo "" >> "$temp_file"
-            echo "**Note:** This file has been automatically truncated to 150 lines maximum." >> "$temp_file"
-            echo "Full content was $line_count lines. Last updated: $TIMESTAMP" >> "$temp_file"
-
-            # Replace the original file with the truncated version
+            tail -n 75 "$md_file" >> "$temp_file"
+            
+            # Replace original with truncated version
             mv "$temp_file" "$md_file"
+            echo "Truncated $md_file from $line_count lines to 150 lines"
         fi
     done
 
@@ -640,16 +643,35 @@ track_updated_files() {
     echo "Documentation update on $TIMESTAMP" > "$track_file"
     echo "----------------------------------------" >> "$track_file"
 
-    # List of directories to check for updated files
-    local check_dirs=(
-        "${PROJECT_DIR}/ai-docs"
-        "${PROJECT_DIR}/src"
-        "${PROJECT_DIR}/tests"
-        "${PROJECT_DIR}/scripts"
-        "${PROJECT_DIR}/.config"
-        "${PROJECT_DIR}/.vscode"
-        "${PROJECT_DIR}/sketches"
-    )
+    # Find all non-hidden, non-gitignored root-level directories
+    local check_dirs=()
+    
+    # Always include these important directories
+    check_dirs+=("${PROJECT_DIR}/ai-docs")
+    
+    # Add all immediate directories in the project root (excluding hidden and gitignored)
+    while IFS= read -r dir; do
+        dir_name=$(basename "$dir")
+        
+        # Skip hidden directories except .config and .vscode (which may contain important files)
+        if [[ "$dir_name" == .* && "$dir_name" != ".config" && "$dir_name" != ".vscode" ]]; then
+            continue
+        fi
+        
+        # Skip git-ignored directories
+        if is_git_ignored "$dir"; then
+            continue
+        fi
+        
+        check_dirs+=("$dir")
+    done < <(find "${PROJECT_DIR}" -maxdepth 1 -type d | grep -v "^${PROJECT_DIR}\$")
+    
+    if [[ "$VERBOSE" == "true" ]]; then
+        echo "Checking ${#check_dirs[@]} directories for updates:"
+        for dir in "${check_dirs[@]}"; do
+            echo "  - $dir"
+        done
+    fi
 
     # Find all files modified in the last 5 minutes (should catch all our updates)
     echo "Files modified during this documentation update:" >> "$track_file"
@@ -718,8 +740,28 @@ if [[ "$LIST_ONLY" == "true" ]]; then
     echo "   - All HTML files in ${PROJECT_DIR}/ai-docs/api/"
     echo ""
     echo "2. Folder Documentation:"
-    for dir in src tests scripts .config .vscode ai-docs sketches; do
-        echo "   - ${PROJECT_DIR}/${dir}/aboutthisfolder.md"
+    
+    # Find all non-hidden, non-gitignored root-level directories
+    visible_dirs=()
+    
+    while IFS= read -r dir; do
+        dir_name=$(basename "$dir")
+        
+        # Skip hidden directories
+        if [[ "$dir_name" == .* ]]; then
+            continue
+        fi
+        
+        # Skip git-ignored directories
+        if is_git_ignored "$dir"; then
+            continue
+        fi
+        
+        visible_dirs+=("$dir")
+    done < <(find "${PROJECT_DIR}" -maxdepth 1 -type d | grep -v "^${PROJECT_DIR}\$")
+    
+    for dir in "${visible_dirs[@]}"; do
+        echo "   - $(basename "$dir")/aboutthisfolder.md"
     done
     echo ""
     echo "3. Other Files:"
