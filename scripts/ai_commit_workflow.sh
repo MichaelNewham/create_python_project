@@ -137,16 +137,17 @@ if not api_key:
     sys.exit(0)
 
 try:
-    # Set up the API request
+    # Set up the API request with improved prompt
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Content-Type': 'application/json'
     }
     
+    # Modified system message to get cleaner output
     data = {
         'model': model,
         'messages': [
-            {'role': 'system', 'content': 'You are a helpful assistant that generates git commit messages.'},
+            {'role': 'system', 'content': 'You are a helpful assistant that generates git commit messages. Generate ONLY the commit message without any additional explanations, formatting, or markdown symbols. Do not use backticks or code blocks. Just write the commit message directly.'},
             {'role': 'user', 'content': '''$prompt'''}
         ],
         'max_tokens': 300
@@ -288,26 +289,46 @@ except Exception as e:
         commit_message="Update project files"
     fi
 
-    # Filter out debug messages and return the clean commit message
-    # Remove lines containing debug messages and AI responses that aren't proper commit messages
-    filtered_message=$(echo "$commit_message" |
-        grep -v "Generating AI commit message" |
-        grep -v "Using project's AI integration utilities" |
-        grep -v "Using DeepSeek API" |
-        grep -v "Here's a concise" |
-        grep -v "The message follows best practices" |
-        grep -v "Certainly!" |
-        grep -v "I'll need" |
-        grep -v "In order to generate" |
-        grep -v "I need more information" |
-        grep -v "Please provide more details")
+    # DEBUG: Print the raw commit message for debugging
+    echo "DEBUG: Raw commit message:" > /tmp/commit_debug.txt
+    echo "$commit_message" >> /tmp/commit_debug.txt
+    
+    # More aggressive filtering to remove all debug output and AI explanations
+    # First, remove specific markers and debug messages
+    filtered_message=$(echo "$commit_message" | 
+        grep -v "Generating AI commit message" | 
+        grep -v "Using project's AI integration utilities" | 
+        grep -v "Using DeepSeek API" | 
+        grep -v "Here's a" | 
+        grep -v "The message follows" | 
+        grep -v "follows best practices" | 
+        grep -v "Certainly" | 
+        grep -v "I'll" | 
+        grep -v "need more information" | 
+        grep -v "Please provide" |
+        grep -v "^$" | # Remove blank lines
+        grep -v "^[[:space:]]*$") # Remove whitespace-only lines
 
+    echo "DEBUG: After initial filtering:" >> /tmp/commit_debug.txt
+    echo "$filtered_message" >> /tmp/commit_debug.txt
+    
     # Extract content from markdown code blocks if present (```...```)
     if echo "$filtered_message" | grep -q '```'; then
+        echo "DEBUG: Found markdown code block, extracting..." >> /tmp/commit_debug.txt
+        # Extract content between triple backticks
         filtered_message=$(echo "$filtered_message" | 
-            sed -n '/```/{s/```//;:a;n;/```/!p;/```/q;}' | 
+            awk '/```/{p=1;next}/```/{p=0}p' | 
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            
+        echo "DEBUG: After code block extraction:" >> /tmp/commit_debug.txt
+        echo "$filtered_message" >> /tmp/commit_debug.txt
     fi
+    
+    # Remove any remaining markdown symbols
+    filtered_message=$(echo "$filtered_message" | 
+        sed 's/```//g' | # Remove any remaining triple backticks
+        sed 's/`//g' |   # Remove any remaining single backticks
+        sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
     # If filtering removed everything or the message is asking for more information, use a default message
     if [ -z "$filtered_message" ] || echo "$filtered_message" | grep -q "need more information"; then
@@ -547,11 +568,18 @@ echo ""
 
 # Ask user if they want to edit the commit message
 print_message "$YELLOW" "Do you want to edit this commit message? (y/n): "
-read -r edit_message
+# Force the prompt to display immediately
+stty -icanon
+
+# Explicitly read from standard input with a timeout
+read -r -t 30 edit_message || true
+echo "DEBUG: User response for editing: '$edit_message'" >> /tmp/commit_debug.txt
+
 if [[ "$edit_message" == "y" || "$edit_message" == "Y" ]]; then
     # Create a temporary file with the commit message
     TEMP_FILE=$(mktemp)
     echo "$COMMIT_MESSAGE" > "$TEMP_FILE"
+    echo "DEBUG: Created temp file for editing at $TEMP_FILE" >> /tmp/commit_debug.txt
 
     # Open the file in the default editor
     if [ -n "$EDITOR" ]; then
@@ -596,20 +624,26 @@ if [ -f "./scripts/update_documentation.sh" ]; then
 fi
 
 # Clean up the commit message one more time to ensure it's properly formatted
-# Remove any remaining debug messages and ensure proper formatting
+# Add debugging to see what's in COMMIT_MESSAGE
+echo "DEBUG: COMMIT_MESSAGE before final cleaning:" > /tmp/commit_final_debug.txt
+echo "$COMMIT_MESSAGE" >> /tmp/commit_final_debug.txt
+
+# More aggressive cleaning of the commit message
 CLEAN_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" |
     grep -v "🤖" |
     grep -v "Using project's" |
     grep -v "Using DeepSeek API" |
-    grep -v "Here's a concise" |
-    grep -v "The message follows best practices" |
+    grep -v "Here's a" |
+    grep -v "The message follows" |
     grep -v "Certainly" |
     grep -v "I'll" |
     grep -v "need more information" |
-    sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' |
-    sed 's/```//' |                 # Remove markdown code block markers
-    sed 's/`//'                     # Remove backticks
-)
+    sed 's/```//g' |  # Remove markdown code block markers
+    sed 's/`//g' |    # Remove backticks
+    sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')  # Trim whitespace
+
+echo "DEBUG: CLEAN_COMMIT_MESSAGE after final cleaning:" >> /tmp/commit_final_debug.txt
+echo "$CLEAN_COMMIT_MESSAGE" >> /tmp/commit_final_debug.txt
 
 # If the message is empty after cleaning, use a default message
 if [ -z "$CLEAN_COMMIT_MESSAGE" ]; then
