@@ -114,66 +114,14 @@ The commit message should follow best practices:
 5. Use imperative mood (\"Add feature\" not \"Added feature\")"
 
     # Try to use DeepSeek API first
-    if command_exists poetry; then
+    if command_exists poetry && [ -f "${PROJECT_DIR}/scripts/deepseek_commit_message.py" ]; then
         print_message "$CYAN" "Using DeepSeek API..."
 
-        # Use DeepSeek to generate commit message
-        local commit_message=$(poetry run python -c "
-import requests
-import os
-import sys
-import json
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Set up DeepSeek API
-api_key = os.environ.get('DEEPSEEK_API_KEY')
-model = os.environ.get('DEEPSEEK_MODEL', 'deepseek-chat')
-
-if not api_key:
-    print('No DeepSeek API key found. Update project files')
-    sys.exit(0)
-
-try:
-    # Set up the API request with improved prompt
-    headers = {
-        'Authorization': f'Bearer {api_key}',
-        'Content-Type': 'application/json'
-    }
-    
-    # Modified system message to get cleaner output
-    data = {
-        'model': model,
-        'messages': [
-            {'role': 'system', 'content': 'You are a helpful assistant that generates git commit messages. Generate ONLY the commit message without any additional explanations, formatting, or markdown symbols. Do not use backticks or code blocks. Just write the commit message directly.'},
-            {'role': 'user', 'content': '''$prompt'''}
-        ],
-        'max_tokens': 300
-    }
-    
-    # Make the API request
-    response = requests.post(
-        'https://api.deepseek.com/v1/chat/completions',
-        headers=headers,
-        data=json.dumps(data)
-    )
-    
-    if response.status_code == 200:
-        # Extract the commit message
-        result = response.json()
-        commit_message = result['choices'][0]['message']['content'].strip()
-        print(commit_message)
-    else:
-        print(f'Error from DeepSeek API: {response.status_code}')
-        print('Update project files')
+        # Make sure the script is executable
+        chmod +x "${PROJECT_DIR}/scripts/deepseek_commit_message.py"
         
-except Exception as e:
-    print(f'Exception: {e}')
-    print('Update project files')
-    sys.exit(0)
-")
+        # Use DeepSeek to generate commit message via the helper script
+        local commit_message=$(poetry run python "${PROJECT_DIR}/scripts/deepseek_commit_message.py" "$prompt")
     # Try to use the project's AI integration utilities if DeepSeek fails
     elif command_exists poetry && poetry run python -c "import sys; sys.path.append('${PROJECT_DIR}'); from create_python_project.utils.ai_integration import OpenAIProvider; print('OK')" 2>/dev/null | grep -q "OK"; then
         # Display message to console only, not captured in variables
@@ -560,19 +508,48 @@ print_message "$BLUE" "💭 Step 4: Generating commit message"
 # Generate the commit message without the colored output
 COMMIT_MESSAGE=$(generate_ai_commit_message)
 
+# Apply direct filtering to avoid visible debug messages
+COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | 
+    grep -v "Generating AI commit message" | 
+    grep -v "Using project's AI integration utilities" | 
+    grep -v "Using DeepSeek API" | 
+    grep -v "Here's a" | 
+    grep -v "The message follows" | 
+    grep -v "follows best practices" | 
+    grep -v "Certainly" | 
+    grep -v "I'll" | 
+    grep -v "need more information" | 
+    grep -v "Please provide" | 
+    grep -v "Exception:" | 
+    grep -v "Error from" |
+    grep -v "^$" | # Remove blank lines
+    grep -v "^[[:space:]]*$") # Remove whitespace-only lines
+
+# Remove any backticks and markdown symbols
+COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | 
+    sed 's/```//g' | # Remove triple backticks
+    sed 's/`//g'     # Remove single backticks
+)
+
 # Display the commit message
 print_message "$GREEN" "Generated commit message: "
 echo ""
 echo "$COMMIT_MESSAGE" | sed 's/^/    /'
 echo ""
+# Ensure output is flushed to terminal
+sync
+sleep 1
 
 # Ask user if they want to edit the commit message
 print_message "$YELLOW" "Do you want to edit this commit message? (y/n): "
-# Force the prompt to display immediately
-stty -icanon
 
-# Explicitly read from standard input with a timeout
-read -r -t 30 edit_message || true
+# Reset any potential terminal settings that might interfere with input
+stty sane
+
+# Read user input - simplifying to make it more reliable
+read -r edit_message
+
+# Log the response for debugging
 echo "DEBUG: User response for editing: '$edit_message'" >> /tmp/commit_debug.txt
 
 if [[ "$edit_message" == "y" || "$edit_message" == "Y" ]]; then
