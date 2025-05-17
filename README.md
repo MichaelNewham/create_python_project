@@ -76,10 +76,6 @@ The project follows a clean organization structure:
 
 ... (truncated for brevity) ...
 
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py
-│   │   ├── api/          # API endpoints
 │   │   ├── core/         # Core functionality
 │   │   ├── db/           # Database models and connections
 │   │   ├── schemas/      # Data validation schemas
@@ -118,6 +114,10 @@ Each provider helps with:
 MIT
 
 ## Last Updated
+
+This project was last updated on: 2025-05-18 00:17:52
+
+Run `./scripts/update_documentation.sh` to update documentation.
 
 This project was last updated on: 2025-05-17 02:05:26
 
