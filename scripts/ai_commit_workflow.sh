@@ -293,11 +293,21 @@ except Exception as e:
     filtered_message=$(echo "$commit_message" |
         grep -v "Generating AI commit message" |
         grep -v "Using project's AI integration utilities" |
+        grep -v "Using DeepSeek API" |
+        grep -v "Here's a concise" |
+        grep -v "The message follows best practices" |
         grep -v "Certainly!" |
         grep -v "I'll need" |
         grep -v "In order to generate" |
         grep -v "I need more information" |
         grep -v "Please provide more details")
+
+    # Extract content from markdown code blocks if present (```...```)
+    if echo "$filtered_message" | grep -q '```'; then
+        filtered_message=$(echo "$filtered_message" | 
+            sed -n '/```/{s/```//;:a;n;/```/!p;/```/q;}' | 
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    fi
 
     # If filtering removed everything or the message is asking for more information, use a default message
     if [ -z "$filtered_message" ] || echo "$filtered_message" | grep -q "need more information"; then
@@ -590,10 +600,16 @@ fi
 CLEAN_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" |
     grep -v "🤖" |
     grep -v "Using project's" |
+    grep -v "Using DeepSeek API" |
+    grep -v "Here's a concise" |
+    grep -v "The message follows best practices" |
     grep -v "Certainly" |
     grep -v "I'll" |
     grep -v "need more information" |
-    sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' |
+    sed 's/```//' |                 # Remove markdown code block markers
+    sed 's/`//'                     # Remove backticks
+)
 
 # If the message is empty after cleaning, use a default message
 if [ -z "$CLEAN_COMMIT_MESSAGE" ]; then
