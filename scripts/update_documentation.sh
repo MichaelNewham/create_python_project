@@ -2,7 +2,7 @@
 # This script generates comprehensive documentation for the create_python_project package
 # It generates:
 # 1. API documentation in ai-docs/api using pdoc
-# 2. aboutthisfolder.md files in each main directory (only in root level, not subdirectories)
+# 2. aboutthisfolder.md files in each main directory (including hidden folders that are tracked by git)
 # 3. Updates to README.md and convo.md
 # Recommended to run this after significant code changes
 
@@ -254,20 +254,15 @@ generate_directory_tree() {
 create_folder_documentation() {
     echo "Updating folder documentation files..."
 
-    # Get all directories in the project root (excluding hidden and gitignored folders)
+    # Get all directories in the project root (including hidden directories that are tracked by git)
     local all_dirs=()
     local hidden_dirs=()
     local gitignored_dirs=()
+    local tracked_hidden_dirs=()
     
     # Find all immediate directories in the project root
     while IFS= read -r dir; do
         dir_name=$(basename "$dir")
-        
-        # Skip hidden directories
-        if [[ "$dir_name" == .* ]]; then
-            hidden_dirs+=("$dir")
-            continue
-        fi
         
         # Check if directory is git-ignored
         if is_git_ignored "$dir"; then
@@ -275,17 +270,29 @@ create_folder_documentation() {
             continue
         fi
         
+        # Track hidden directories separately
+        if [[ "$dir_name" == .* ]]; then
+            # Add hidden directories that are tracked by git to tracked_hidden_dirs
+            tracked_hidden_dirs+=("$dir")
+            continue
+        fi
+        
         all_dirs+=("$dir")
     done < <(find "${PROJECT_DIR}" -maxdepth 1 -type d | grep -v "^${PROJECT_DIR}\$")
+    
+    # Add tracked hidden directories to all_dirs
+    for dir in "${tracked_hidden_dirs[@]}"; do
+        all_dirs+=("$dir")
+    done
     
     # Log what we're doing
     if [[ "$VERBOSE" == "true" ]]; then
         echo "Found ${#all_dirs[@]} root-level directories to document"
-        echo "Skipping ${#hidden_dirs[@]} hidden directories"
+        echo "Including ${#tracked_hidden_dirs[@]} tracked hidden directories"
         
-        if [[ ${#hidden_dirs[@]} -gt 0 && "$VERBOSE" == "true" ]]; then
-            for hidden_dir in "${hidden_dirs[@]}"; do
-                echo "  - $(basename "$hidden_dir") (hidden)"
+        if [[ ${#tracked_hidden_dirs[@]} -gt 0 && "$VERBOSE" == "true" ]]; then
+            for tracked_hidden_dir in "${tracked_hidden_dirs[@]}"; do
+                echo "  - $(basename "$tracked_hidden_dir") (hidden but tracked)"
             done
         fi
         
@@ -335,19 +342,48 @@ create_folder_documentation() {
                     folder_description="Log files for the Create Python Project."
                     folder_purpose="Contains log output from application runs and build processes."
                     ;;
+                ".config")
+                    folder_description="Configuration files for the Create Python Project."
+                    folder_purpose="Contains configuration files for linters, formatters, and other development tools."
+                    ;;
+                ".vscode")
+                    folder_description="Visual Studio Code configuration for the Create Python Project."
+                    folder_purpose="Contains VS Code settings, tasks, and extensions configuration."
+                    ;;
                 *)
-                    folder_description="Project folder for the Create Python Project."
-                    folder_purpose="Contains project files related to $folder_name functionality."
+                    # For hidden directories that don't match specific cases
+                    if [[ "$folder_name" == .* ]]; then
+                        folder_description="Hidden directory for the Create Python Project."
+                        folder_purpose="Contains configuration and system files for $folder_name."
+                    else
+                        folder_description="Project folder for the Create Python Project."
+                        folder_purpose="Contains project files related to $folder_name functionality."
+                    fi
                     ;;
             esac
 
-            # Generate tree visualization for the folder structure
-            local tree_output=""
+            # Check if the folder contents have changed since the last aboutthisfolder.md update
+            local should_update=true
+            if [[ -f "$doc_file" ]]; then
+                local doc_timestamp=$(stat -c %Y "$doc_file")
+                local folder_timestamp=$(find "$dir" -type f -not -path "$doc_file" -newer "$doc_file" | wc -l)
+                if [[ $folder_timestamp -eq 0 ]]; then
+                    should_update=false
+                    if [[ "$VERBOSE" == "true" ]]; then
+                        echo "Skipping $folder_name folder - contents have not changed"
+                    fi
+                fi
+            fi
 
-            # Special handling for ai-docs folder due to its complex structure
-            if [[ "$folder_name" == "ai-docs" ]]; then
-                # Create a hardcoded tree structure for ai-docs
-                cat > "$doc_file" << EOF
+            # Only update the file if the folder contents have changed or the file doesn't exist
+            if [[ "$should_update" == true ]]; then
+                # Generate tree visualization for the folder structure
+                local tree_output=""
+
+                # Special handling for ai-docs folder due to its complex structure
+                if [[ "$folder_name" == "ai-docs" ]]; then
+                    # Create a hardcoded tree structure for ai-docs
+                    cat > "$doc_file" << EOF
 <!-- filepath: $doc_file -->
 # Ai-docs Folder
 
@@ -380,35 +416,36 @@ ai-docs/
 
 This documentation was automatically generated on: $TIMESTAMP
 EOF
-                # Skip the normal file creation since we've already created it
+                    # Skip the normal file creation since we've already created it
+                    echo "Created/updated documentation for $folder_name folder"
+                    continue
+                else
+                    # For other folders, use the tree generation function
+                    tree_output=$(generate_directory_tree "$dir" "$max_depth")
+                fi
+
+                # Create/update the aboutthisfolder.md file
+                echo "<!-- filepath: $doc_file -->" > "$doc_file"
+                echo "# ${folder_name^} Folder" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "$folder_description" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "## Purpose" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "$folder_purpose" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "## Structure" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "\`\`\`" >> "$doc_file"
+                echo -e "$tree_output" >> "$doc_file"
+                echo "\`\`\`" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "## Last Updated" >> "$doc_file"
+                echo "" >> "$doc_file"
+                echo "This documentation was automatically generated on: $TIMESTAMP" >> "$doc_file"
+
                 echo "Created/updated documentation for $folder_name folder"
-                continue
-            else
-                # For other folders, use the tree generation function
-                tree_output=$(generate_directory_tree "$dir" "$max_depth")
             fi
-
-            # Create/update the aboutthisfolder.md file
-            echo "<!-- filepath: $doc_file -->" > "$doc_file"
-            echo "# ${folder_name^} Folder" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "$folder_description" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "## Purpose" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "$folder_purpose" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "## Structure" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "\`\`\`" >> "$doc_file"
-            echo -e "$tree_output" >> "$doc_file"
-            echo "\`\`\`" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "## Last Updated" >> "$doc_file"
-            echo "" >> "$doc_file"
-            echo "This documentation was automatically generated on: $TIMESTAMP" >> "$doc_file"
-
-            echo "Created/updated documentation for $folder_name folder"
         fi
     done
 }
@@ -419,18 +456,99 @@ update_readme() {
 
     local readme_file="${PROJECT_DIR}/README.md"
 
+    # Get the list of all tracked directories
+    local all_dirs=()
+    local tracked_hidden_dirs=()
+    
+    # Find all immediate directories in the project root
+    while IFS= read -r dir; do
+        dir_name=$(basename "$dir")
+        
+        # Skip directories that are git-ignored
+        if is_git_ignored "$dir"; then
+            continue
+        fi
+        
+        # Handle hidden directories separately
+        if [[ "$dir_name" == .* ]]; then
+            tracked_hidden_dirs+=("$dir_name")
+        else
+            all_dirs+=("$dir_name")
+        fi
+    done < <(find "${PROJECT_DIR}" -maxdepth 1 -type d | grep -v "^${PROJECT_DIR}\$")
+    
+    # Sort the directory arrays
+    IFS=$'\n' all_dirs=($(sort <<< "${all_dirs[*]}"))
+    IFS=$'\n' tracked_hidden_dirs=($(sort <<< "${tracked_hidden_dirs[*]}"))
+    unset IFS
+
+    # Generate a project structure section if it doesn't exist
+    if ! grep -q "## Project Structure" "$readme_file"; then
+        # Create a structured section
+        local structure_content="\n## Project Structure\n\nThe project is organized as follows:\n\n"
+        
+        # Add visible directories first
+        for dir in "${all_dirs[@]}"; do
+            structure_content+="- **$dir/**: "
+            
+            # Add a brief description based on folder name
+            case "$dir" in
+                "src")
+                    structure_content+="Main implementation code\n"
+                    ;;
+                "tests")
+                    structure_content+="Test files for the project\n"
+                    ;;
+                "scripts")
+                    structure_content+="Automation scripts for development workflow\n"
+                    ;;
+                "ai-docs")
+                    structure_content+="AI-related documentation and conversation logs\n"
+                    ;;
+                "logs")
+                    structure_content+="Log output files\n"
+                    ;;
+                *)
+                    structure_content+="Project files\n"
+                    ;;
+            esac
+        done
+        
+        # Add tracked hidden directories
+        if [[ ${#tracked_hidden_dirs[@]} -gt 0 ]]; then
+            structure_content+="\n### Configuration Directories\n\n"
+            for dir in "${tracked_hidden_dirs[@]}"; do
+                structure_content+="- **$dir/**: "
+                
+                # Add a brief description based on folder name
+                case "$dir" in
+                    ".config")
+                        structure_content+="Configuration files for linters and tools\n"
+                        ;;
+                    ".vscode")
+                        structure_content+="VS Code specific settings and tasks\n"
+                        ;;
+                    ".github")
+                        structure_content+="GitHub workflows and configuration\n"
+                        ;;
+                    *)
+                        structure_content+="Configuration files\n"
+                        ;;
+                esac
+            done
+        fi
+        
+        # Append to README.md
+        echo -e "$structure_content" >> "$readme_file"
+    fi
+
     # Only update the last updated section without changing the core content
     if grep -q "## Last Updated" "$readme_file"; then
-        # If the section already exists, update it
+        # Update the "Last Updated" section
         sed -i "/## Last Updated/,/^$/c\\## Last Updated\\n\\nThis project was last updated on: $TIMESTAMP\\n\\nRun \`./scripts/update_documentation.sh\` to update documentation.\\n" "$readme_file"
     else
-        # If the section doesn't exist, add it to the end
-        echo "" >> "$readme_file"
-        echo "## Last Updated" >> "$readme_file"
-        echo "" >> "$readme_file"
-        echo "This project was last updated on: $TIMESTAMP" >> "$readme_file"
-        echo "" >> "$readme_file"
-        echo "Run \`./scripts/update_documentation.sh\` to update documentation." >> "$readme_file"
+        # Add the "Last Updated" section if it doesn't exist
+        echo -e "\n## Last Updated\n\nThis project was last updated on: $TIMESTAMP\n\nRun \`./scripts/update_documentation.sh\` to update documentation.\n" >> "$readme_file"
     fi
 
     echo "README.md updated successfully"
@@ -598,9 +716,9 @@ check_sensitive_info() {
     fi
 }
 
-# Function to limit markdown files to 150 lines
+# Function to limit markdown files to 500 lines
 limit_markdown_files() {
-    echo "Limiting all markdown files to 150 lines maximum..."
+    echo "Limiting all markdown files to 500 lines maximum..."
 
     # Find all markdown files in the project
     find "${PROJECT_DIR}" -type f -name "*.md" | while read -r md_file; do
@@ -612,24 +730,24 @@ limit_markdown_files() {
         # Count lines in the file
         local line_count=$(wc -l < "$md_file")
 
-        # If the file has more than 150 lines, truncate it
-        if [[ $line_count -gt 150 ]]; then
+        # If the file has more than 500 lines, truncate it
+        if [[ $line_count -gt 500 ]]; then
             local temp_file="${md_file}.tmp"
             
-            # Create truncated version with first 75 lines and last 75 lines
-            head -n 75 "$md_file" > "$temp_file"
+            # Create truncated version with first 250 lines and last 250 lines
+            head -n 250 "$md_file" > "$temp_file"
             echo "" >> "$temp_file"
             echo "... (truncated for brevity) ..." >> "$temp_file"
             echo "" >> "$temp_file"
-            tail -n 75 "$md_file" >> "$temp_file"
+            tail -n 250 "$md_file" >> "$temp_file"
             
             # Replace original with truncated version
             mv "$temp_file" "$md_file"
-            echo "Truncated $md_file from $line_count lines to 150 lines"
+            echo "Truncated $md_file from $line_count lines to 500 lines"
         fi
     done
 
-    echo "All markdown files limited to 150 lines maximum"
+    echo "All markdown files limited to 500 lines maximum"
 }
 
 # Function to track and report all updated files
@@ -771,7 +889,7 @@ if [[ "$LIST_ONLY" == "true" ]]; then
     echo "   - ${PROJECT_DIR}/ai-docs/updated_files.txt"
     echo ""
     echo "4. File Size Limitation:"
-    echo "   - All markdown files will be limited to 150 lines maximum"
+    echo "   - All markdown files will be limited to 500 lines maximum"
     echo ""
     echo "To perform the actual update, run without the --list-only option."
 else
@@ -781,7 +899,7 @@ else
     update_readme
     update_convo_md
     check_sensitive_info
-    # Limit all markdown files to 150 lines
+    # Limit all markdown files to 500 lines
     limit_markdown_files
     track_updated_files
 fi

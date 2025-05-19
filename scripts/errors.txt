@@ -1,0 +1,329 @@
+================================================================
+                  AI-ASSISTED COMMIT WORKFLOW                   
+================================================================
+Checking Python dependencies in Poetry environment...
+source /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/activate
+Loaded environment variables from .env file.
+✅ DeepSeek API key found.
+   Using model: deepseek-chat
+📋 Step 1: Cleaning up and adding specific files for this commit
+Cleaning up problematic files...
+Adding workflow files...
+Files added successfully
+📚 Step 2: Running focused documentation update
+Updating git_workflow.md...
+Updating scripts/aboutthisfolder.md...
+Documentation checks passed
+📎 Adding documentation changes to git
+🔍 Step 3: Running full linting and code quality checks
+Removing backup and temporary files...
+Running Black code formatting (attempt 1/2)...
+black....................................................................Failed
+- hook id: black
+- files were modified by this hook
+
+reformatted src/create_python_project/utils/ai_prompts.py
+reformatted src/create_python_project/create_python_project.py
+reformatted src/create_python_project/utils/core_project_builder.py
+
+All done! ✨ 🍰 ✨
+3 files reformatted, 18 files left unchanged.
+
+⚠️ Black code formatting failed. Attempting to fix issues automatically...
+All done! ✨ 🍰 ✨
+21 files left unchanged.
+Running Black code formatting (attempt 2/2)...
+black....................................................................Passed
+✅ Black code formatting passed!
+Running isort import sorting (attempt 1/2)...
+isort....................................................................Passed
+✅ isort import sorting passed!
+Running Ruff linting (attempt 1/2)...
+ruff.....................................................................Failed
+- hook id: ruff
+- exit code: 1
+- files were modified by this hook
+
+src/create_python_project/create_python_project.py:645:10: F841 Local variable `status` is assigned to but never used
+    |
+643 |     with console.status(
+644 |         "[bold green]Building your Python project 🐍[/bold green]", spinner="dots"
+645 |     ) as status:
+    |          ^^^^^^ F841
+646 |         console.print("\n[dim]Scaffolding directory structure...[/dim]")
+    |
+    = help: Remove assignment to unused variable `status`
+
+src/create_python_project/utils/core_project_builder.py:690:34: F821 Undefined name `e`
+    |
+688 |             return response.choices[0].message.content
+689 |         except Exception as e:
+690 |             return f"Error: {str(e)}"
+    |                                  ^ F821
+691 | '''
+692 |                 )
+    |
+
+src/create_python_project/utils/core_project_builder.py:723:57: F821 Undefined name `ext`
+    |
+721 |         return pd.read_json(file_path)
+722 |     else:
+723 |         raise ValueError(f"Unsupported file extension: {ext}")
+    |                                                         ^^^ F821
+724 |
+725 | def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
+    |
+
+src/create_python_project/utils/core_project_builder.py:741:35: F821 Undefined name `column`
+    |
+739 |     if pd.api.types.is_numeric_dtype(df[column]):
+740 |         df[column].hist()
+741 |         plt.title(f"Histogram of {column}")
+    |                                   ^^^^^^ F821
+742 |     else:
+743 |         df[column].value_counts().plot(kind='bar')
+    |
+
+src/create_python_project/utils/core_project_builder.py:744:38: F821 Undefined name `column`
+    |
+742 |     else:
+743 |         df[column].value_counts().plot(kind='bar')
+744 |         plt.title(f"Value counts of {column}")
+    |                                      ^^^^^^ F821
+745 |         
+746 |     plt.tight_layout()
+    |
+
+Found 16 errors (11 fixed, 5 remaining).
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+
+⚠️ Ruff linting failed. Attempting to fix issues automatically...
+error: unexpected argument '--fix' found
+
+Usage: ruff [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+Running Ruff linting (attempt 2/2)...
+ruff.....................................................................Failed
+- hook id: ruff
+- exit code: 1
+
+src/create_python_project/create_python_project.py:645:10: F841 Local variable `status` is assigned to but never used
+    |
+643 |     with console.status(
+644 |         "[bold green]Building your Python project 🐍[/bold green]", spinner="dots"
+645 |     ) as status:
+    |          ^^^^^^ F841
+646 |         console.print("\n[dim]Scaffolding directory structure...[/dim]")
+    |
+    = help: Remove assignment to unused variable `status`
+
+src/create_python_project/utils/core_project_builder.py:690:34: F821 Undefined name `e`
+    |
+688 |             return response.choices[0].message.content
+689 |         except Exception as e:
+690 |             return f"Error: {str(e)}"
+    |                                  ^ F821
+691 | '''
+692 |                 )
+    |
+
+src/create_python_project/utils/core_project_builder.py:723:57: F821 Undefined name `ext`
+    |
+721 |         return pd.read_json(file_path)
+722 |     else:
+723 |         raise ValueError(f"Unsupported file extension: {ext}")
+    |                                                         ^^^ F821
+724 |
+725 | def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
+    |
+
+src/create_python_project/utils/core_project_builder.py:741:35: F821 Undefined name `column`
+    |
+739 |     if pd.api.types.is_numeric_dtype(df[column]):
+740 |         df[column].hist()
+741 |         plt.title(f"Histogram of {column}")
+    |                                   ^^^^^^ F821
+742 |     else:
+743 |         df[column].value_counts().plot(kind='bar')
+    |
+
+src/create_python_project/utils/core_project_builder.py:744:38: F821 Undefined name `column`
+    |
+742 |     else:
+743 |         df[column].value_counts().plot(kind='bar')
+744 |         plt.title(f"Value counts of {column}")
+    |                                      ^^^^^^ F821
+745 |         
+746 |     plt.tight_layout()
+    |
+
+Found 5 errors.
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+
+❌ Ruff linting failed after 2 attempts.
+Running Flake8 linting (attempt 1/2)...
+flake8...................................................................Failed
+- hook id: flake8
+- exit code: 1
+
+src/create_python_project/create_python_project.py:645:10: F841 local variable 'status' is assigned to but never used
+src/create_python_project/utils/ai_prompts.py:75:8: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:80:8: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:82:-2: E202 whitespace before ']'
+src/create_python_project/utils/ai_prompts.py:82:4: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:87:4: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:95:-170: E202 whitespace before ']'
+src/create_python_project/utils/ai_prompts.py:95:-2: E202 whitespace before ']'
+src/create_python_project/utils/core_project_builder.py:547:14: E201 whitespace after '{'
+src/create_python_project/utils/core_project_builder.py:547:20: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:548:36: E201 whitespace after '{'
+src/create_python_project/utils/core_project_builder.py:548:80: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:554:20: E201 whitespace after '{'
+src/create_python_project/utils/core_project_builder.py:554:61: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:690:-136: E202 whitespace before ']'
+src/create_python_project/utils/core_project_builder.py:690:-88: E202 whitespace before ')'
+src/create_python_project/utils/core_project_builder.py:690:34: F821 undefined name 'e'
+src/create_python_project/utils/core_project_builder.py:723:57: F821 undefined name 'ext'
+src/create_python_project/utils/core_project_builder.py:728:9: E122 continuation line missing indentation or outdented
+src/create_python_project/utils/core_project_builder.py:732:4: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:741:35: F821 undefined name 'column'
+src/create_python_project/utils/core_project_builder.py:744:38: F821 undefined name 'column'
+src/create_python_project/utils/core_project_builder.py:1173:-176: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1173:-105: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1173:-29: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1327:4: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:1415:-606: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1415:-214: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1447:-820: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:2392:151: E501 line too long (151 > 150 characters)
+src/create_python_project/utils/core_project_builder.py:2450:151: E501 line too long (199 > 150 characters)
+
+⚠️ Flake8 linting failed. Attempting to fix issues automatically...
+Running Flake8 linting (attempt 2/2)...
+flake8...................................................................Failed
+- hook id: flake8
+- exit code: 1
+
+src/create_python_project/create_python_project.py:645:10: F841 local variable 'status' is assigned to but never used
+src/create_python_project/utils/ai_prompts.py:75:8: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:80:8: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:82:-2: E202 whitespace before ']'
+src/create_python_project/utils/ai_prompts.py:82:4: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:87:4: E202 whitespace before '}'
+src/create_python_project/utils/ai_prompts.py:95:-170: E202 whitespace before ']'
+src/create_python_project/utils/ai_prompts.py:95:-2: E202 whitespace before ']'
+src/create_python_project/utils/core_project_builder.py:547:14: E201 whitespace after '{'
+src/create_python_project/utils/core_project_builder.py:547:20: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:548:36: E201 whitespace after '{'
+src/create_python_project/utils/core_project_builder.py:548:80: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:554:20: E201 whitespace after '{'
+src/create_python_project/utils/core_project_builder.py:554:61: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:690:-136: E202 whitespace before ']'
+src/create_python_project/utils/core_project_builder.py:690:-88: E202 whitespace before ')'
+src/create_python_project/utils/core_project_builder.py:690:34: F821 undefined name 'e'
+src/create_python_project/utils/core_project_builder.py:723:57: F821 undefined name 'ext'
+src/create_python_project/utils/core_project_builder.py:728:9: E122 continuation line missing indentation or outdented
+src/create_python_project/utils/core_project_builder.py:732:4: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:741:35: F821 undefined name 'column'
+src/create_python_project/utils/core_project_builder.py:744:38: F821 undefined name 'column'
+src/create_python_project/utils/core_project_builder.py:1173:-176: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1173:-105: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1173:-29: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1327:4: E202 whitespace before '}'
+src/create_python_project/utils/core_project_builder.py:1415:-606: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1415:-214: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:1447:-820: E221 multiple spaces before operator
+src/create_python_project/utils/core_project_builder.py:2392:151: E501 line too long (151 > 150 characters)
+src/create_python_project/utils/core_project_builder.py:2450:151: E501 line too long (199 > 150 characters)
+
+❌ Flake8 linting failed after 2 attempts.
+Running mypy type checking (attempt 1/2)...
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+src/create_python_project/utils/core_project_builder.py:20: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
+src/create_python_project/utils/core_project_builder.py:20: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/utils/core_project_builder.py:20: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+src/create_python_project/utils/core_project_builder.py:197: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:201: error: Value of type "object" is not indexable  [index]
+src/create_python_project/utils/core_project_builder.py:206: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:211: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:214: error: Value of type "object" is not indexable  [index]
+src/create_python_project/utils/core_project_builder.py:256: error: Unsupported right operand type for in ("object")  [operator]
+src/create_python_project/utils/core_project_builder.py:257: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:258: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:261: error: Value of type "object" is not indexable  [index]
+src/create_python_project/utils/core_project_builder.py:690: error: Trying to read deleted variable "e"  [misc]
+src/create_python_project/utils/core_project_builder.py:690: error: Name "e" is used before definition  [used-before-def]
+src/create_python_project/utils/core_project_builder.py:723: error: Name "ext" is not defined  [name-defined]
+src/create_python_project/utils/core_project_builder.py:741: error: Name "column" is not defined  [name-defined]
+src/create_python_project/utils/core_project_builder.py:744: error: Name "column" is not defined  [name-defined]
+src/create_python_project/utils/core_project_builder.py:915: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
+src/create_python_project/utils/core_project_builder.py:915: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/utils/core_project_builder.py:915: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+src/create_python_project/utils/core_project_builder.py:1358: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
+src/create_python_project/utils/core_project_builder.py:1358: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/utils/core_project_builder.py:1358: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+src/create_python_project/utils/core_project_builder.py:1982: error: Item "None" of "Any | None" has no attribute "replace"  [union-attr]
+src/create_python_project/utils/core_project_builder.py:1988: error: Unsupported right operand type for in ("Any | None")  [operator]
+src/create_python_project/utils/core_project_builder.py:2031: error: Unsupported right operand type for in ("Any | None")  [operator]
+src/create_python_project/utils/core_project_builder.py:2074: error: Unsupported right operand type for in ("Any | None")  [operator]
+src/create_python_project/create_python_project.py:227: error: Incompatible types in assignment (expression has type "dict[Never, Never]", target has type "str")  [assignment]
+src/create_python_project/create_python_project.py:448: error: Incompatible types in assignment (expression has type "AIProvider", variable has type "DeepSeekProvider")  [assignment]
+src/create_python_project/create_python_project.py:654: error: Argument "tech_stack" to "create_project_structure" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
+src/create_python_project/create_python_project.py:726: error: Argument "tech_stack" to "initialize_git_repo" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
+Found 25 errors in 2 files (checked 21 source files)
+
+⚠️ mypy type checking failed. Attempting to fix issues automatically...
+Running mypy type checking (attempt 2/2)...
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+src/create_python_project/utils/core_project_builder.py:20: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
+src/create_python_project/utils/core_project_builder.py:20: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/utils/core_project_builder.py:20: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+src/create_python_project/utils/core_project_builder.py:197: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:201: error: Value of type "object" is not indexable  [index]
+src/create_python_project/utils/core_project_builder.py:206: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:211: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:214: error: Value of type "object" is not indexable  [index]
+src/create_python_project/utils/core_project_builder.py:256: error: Unsupported right operand type for in ("object")  [operator]
+src/create_python_project/utils/core_project_builder.py:257: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:258: error: "object" has no attribute "get"  [attr-defined]
+src/create_python_project/utils/core_project_builder.py:261: error: Value of type "object" is not indexable  [index]
+src/create_python_project/utils/core_project_builder.py:690: error: Trying to read deleted variable "e"  [misc]
+src/create_python_project/utils/core_project_builder.py:690: error: Name "e" is used before definition  [used-before-def]
+src/create_python_project/utils/core_project_builder.py:723: error: Name "ext" is not defined  [name-defined]
+src/create_python_project/utils/core_project_builder.py:741: error: Name "column" is not defined  [name-defined]
+src/create_python_project/utils/core_project_builder.py:744: error: Name "column" is not defined  [name-defined]
+src/create_python_project/utils/core_project_builder.py:915: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
+src/create_python_project/utils/core_project_builder.py:915: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/utils/core_project_builder.py:915: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+src/create_python_project/utils/core_project_builder.py:1358: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
+src/create_python_project/utils/core_project_builder.py:1358: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/utils/core_project_builder.py:1358: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+src/create_python_project/utils/core_project_builder.py:1982: error: Item "None" of "Any | None" has no attribute "replace"  [union-attr]
+src/create_python_project/utils/core_project_builder.py:1988: error: Unsupported right operand type for in ("Any | None")  [operator]
+src/create_python_project/utils/core_project_builder.py:2031: error: Unsupported right operand type for in ("Any | None")  [operator]
+src/create_python_project/utils/core_project_builder.py:2074: error: Unsupported right operand type for in ("Any | None")  [operator]
+src/create_python_project/create_python_project.py:227: error: Incompatible types in assignment (expression has type "dict[Never, Never]", target has type "str")  [assignment]
+src/create_python_project/create_python_project.py:448: error: Incompatible types in assignment (expression has type "AIProvider", variable has type "DeepSeekProvider")  [assignment]
+src/create_python_project/create_python_project.py:654: error: Argument "tech_stack" to "create_project_structure" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
+src/create_python_project/create_python_project.py:726: error: Argument "tech_stack" to "initialize_git_repo" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
+Found 25 errors in 2 files (checked 21 source files)
+
+❌ mypy type checking failed after 2 attempts.
+Running Pylint comprehensive linting...
+Pylint score: 9.90/10.0
+✅ Pylint check passed (score >= 9.0)!
+❌ Some linting checks failed.
+You can:
+1. Fix the issues and run the workflow again
+2. Continue anyway (not recommended)
+Do you want to continue anyway? (y/n): Aborting commit due to linting failures.
+
+ *  The terminal process "/usr/bin/zsh '-c', '/home/michaelnewham/bin/python_projects/create_python_project/scripts/ai_commit_workflow.sh'" terminated with exit code: 1. 
+ *  Terminal will be reused by tasks, press any key to close it. 

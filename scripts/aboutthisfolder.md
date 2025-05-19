@@ -13,12 +13,19 @@ Contains helper scripts for development, documentation, and automation tasks.
 scripts/
 ├── aboutthisfolder.md
 ├── ai_commit_workflow.sh
+├── check_gitlab_connection.sh
 ├── commit_with_docs_fix.sh
 ├── commit_with_docs.sh
 ├── create_gitlab_branch.sh
 ├── deepseek_commit_message.py
+├── download_pexels_image.sh
+├── errors.txt
+├── fix_lint_issues.py
 ├── fix_lint_issues.sh
 ├── fix_pylint_issues.sh
+├── fix_specific_lint_issues.py
+├── force_push_to_remotes.sh
+├── pexels_instructions.sh
 ├── post_commit_push.sh
 ├── remove_large_file.sh
 ├── run_mypy.sh
@@ -29,4 +36,4 @@ scripts/
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-18 00:26:21
+This documentation was automatically generated on: 2025-05-19 23:38:59

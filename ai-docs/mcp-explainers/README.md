@@ -11,6 +11,7 @@ This directory contains documentation and explanatory guides for Model Context P
 - [Perplexity Tools Guide](perplexity.md) - A guide to using Perplexity as an AI research assistant to find accurate, up-to-date information.
 - [PromptBoost Tools Guide](promptboost.md) - A guide to enhancing your prompts to get better AI-generated code and responses.
 - [Bright Data Tools Guide](brightdata.md) - A guide to using Bright Data for web scraping, data extraction, and browser automation with anti-bot detection capabilities.
+- [Pexels Tools Guide](pexels.md) - A guide to using Pexels MCP Server for searching, retrieving, and downloading high-quality photos and videos.
 
 ## MCP Server & Tool Count Overview
 
@@ -25,6 +26,7 @@ Each guide corresponds to a specific capability or MCP server in our configurati
 | Perplexity | Perplexity | 1 tool | AI research assistant |
 | PromptBoost | VS Code Extension | 1 tool | Improving prompt quality and effectiveness |
 | Bright Data | BrightData | 31 tools | Web scraping, data extraction, and browser automation |
+| Pexels | pexels-mcp-server | 11 tools | Stock photos and videos search and download |
 
 ## Tools Distribution
 
@@ -35,6 +37,7 @@ Each guide corresponds to a specific capability or MCP server in our configurati
 - **VS Code Native/GitHub Copilot**: File operations, searching, testing, terminal operations (not configured in mcp.json)
 - **PromptBoost** (1 tool): `promptBoost` for enhancing prompts with better structure, specificity and technical context
 - **Bright Data** (31 tools): Web scraping, structured data extraction, search engine results, browser automation
+- **Pexels** (11 tools): Search and download photos/videos, browse collections, get curated content
 
 ## Purpose
 
@@ -48,4 +51,4 @@ Each guide provides:
 
 ## Last Updated
 
-This directory was last updated on: 2025-05-17
+This directory was last updated on: 2025-05-19

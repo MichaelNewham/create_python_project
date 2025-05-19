@@ -37,6 +37,71 @@ Format: "project_type: brief explanation"
 """
 
 
+def get_technology_stack_prompt(
+    project_name: str, project_description: str, project_type: str
+) -> str:
+    """
+    Get a prompt for suggesting a technology stack for the project.
+
+    Args:
+        project_name: Name of the project
+        project_description: Description of the project
+        project_type: Type of the project (web, cli, etc.)
+
+    Returns:
+        Formatted prompt for AI
+    """
+    return f"""
+You are an expert Python developer tasked with recommending the most suitable technology stack for the following project:
+
+Project Name: {project_name}
+Project Description: {project_description}
+Project Type: {project_type}
+
+Please recommend a complete technology stack organized by categories. For each category, recommend 1-3 options with the first being your top recommendation.
+
+Your response should follow this JSON format exactly:
+
+{{
+  "categories": [
+    {{
+      "name": "Category Name",
+      "description": "Description of this technology category",
+      "options": [
+        {{"name": "Technology Name 1",
+          "description": "Clear description of this technology and why it suits this project",
+          "recommended": true}},
+        {{"name": "Technology Name 2",
+          "description": "Description of alternative technology",
+          "recommended": false}}
+      ]
+    }},
+    {{"name": "Next category...",
+      "description": "Description of this category",
+      "options": [...]}}
+  ],
+  "analysis": [
+    "Key feature needed: Feature 1",
+    "Key feature needed: Feature 2",
+    "Key feature needed: Feature 3",
+    "Key feature needed: Feature 4"
+  ]
+}}
+
+For a {project_type} project, include relevant technology categories such as:
+- Backend Framework (if applicable)
+- Database (if applicable)
+- Authentication (if applicable)
+- Frontend Technology (if applicable)
+- Data Processing (if applicable)
+- Testing Tools
+- Deployment Options
+- Any other categories relevant to the specific project needs
+
+Analyze the project description carefully to identify the key requirements and recommend appropriate technologies that will best suit this specific project's needs. Always mark exactly one option as recommended=true in each category.
+"""
+
+
 def get_project_structure_prompt(
     project_name: str,
     project_description: str,
@@ -120,12 +185,12 @@ Format your response as:
 Example format:
 ```
 Production Dependencies:
-- flask: Web framework for building the application
-- sqlalchemy: ORM for database interactions
+- package1: Description of what this package does and why it's needed
+- package2: Description of what this package does and why it's needed
 
 Development Dependencies:
-- pytest: Testing framework
-- black: Code formatter
+- test-package: Testing framework recommended for this project
+- lint-package: Code quality tool recommended for this project
 ```
 
 Be selective and focus on the most relevant packages for this specific project. Only recommend well-established packages with good community support.

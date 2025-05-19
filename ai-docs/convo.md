@@ -1,5 +1,42 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/convo.md -->
 # Engineering Assessment for Create Python Project
+
+## Latest Updates (2025-05-19)
+
+### Changes Made
+<!-- doc_update_20250519 -->
+1. **Enhanced Technology Stack Selection**
+   - Added more detailed explanations for each technology category
+   - Implemented "Other" option for all technology categories
+   - Added AI-powered inference for custom technology selections
+   - Added "Best for" descriptions for each technology option
+   - Improved user experience with clearer technology descriptions
+
+2. **Custom Technology Support**
+   - Added support for handling custom frontend frameworks like Next.js
+   - Enhanced dependency resolution for both standard and custom technologies
+   - Implemented custom deployment options (Cloudflare Tunnels, Vercel, Netlify)
+   - Added infrastructure for tech stack customization without hardcoding
+
+3. **Improved AI Provider Resilience**
+   - Added DeepSeek as a fallback AI provider
+   - Implemented better error handling for AI service failures
+   - Added robust normalization of technology names
+
+### Next Steps
+1. **Testing the Technology Stack Selection**
+   - Create test cases for various technology selections including custom options
+   - Verify that custom deployment configurations work correctly
+   - Test AI fallback mechanism
+
+2. **Frontend Framework Integration**
+   - Improve Next.js template generation
+   - Add more frontend framework options
+   - Enhance integration between backend and frontend templates
+
+3. **User Documentation**
+   - Create guide for custom technology options
+   - Document deployment options in detail
+   - Add screenshots of the CLI interface
 
 ## Latest Updates (2025-05-17)
 
