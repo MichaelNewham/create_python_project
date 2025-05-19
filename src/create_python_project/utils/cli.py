@@ -6,10 +6,8 @@ This module provides utilities for handling command-line interface operations.
 It manages user input, displays, and interactive prompts.
 """
 
-from typing import List, Optional, Tuple
 
-
-def enhanced_input(prompt: str, default: Optional[str] = None) -> str:
+def enhanced_input(prompt: str, default: str | None = None) -> str:
     """
     Enhanced input function with support for default values and better editing.
 
@@ -28,10 +26,10 @@ def enhanced_input(prompt: str, default: Optional[str] = None) -> str:
 
 
 def select_from_list(
-    items: List[str],
+    items: list[str],
     prompt: str,
     allow_custom: bool = False,
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """
     Allow the user to select an item from a list.
 

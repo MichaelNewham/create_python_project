@@ -5,7 +5,7 @@ Configuration files for the Create Python Project.
 
 ## Purpose
 
-Contains configuration files for development tools like mypy, pylint, etc.
+Contains configuration files for linters, formatters, and other development tools.
 
 ## Structure
 
@@ -13,9 +13,10 @@ Contains configuration files for development tools like mypy, pylint, etc.
 .config/
 ├── aboutthisfolder.md
 ├── mypy.ini
-└── pylintrc
+├── pylintrc
+└── ruff.toml
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-17 01:23:47
+This documentation was automatically generated on: 2025-05-20 00:52:06

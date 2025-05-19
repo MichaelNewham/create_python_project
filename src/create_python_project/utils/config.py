@@ -7,10 +7,9 @@ It manages .env files, project-specific settings, and default configurations.
 """
 
 import os
-from typing import Dict, Tuple
 
 
-def load_env_file(env_file: str = ".env") -> Dict[str, str]:
+def load_env_file(env_file: str = ".env") -> dict[str, str]:
     """
     Load environment variables from a .env file.
 
@@ -20,13 +19,13 @@ def load_env_file(env_file: str = ".env") -> Dict[str, str]:
     Returns:
         Dictionary containing environment variables
     """
-    env_vars: Dict[str, str] = {}
+    env_vars: dict[str, str] = {}
 
     if not os.path.exists(env_file):
         return env_vars
 
     try:
-        with open(env_file, "r", encoding="utf-8") as file:
+        with open(env_file, encoding="utf-8") as file:
             for line in file:
                 line = line.strip()
 
@@ -54,7 +53,7 @@ def load_env_file(env_file: str = ".env") -> Dict[str, str]:
         return {}
 
 
-def create_env_file(project_dir: str, variables: Dict[str, str]) -> Tuple[bool, str]:
+def create_env_file(project_dir: str, variables: dict[str, str]) -> tuple[bool, str]:
     """
     Create a .env file in the project directory.
 
@@ -93,7 +92,7 @@ def create_env_file(project_dir: str, variables: Dict[str, str]) -> Tuple[bool, 
         # Check if .gitignore exists and if .env is already in it
         gitignore_content = ""
         if os.path.exists(gitignore_path):
-            with open(gitignore_path, "r", encoding="utf-8") as file:
+            with open(gitignore_path, encoding="utf-8") as file:
                 gitignore_content = file.read()
 
         # Add .env to .gitignore if not already present
@@ -113,7 +112,7 @@ def create_env_file(project_dir: str, variables: Dict[str, str]) -> Tuple[bool, 
         return False, f"Failed to create .env file: {str(e)}"
 
 
-def get_project_types() -> Dict[str, Dict[str, str]]:
+def get_project_types() -> dict[str, dict[str, str]]:
     """
     Get the available project types and their configurations.
 

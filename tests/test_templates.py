@@ -73,7 +73,7 @@ class TestCreateFileFromTemplate:
         assert os.path.exists(output_path), "File was not created"
 
         # Check file contents
-        with open(output_path, "r") as f:
+        with open(output_path) as f:
             content = f.read()
 
         assert "test_project" in content, "Project name not found in created file"

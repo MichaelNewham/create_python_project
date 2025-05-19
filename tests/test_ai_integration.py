@@ -2,7 +2,7 @@
 Tests for the ai_integration module.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -35,7 +35,7 @@ class TestAIProvider:
 class TestGetAvailableAIProviders:
     """Tests for the get_available_ai_providers function."""
 
-    def test_get_available_providers(self, mock_env_vars: Dict[str, str]) -> None:
+    def test_get_available_providers(self, mock_env_vars: dict[str, str]) -> None:
         """Test getting available AI providers."""
         # Execute
         providers = get_available_ai_providers()
@@ -56,7 +56,7 @@ class TestSelectAIProvider:
     """Tests for the select_ai_provider function."""
 
     def test_select_ai_provider(
-        self, mock_env_vars: Dict[str, str], monkeypatch: Any
+        self, mock_env_vars: dict[str, str], monkeypatch: Any
     ) -> None:
         """Test selecting an AI provider."""
         # Setup

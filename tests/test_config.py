@@ -67,7 +67,7 @@ class TestCreateEnvFile:
         assert os.path.exists(env_file), ".env file not created"
 
         # Check file contents
-        with open(env_file, "r") as f:
+        with open(env_file) as f:
             content = f.read()
 
         assert "TEST_VAR=test_value" in content, "TEST_VAR not found in .env file"

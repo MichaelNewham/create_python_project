@@ -58,7 +58,8 @@ Project Name: {project_name}
 Project Description: {project_description}
 Project Type: {project_type}
 
-Please recommend a complete technology stack organized by categories. For each category, recommend 1-3 options with the first being your top recommendation.
+Please recommend a complete technology stack organized by categories.
+For each category, recommend 1-3 options with the first being your top recommendation.
 
 Your response should follow this JSON format exactly:
 
@@ -76,9 +77,11 @@ Your response should follow this JSON format exactly:
           "recommended": false}}
       ]
     }},
-    {{"name": "Next category...",
+    {{
+      "name": "Next category...",
       "description": "Description of this category",
-      "options": [...]}}
+      "options": []
+    }}
   ],
   "analysis": [
     "Key feature needed: Feature 1",
@@ -98,7 +101,8 @@ For a {project_type} project, include relevant technology categories such as:
 - Deployment Options
 - Any other categories relevant to the specific project needs
 
-Analyze the project description carefully to identify the key requirements and recommend appropriate technologies that will best suit this specific project's needs. Always mark exactly one option as recommended=true in each category.
+Analyze the project description carefully to identify the key requirements and recommend appropriate technologies.
+Choose technologies that will best suit this specific project's needs. Always mark exactly one option as recommended=true in each category.
 """
 
 

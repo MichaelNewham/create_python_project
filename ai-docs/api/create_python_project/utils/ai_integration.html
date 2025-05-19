@@ -769,7 +769,7 @@ It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.</p
             response.raise_for_status()
 
             result = response.json()
-            logging.debug(f&#34;Received response from Perplexity API: {result}&#34;)
+            logging.debug(&#34;Received response from Perplexity API: %s&#34;, result)
 
             if &#34;choices&#34; not in result or not result.get(&#34;choices&#34;):
                 return (
@@ -847,7 +847,7 @@ It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.</p
         response.raise_for_status()
 
         result = response.json()
-        logging.debug(f&#34;Received response from Perplexity API: {result}&#34;)
+        logging.debug(&#34;Received response from Perplexity API: %s&#34;, result)
 
         if &#34;choices&#34; not in result or not result.get(&#34;choices&#34;):
             return (

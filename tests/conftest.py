@@ -4,7 +4,8 @@ Test fixtures and configuration for the Create Python Project tests.
 
 import shutil
 import tempfile
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 
 import pytest
 
@@ -23,7 +24,7 @@ def temp_dir() -> Generator[str, None, None]:
 
 
 @pytest.fixture
-def mock_env_vars(monkeypatch: Any) -> Dict[str, str]:
+def mock_env_vars(monkeypatch: Any) -> dict[str, str]:
     """
     Create mock environment variables for testing.
 

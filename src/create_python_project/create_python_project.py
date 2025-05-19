@@ -8,7 +8,7 @@ It handles the CLI interface and orchestrates the project creation process.
 
 import os
 import sys
-from typing import Dict, Tuple
+from typing import Any
 
 # Load environment variables from .env file
 try:
@@ -45,7 +45,7 @@ logger = log_utils.setup_logging()
 console = Console()
 
 
-def get_project_info() -> Tuple[bool, Dict[str, str]]:
+def get_project_info() -> tuple[bool, dict[str, Any]]:
     """
     Get project information from the user.
 
@@ -120,7 +120,7 @@ def get_project_info() -> Tuple[bool, Dict[str, str]]:
     return True, project_info
 
 
-def determine_project_type(project_info: Dict[str, str]) -> Tuple[bool, str]:
+def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     """
     Determine the project type based on project description.
 
@@ -224,6 +224,7 @@ def determine_project_type(project_info: Dict[str, str]) -> Tuple[bool, str]:
 
     # Now that we have a project type, get technology stack recommendations
     project_info["project_type"] = project_type
+    # Create a new dictionary specifically for tech_stack
     project_info["tech_stack"] = {}
 
     # Show AI analysis header
@@ -435,17 +436,40 @@ def determine_project_type(project_info: Dict[str, str]) -> Tuple[bool, str]:
                         # Generate a prompt to determine the appropriate technology based on user's description
                         tech_inference_prompt = f"""
                         The user is setting up a {project_type} project and wants to use a different {category['name']} than those offered.
-                        
+
                         User's preference: "{user_description}"
-                        
+
                         Based on this description, what specific technology name should be used? Respond with ONLY the name of the technology.
                         """
 
-                        # Use the same AI provider to infer the technology
+                        # Create a provider for inferring technology
+                        from create_python_project.utils.ai_integration import (
+                            AIProvider,
+                            DeepSeekProvider,
+                            OpenAIProvider,
+                        )
+
+                        # Initialize with a concrete implementation
+                        inference_provider: AIProvider
+
                         if "DeepSeek" in providers:
-                            inference_provider = ai_integration.DeepSeekProvider()
-                        else:
-                            inference_provider = selected_provider
+                            # Create a DeepSeek provider
+                            inference_provider = DeepSeekProvider()
+                        elif selected_provider is not None:
+                            # Clone the selected provider's properties
+                            if isinstance(selected_provider, DeepSeekProvider):
+                                inference_provider = DeepSeekProvider(
+                                    api_key=selected_provider.api_key,
+                                    model=selected_provider.model,
+                                )
+                            elif isinstance(selected_provider, OpenAIProvider):
+                                inference_provider = OpenAIProvider(
+                                    api_key=selected_provider.api_key,
+                                    model=selected_provider.model,
+                                )
+                            else:
+                                # Default to a concrete implementation
+                                inference_provider = OpenAIProvider()
 
                         (
                             inference_success,
@@ -573,8 +597,8 @@ def get_technology_use_case(tech_name: str) -> str:
 
 
 def manual_project_type_selection(
-    project_types: Dict[str, Dict[str, str]]
-) -> Tuple[bool, str]:
+    project_types: dict[str, dict[str, str]]
+) -> tuple[bool, str]:
     """
     Allow manual selection of project type when AI is unavailable or not chosen.
 
@@ -588,7 +612,7 @@ def manual_project_type_selection(
     console.print("\n[bold]Please select a project type:[/bold]")
 
     project_type_list = []
-    for type_key, type_info in project_types.items():
+    for _, type_info in project_types.items():
         project_type_list.append(f"{type_info['name']} - {type_info['description']}")
 
     for i, item in enumerate(project_type_list, 1):
@@ -611,7 +635,7 @@ def manual_project_type_selection(
         return False, "Failed to select project type"
 
 
-def create_project(project_info: Dict[str, str], project_type: str) -> Tuple[bool, str]:
+def create_project(project_info: dict[str, Any], project_type: str) -> tuple[bool, str]:
     """
     Create the project structure.
 
@@ -646,12 +670,19 @@ def create_project(project_info: Dict[str, str], project_type: str) -> Tuple[boo
         console.print("\n[dim]Scaffolding directory structure...[/dim]")
 
         # Create project structure with technology stack information
+        tech_stack_from_info = project_info.get("tech_stack")
+        tech_stack_dict: dict[str, Any] = {}
+
+        # Make sure we have a valid dictionary
+        if isinstance(tech_stack_from_info, dict):
+            tech_stack_dict = tech_stack_from_info
+
         structure_success, message = core_project_builder.create_project_structure(
             project_name=project_info["project_name"],
             project_dir=project_info["project_dir"],
             project_type=project_type,
             with_ai=True,
-            tech_stack=project_info.get("tech_stack", {}),
+            tech_stack=tech_stack_dict,
             **project_info,
         )
 
@@ -715,6 +746,14 @@ def create_project(project_info: Dict[str, str], project_type: str) -> Tuple[boo
         ) as progress:
             task = progress.add_task("Setting up", total=None)
 
+            # Ensure we have a valid tech_stack dictionary
+            git_tech_stack_from_info = project_info.get("tech_stack")
+            git_tech_stack: dict[str, Any] = {}
+
+            # Make sure we have a valid dictionary
+            if isinstance(git_tech_stack_from_info, dict):
+                git_tech_stack = git_tech_stack_from_info
+
             git_success, git_message = core_project_builder.initialize_git_repo(
                 project_dir=project_info["project_dir"],
                 project_name=project_info["project_name"],
@@ -723,7 +762,7 @@ def create_project(project_info: Dict[str, str], project_type: str) -> Tuple[boo
                 with_github_config=setup_github_config,
                 project_description=project_info.get("project_description", ""),
                 project_type=project_type,
-                tech_stack=project_info.get("tech_stack", {}),
+                tech_stack=git_tech_stack,
             )
 
             progress.update(task, completed=True)

@@ -48,14 +48,14 @@ It handles the CLI interface and orchestrates the project creation process.</p>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="create_python_project.create_python_project.create_project"><code class="name flex">
-<span>def <span class="ident">create_project</span></span>(<span>project_info: Dict[str, str], project_type: str) ‑> Tuple[bool, str]</span>
+<span>def <span class="ident">create_project</span></span>(<span>project_info: Dict[str, Any], project_type: str) ‑> Tuple[bool, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_project(project_info: Dict[str, str], project_type: str) -&gt; Tuple[bool, str]:
+<pre><code class="python">def create_project(project_info: Dict[str, Any], project_type: str) -&gt; Tuple[bool, str]:
     &#34;&#34;&#34;
     Create the project structure.
 
@@ -69,7 +69,7 @@ It handles the CLI interface and orchestrates the project creation process.</p>
     console.print(&#34;\n&#34;)
     section_panel = Panel(
         Text(
-            &#34;[bold magenta]Step 4: Project Type and Technology Selection[/bold magenta]&#34;,
+            &#34;[bold magenta]Step 4: Creating Project Structure[/bold magenta]&#34;,
             justify=&#34;center&#34;,
         ),
         style=&#34;bold magenta&#34;,
@@ -81,29 +81,36 @@ It handles the CLI interface and orchestrates the project creation process.</p>
     # Show selected project type
     project_types = config.get_project_types()
     type_info = project_types.get(project_type, {&#34;name&#34;: project_type.capitalize()})
-    console.print(f&#34;\n[bold yellow]{type_info[&#39;name&#39;]}[/bold yellow]&#34;)
+    console.print(f&#34;\n[bold yellow]Creating {type_info[&#39;name&#39;]} project[/bold yellow]&#34;)
 
-    # Create project structure
-    with Progress(
-        SpinnerColumn(),
-        TextColumn(&#34;[bold magenta]Creating project structure...[/bold magenta]&#34;),
-        console=console,
-    ) as progress:
-        task = progress.add_task(&#34;Creating&#34;, total=None)
+    # Display a small animated python in the terminal
+    with console.status(
+        &#34;[bold green]Building your Python project 🐍[/bold green]&#34;, spinner=&#34;dots&#34;
+    ):
+        console.print(&#34;\n[dim]Scaffolding directory structure...[/dim]&#34;)
+
+        # Create project structure with technology stack information
+        tech_stack_from_info = project_info.get(&#34;tech_stack&#34;)
+        tech_stack_dict: Dict[str, Any] = {}
+
+        # Make sure we have a valid dictionary
+        if isinstance(tech_stack_from_info, dict):
+            tech_stack_dict = tech_stack_from_info
 
         structure_success, message = core_project_builder.create_project_structure(
             project_name=project_info[&#34;project_name&#34;],
             project_dir=project_info[&#34;project_dir&#34;],
             project_type=project_type,
             with_ai=True,
+            tech_stack=tech_stack_dict,
             **project_info,
         )
 
-        progress.update(task, completed=True)
+        if not structure_success:
+            console.print(f&#34;[bold red]Error:[/bold red] {message}&#34;)
+            return False, message
 
-    if not structure_success:
-        console.print(f&#34;[bold red]Error:[/bold red] {message}&#34;)
-        return False, message
+        console.print(&#34;[dim]Finalizing project setup...[/dim]&#34;)
 
     console.print(f&#34;\n[bold green]✅ {message}[/bold green]&#34;)
 
@@ -137,6 +144,21 @@ It handles the CLI interface and orchestrates the project creation process.</p>
         )
         gitlab_username = pt_prompt()
 
+        # Ask for GitHub Copilot configuration
+        setup_github_config = Confirm.ask(
+            &#34;\n[bold cyan]Would you like to set up GitHub Copilot configuration files?[/bold cyan]&#34;,
+            default=True,
+        )
+
+        # If setting up GitHub config, explain the benefits
+        if setup_github_config:
+            console.print(
+                &#34;\n[italic]This will create a .github directory with configuration files for GitHub Copilot:[/italic]&#34;
+            )
+            console.print(&#34;[dim]- Project-specific coding standards and guidelines&#34;)
+            console.print(&#34;[dim]- Custom prompt templates for common development tasks&#34;)
+            console.print(&#34;[dim]- VS Code settings for integration with GitHub Copilot&#34;)
+
         with Progress(
             SpinnerColumn(),
             TextColumn(&#34;[bold cyan]Setting up Git repository...[/bold cyan]&#34;),
@@ -144,17 +166,37 @@ It handles the CLI interface and orchestrates the project creation process.</p>
         ) as progress:
             task = progress.add_task(&#34;Setting up&#34;, total=None)
 
+            # Ensure we have a valid tech_stack dictionary
+            git_tech_stack_from_info = project_info.get(&#34;tech_stack&#34;)
+            git_tech_stack: Dict[str, Any] = {}
+
+            # Make sure we have a valid dictionary
+            if isinstance(git_tech_stack_from_info, dict):
+                git_tech_stack = git_tech_stack_from_info
+
             git_success, git_message = core_project_builder.initialize_git_repo(
-                project_info[&#34;project_dir&#34;],
-                project_info[&#34;project_name&#34;],
+                project_dir=project_info[&#34;project_dir&#34;],
+                project_name=project_info[&#34;project_name&#34;],
                 github_username=github_username,
                 gitlab_username=gitlab_username,
+                with_github_config=setup_github_config,
+                project_description=project_info.get(&#34;project_description&#34;, &#34;&#34;),
+                project_type=project_type,
+                tech_stack=git_tech_stack,
             )
 
             progress.update(task, completed=True)
 
         if git_success:
             console.print(f&#34;\n[bold green]✅ {git_message}[/bold green]&#34;)
+
+            if setup_github_config:
+                console.print(
+                    &#34;\n[green]✓[/green] GitHub Copilot configuration files created in the .github directory&#34;
+                )
+                console.print(
+                    &#34;[dim]To use these with VS Code, install the GitHub Copilot extension[/dim]&#34;
+                )
 
             if github_username or gitlab_username:
                 console.print(
@@ -170,7 +212,7 @@ It handles the CLI interface and orchestrates the project creation process.</p>
     # Set up virtual environment
     console.print(&#34;\n&#34;)
     venv_panel = Panel(
-        Text(&#34;🐍 SETTING UP VIRTUAL ENVIRONMENT&#34;, justify=&#34;center&#34;),
+        Text(&#34;🐍 SETTING UP POETRY ENVIRONMENT&#34;, justify=&#34;center&#34;),
         style=&#34;bold yellow&#34;,
         border_style=&#34;yellow&#34;,
         expand=True,
@@ -178,14 +220,14 @@ It handles the CLI interface and orchestrates the project creation process.</p>
     console.print(venv_panel)
 
     setup_venv = Confirm.ask(
-        &#34;[bold cyan]Do you want to set up a virtual environment?[/bold cyan]&#34;,
+        &#34;[bold cyan]Do you want to set up Poetry and install dependencies?[/bold cyan]&#34;,
         default=True,
     )
 
     if setup_venv:
         with Progress(
             SpinnerColumn(),
-            TextColumn(&#34;[bold yellow]Setting up virtual environment...[/bold yellow]&#34;),
+            TextColumn(&#34;[bold yellow]Setting up Poetry environment...[/bold yellow]&#34;),
             console=console,
         ) as progress:
             task = progress.add_task(&#34;Setting up&#34;, total=None)
@@ -198,9 +240,17 @@ It handles the CLI interface and orchestrates the project creation process.</p>
 
         if venv_success:
             console.print(f&#34;\n[bold green]✅ {venv_message}[/bold green]&#34;)
+            console.print(
+                &#34;[dim]To activate the environment, run [bold]poetry shell[/bold] in your project directory[/dim]&#34;
+            )
         else:
             console.print(f&#34;\n[bold red]❌ {venv_message}[/bold red]&#34;)
-            console.print(&#34;[yellow]Continuing without virtual environment...[/yellow]&#34;)
+            console.print(
+                &#34;[yellow]Continuing without Poetry environment setup...[/yellow]&#34;
+            )
+            console.print(
+                &#34;[dim]You can set it up later by running [bold]poetry install[/bold] in your project directory[/dim]&#34;
+            )
 
     return True, &#34;Project created successfully&#34;</code></pre>
 </details>
@@ -216,14 +266,14 @@ It handles the CLI interface and orchestrates the project creation process.</p>
 <p>Tuple containing success status and message</p></div>
 </dd>
 <dt id="create_python_project.create_python_project.determine_project_type"><code class="name flex">
-<span>def <span class="ident">determine_project_type</span></span>(<span>project_info: Dict[str, str]) ‑> Tuple[bool, str]</span>
+<span>def <span class="ident">determine_project_type</span></span>(<span>project_info: Dict[str, Any]) ‑> Tuple[bool, str]</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def determine_project_type(project_info: Dict[str, str]) -&gt; Tuple[bool, str]:
+<pre><code class="python">def determine_project_type(project_info: Dict[str, Any]) -&gt; Tuple[bool, str]:
     &#34;&#34;&#34;
     Determine the project type based on project description.
 
@@ -252,122 +302,380 @@ It handles the CLI interface and orchestrates the project creation process.</p>
             &#34;Please describe your project (this helps with AI recommendations)&#34;
         )
 
-    console.print(
-        &#34;\nYou can select a project type or let AI suggest one based on your description.&#34;
-    )
-    ai_suggestion = Confirm.ask(
-        &#34;[bold cyan]Would you like AI to suggest a project type?[/bold cyan]&#34;,
-        default=True,
-    )
+    # Select AI provider for project analysis
+    providers = ai_integration.get_available_ai_providers()
+    if not providers:
+        console.print(
+            &#34;[bold yellow]No AI providers available. Please set up API keys in your environment variables.[/bold yellow]&#34;
+        )
+        return manual_project_type_selection(project_types)
 
-    # Select AI provider first if wanting AI suggestions
-    selected_provider = None
-    if ai_suggestion:
-        providers = ai_integration.get_available_ai_providers()
-        if not providers:
+    provider_success, selected_provider = ai_integration.select_ai_provider(providers)
+    if not provider_success or not selected_provider:
+        console.print(
+            &#34;[bold yellow]Failed to select an AI provider. Falling back to manual selection.[/bold yellow]&#34;
+        )
+        return manual_project_type_selection(project_types)
+
+    # Use AI to determine project type
+    with Progress(
+        SpinnerColumn(),
+        TextColumn(&#34;[bold cyan]Analyzing your project description...[/bold cyan]&#34;),
+        console=console,
+    ) as progress:
+        task = progress.add_task(&#34;Analyzing&#34;, total=None)
+
+        # Generate type detection prompt
+        prompt = ai_prompts.get_project_type_prompt(
+            project_info[&#34;project_name&#34;],
+            project_info[&#34;project_description&#34;],
+        )
+
+        # Get AI response for project type
+        ai_success, response = selected_provider.generate_response(prompt)
+
+        # If selected provider fails, try DeepSeek as fallback
+        if (
+            not ai_success
+            and selected_provider.__class__.__name__ != &#34;DeepSeekProvider&#34;
+            and &#34;DeepSeek&#34; in providers
+        ):
             console.print(
-                &#34;[bold yellow]No AI providers available. Please set up API keys in your environment variables.[/bold yellow]&#34;
+                f&#34;[bold yellow]Selected AI provider failed: {response}. Trying DeepSeek as fallback...[/bold yellow]&#34;
             )
-            ai_suggestion = False
-        else:
-            provider_success, selected_provider = ai_integration.select_ai_provider(
-                providers
+            deepseek_provider = ai_integration.DeepSeekProvider()
+            ai_success, response = deepseek_provider.generate_response(prompt)
+
+        # Update progress
+        progress.update(task, completed=True)
+        progress.stop()
+
+        if not ai_success:
+            console.print(
+                f&#34;[bold red]Error getting AI suggestion:[/bold red] {response}&#34;
             )
-            if not provider_success or not selected_provider:
+            return manual_project_type_selection(project_types)
+
+        # Extract project type from response
+        project_type = None
+        explanation = &#34;&#34;
+        response_lines = response.strip().split(&#34;\n&#34;)
+        for line in response_lines:
+            if &#34;:&#34; in line:
+                suggested_type, explanation = line.split(&#34;:&#34;, 1)
+                suggested_type = suggested_type.strip().lower()
+
+                if suggested_type in project_types:
+                    project_type = suggested_type
+                    break
+
+        if not project_type:
+            console.print(
+                &#34;[bold yellow]AI couldn&#39;t determine a suitable project type from your description.[/bold yellow]&#34;
+            )
+            return manual_project_type_selection(project_types)
+
+    # Now that we have a project type, get technology stack recommendations
+    project_info[&#34;project_type&#34;] = project_type
+    # Create a new dictionary specifically for tech_stack
+    project_info[&#34;tech_stack&#34;] = {}
+
+    # Show AI analysis header
+    console.print(&#34;\n&#34;)
+    ai_header = Panel(
+        Text(&#34;🤖 AI ANALYSIS COMPLETE&#34;, justify=&#34;center&#34;, style=&#34;bold white&#34;),
+        border_style=&#34;cyan&#34;,
+        expand=True,
+    )
+    console.print(ai_header)
+
+    # Display project type recommendation
+    type_info = project_types.get(project_type, {&#34;name&#34;: project_type.capitalize()})
+    console.print(&#34;\nBased on your description, I recommend a &#34;, end=&#34;&#34;)
+    console.print(f&#34;[bold green]&#39;{project_type}&#39;[/bold green]&#34;, end=&#34;&#34;)
+    console.print(f&#34; project ({type_info[&#39;name&#39;]}).&#34;)
+    console.print(f&#34;[italic]{explanation.strip()}[/italic]\n&#34;)
+
+    # Generate technology stack prompt
+    with Progress(
+        SpinnerColumn(),
+        TextColumn(&#34;[bold cyan]Analyzing optimal technology stack...[/bold cyan]&#34;),
+        console=console,
+    ) as progress:
+        task = progress.add_task(&#34;Analyzing&#34;, total=None)
+
+        tech_prompt = ai_prompts.get_technology_stack_prompt(
+            project_info[&#34;project_name&#34;],
+            project_info[&#34;project_description&#34;],
+            project_type,
+        )
+
+        # Get AI response for technology stack
+        tech_success, tech_response = selected_provider.generate_response(tech_prompt)
+
+        # If selected provider fails, try DeepSeek as fallback
+        if (
+            not tech_success
+            and selected_provider.__class__.__name__ != &#34;DeepSeekProvider&#34;
+            and &#34;DeepSeek&#34; in providers
+        ):
+            console.print(
+                f&#34;[bold yellow]Selected AI provider failed for tech stack: {tech_response}. Trying DeepSeek as fallback...[/bold yellow]&#34;
+            )
+            deepseek_provider = ai_integration.DeepSeekProvider()
+            tech_success, tech_response = deepseek_provider.generate_response(
+                tech_prompt
+            )
+
+        # Update progress
+        progress.update(task, completed=True)
+        progress.stop()
+
+        if not tech_success:
+            console.print(
+                f&#34;[bold yellow]Could not generate technology recommendations: {tech_response}[/bold yellow]&#34;
+            )
+            return True, project_type
+
+    # Parse the JSON response and display technology stack recommendations
+    try:
+        import json
+
+        tech_data = json.loads(tech_response)
+
+        # Display key project features identified by AI
+        if &#34;analysis&#34; in tech_data and tech_data[&#34;analysis&#34;]:
+            console.print(&#34;I&#39;ve analyzed your project needs:&#34;)
+            for feature in tech_data[&#34;analysis&#34;]:
+                console.print(f&#34;  {feature}&#34;, style=&#34;cyan&#34;)
+            console.print(&#34;&#34;)
+
+        # Display technology categories and options
+        if &#34;categories&#34; in tech_data and tech_data[&#34;categories&#34;]:
+            console.print(
+                &#34;[bold yellow]Understanding Your Technology Stack Options:[/bold yellow]\n&#34;
+            )
+            console.print(
+                &#34;Each technology category serves a specific purpose in your project. Here&#39;s what they do:\n&#34;
+            )
+
+            # Print a brief explanation of each category first
+            for category in tech_data[&#34;categories&#34;]:
                 console.print(
-                    &#34;[bold yellow]Failed to select an AI provider. Falling back to manual selection.[/bold yellow]&#34;
+                    f&#34;[bold magenta]{category[&#39;name&#39;]}[/bold magenta]: {category[&#39;description&#39;]}&#34;
                 )
-                ai_suggestion = False
 
-    # Now proceed with project type analysis if we have a provider
-    if ai_suggestion and selected_provider:
-        # Try to use AI to determine project type
-        with Progress(
-            SpinnerColumn(),
-            TextColumn(&#34;[bold cyan]Analyzing your project description...[/bold cyan]&#34;),
-            console=console,
-        ) as progress:
-            task = progress.add_task(&#34;Analyzing&#34;, total=None)
-
-            # Generate prompt
-            prompt = ai_prompts.get_project_type_prompt(
-                project_info[&#34;project_name&#34;],
-                project_info[&#34;project_description&#34;],
+            console.print(
+                &#34;\n[bold yellow]Recommended Technology Stack:[/bold yellow]\n&#34;
             )
 
-            # Get AI response
-            ai_success, response = selected_provider.generate_response(prompt)
+            for category in tech_data[&#34;categories&#34;]:
+                # Print category header with clearer explanation
+                console.print(
+                    f&#34;🔹 [bold cyan]{category[&#39;name&#39;]}[/bold cyan] - {category[&#39;description&#39;]}&#34;
+                )
+                console.print(
+                    f&#34;   [italic dim]Why it matters: This determines how your project will {get_category_impact(category[&#39;name&#39;])}&lt;/italic dim&gt;&#34;
+                )
 
-            # Stop the progress indicator before showing results
-            progress.update(task, completed=True)
-            progress.stop()
+                # Print technology options with checkboxes and clear explanations
+                for option in category[&#34;options&#34;]:
+                    is_recommended = option.get(&#34;recommended&#34;, False)
+                    prefix = &#34;[x]&#34; if is_recommended else &#34;[ ]&#34;
+                    style = &#34;bold green&#34; if is_recommended else &#34;white&#34;
 
-            if ai_success:
-                # Extract project type from response
-                response_lines = response.strip().split(&#34;\n&#34;)
-                for line in response_lines:
-                    if &#34;:&#34; in line:
-                        suggested_type, explanation = line.split(&#34;:&#34;, 1)
-                        suggested_type = suggested_type.strip().lower()
+                    console.print(f&#34;  {prefix} &#34;, end=&#34;&#34;)
+                    console.print(option[&#34;name&#34;], style=style, end=&#34;&#34;)
 
-                        if suggested_type in project_types:
+                    if is_recommended:
+                        console.print(&#34; ⭐ &#34;, end=&#34;&#34;)
+                        console.print(&#34;(AI recommended)&#34;, style=&#34;italic&#34;)
+                    else:
+                        console.print(&#34;&#34;)
+
+                    console.print(f&#34;      {option[&#39;description&#39;]}&#34;)
+
+                    # Add details on when this technology is most appropriate
+                    console.print(
+                        f&#34;      [dim]Best for: {get_technology_use_case(option[&#39;name&#39;])}&lt;/dim&gt;&#34;
+                    )
+
+                console.print(&#34;&#34;)
+
+            # Allow user to customize technology selections
+            console.print(
+                &#34;[bold cyan]Would you like to customize the technology selections? (yes/no)[/bold cyan]&#34;,
+                end=&#34; &#34;,
+            )
+            customize = Prompt.ask(&#34;&#34;, choices=[&#34;yes&#34;, &#34;no&#34;], default=&#34;no&#34;)
+
+            if customize.lower() == &#34;yes&#34;:
+                for category in tech_data[&#34;categories&#34;]:
+                    console.print(
+                        f&#34;\n[bold magenta]Select {category[&#39;name&#39;]}:[/bold magenta]&#34;
+                    )
+                    console.print(
+                        f&#34;[italic]This determines how your project will {get_category_impact(category[&#39;name&#39;])}.[/italic]&#34;
+                    )
+                    options = [option[&#34;name&#34;] for option in category[&#34;options&#34;]]
+
+                    # Find recommended option as default
+                    default_option = next(
+                        (
+                            option[&#34;name&#34;]
+                            for option in category[&#34;options&#34;]
+                            if option.get(&#34;recommended&#34;, False)
+                        ),
+                        options[0],
+                    )
+
+                    # Display options with numbers and detailed explanations
+                    for i, option_name in enumerate(options, 1):
+                        is_recommended = option_name == default_option
+                        style = &#34;cyan&#34; if is_recommended else &#34;white&#34;
+                        recommendation = &#34; (AI recommended)&#34; if is_recommended else &#34;&#34;
+                        console.print(
+                            f&#34;  {i}. [bold {style}]{option_name}[/bold {style}]{recommendation}&#34;
+                        )
+
+                        # Find option details from category data
+                        option_data = next(
+                            (
+                                opt
+                                for opt in category[&#34;options&#34;]
+                                if opt[&#34;name&#34;] == option_name
+                            ),
+                            None,
+                        )
+                        if option_data:
                             console.print(
-                                f&#34;\n[bold green]Based on your description, I recommend a &#39;[cyan]{suggested_type}[/cyan]&#39; project.[/bold green]&#34;
+                                f&#34;     [dim]{option_data[&#39;description&#39;]}[/dim]&#34;
                             )
                             console.print(
-                                f&#34;[italic]Explanation: {explanation.strip()}[/italic]&#34;
+                                f&#34;     [dim]Best for: {get_technology_use_case(option_name)}[/dim]&#34;
                             )
 
-                            confirm = Confirm.ask(
-                                &#34;[bold cyan]Do you want to use this suggestion?[/bold cyan]&#34;,
-                                default=True,
+                    # Add &#34;Other&#34; option
+                    other_option_number = len(options) + 1
+                    console.print(
+                        f&#34;  {other_option_number}. Other (describe your preference)&#34;
+                    )
+                    console.print(
+                        &#34;     [dim]Tell us what technology you prefer if none of the above meet your needs[/dim]&#34;
+                    )
+
+                    # Ask user to select an option
+                    selection = Prompt.ask(
+                        &#34;Enter your choice&#34;,
+                        choices=[
+                            str(i) for i in range(1, len(options) + 2)
+                        ],  # +2 to include the &#34;Other&#34; option
+                        default=str(options.index(default_option) + 1),
+                    )
+
+                    selected_index = int(selection) - 1
+
+                    # Handle &#34;Other&#34; option
+                    if selected_index == len(options):  # User selected &#34;Other&#34;
+                        console.print(
+                            &#34;\nPlease describe your preferred technology in plain English:&#34;
+                        )
+                        user_description = pt_prompt()
+
+                        console.print(
+                            &#34;\n[bold cyan]Processing your preference...[/bold cyan]&#34;
+                        )
+
+                        # Generate a prompt to determine the appropriate technology based on user&#39;s description
+                        tech_inference_prompt = f&#34;&#34;&#34;
+                        The user is setting up a {project_type} project and wants to use a different {category[&#39;name&#39;]} than those offered.
+                        
+                        User&#39;s preference: &#34;{user_description}&#34;
+                        
+                        Based on this description, what specific technology name should be used? Respond with ONLY the name of the technology.
+                        &#34;&#34;&#34;
+
+                        # Create a provider for inferring technology
+                        from create_python_project.utils.ai_integration import (
+                            AIProvider,
+                            DeepSeekProvider,
+                            OpenAIProvider,
+                        )
+
+                        # Initialize with a concrete implementation
+                        inference_provider: AIProvider
+
+                        if &#34;DeepSeek&#34; in providers:
+                            # Create a DeepSeek provider
+                            inference_provider = DeepSeekProvider()
+                        elif selected_provider is not None:
+                            # Clone the selected provider&#39;s properties
+                            if isinstance(selected_provider, DeepSeekProvider):
+                                inference_provider = DeepSeekProvider(
+                                    api_key=selected_provider.api_key,
+                                    model=selected_provider.model,
+                                )
+                            elif isinstance(selected_provider, OpenAIProvider):
+                                inference_provider = OpenAIProvider(
+                                    api_key=selected_provider.api_key,
+                                    model=selected_provider.model,
+                                )
+                            else:
+                                # Default to a concrete implementation
+                                inference_provider = OpenAIProvider()
+
+                        (
+                            inference_success,
+                            inferred_tech,
+                        ) = inference_provider.generate_response(tech_inference_prompt)
+
+                        if inference_success:
+                            inferred_tech = inferred_tech.strip()
+                            console.print(
+                                f&#34;[bold green]Based on your description, I&#39;ll use [/bold green][bold yellow]{inferred_tech}[/bold yellow]&#34;
                             )
-                            if confirm:
-                                return True, suggested_type
-                            break
+
+                            # Add this as a new option to the category
+                            new_option = {
+                                &#34;name&#34;: inferred_tech,
+                                &#34;description&#34;: f&#34;Custom selection: {user_description}&#34;,
+                                &#34;recommended&#34;: True,
+                            }
+
+                            # Add the new option
+                            category[&#34;options&#34;].append(new_option)
+
+                            # Set selected_name to the inferred technology
+                            selected_name = inferred_tech
+                        else:
+                            console.print(
+                                &#34;[bold red]Failed to process your custom selection. Using default option.[/bold red]&#34;
+                            )
+                            selected_name = default_option
+                    else:
+                        selected_name = options[selected_index]
+
+                    # Update recommended flag in the tech_data
+                    for option in category[&#34;options&#34;]:
+                        option[&#34;recommended&#34;] = option[&#34;name&#34;] == selected_name
 
                 console.print(
-                    &#34;[bold yellow]AI couldn&#39;t determine a suitable project type from your description.[/bold yellow]&#34;
+                    &#34;\n[bold green]✅ Technology selections updated based on your preferences[/bold green]\n&#34;
                 )
-                ai_suggestion = False
             else:
                 console.print(
-                    f&#34;[bold red]Error getting AI suggestion:[/bold red] {response}&#34;
+                    &#34;[bold cyan]Using AI-recommended technologies for your project.[/bold cyan]\n&#34;
                 )
-                ai_suggestion = False
 
-    if not ai_suggestion:
-        # Manual selection
-        console.print(&#34;\n[bold]Please select a project type:[/bold]&#34;)
+            # Store technology selections in project_info
+            project_info[&#34;tech_stack&#34;] = tech_data
 
-        project_type_list = []
-        for type_key, type_info in project_types.items():
-            project_type_list.append(
-                f&#34;{type_info[&#39;name&#39;]} - {type_info[&#39;description&#39;]}&#34;
-            )
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        console.print(
+            f&#34;[bold yellow]Error parsing technology recommendations: {str(e)}[/bold yellow]&#34;
+        )
 
-        for i, item in enumerate(project_type_list, 1):
-            console.print(f&#34;[cyan]{i}.[/cyan] {item}&#34;)
-
-        try:
-            selection = Prompt.ask(
-                &#34;[bold cyan]Select project type[/bold cyan]&#34;,
-                choices=[str(i) for i in range(1, len(project_type_list) + 1)],
-                default=&#34;1&#34;,
-            )
-            index = int(selection) - 1
-
-            # Extract type key from selection
-            type_key = list(project_types.keys())[index]
-            return True, type_key
-
-        except Exception as e:
-            console.print(
-                f&#34;[bold red]Error selecting project type:[/bold red] {str(e)}&#34;
-            )
-            return False, &#34;Failed to select project type&#34;
-
-    return False, &#34;Failed to determine project type&#34;</code></pre>
+    return True, project_type</code></pre>
 </details>
 <div class="desc"><p>Determine the project type based on project description.</p>
 <h2 id="args">Args</h2>
@@ -378,15 +686,59 @@ It handles the CLI interface and orchestrates the project creation process.</p>
 <h2 id="returns">Returns</h2>
 <p>Tuple containing success status and project type</p></div>
 </dd>
-<dt id="create_python_project.create_python_project.get_project_info"><code class="name flex">
-<span>def <span class="ident">get_project_info</span></span>(<span>) ‑> Tuple[bool, Dict[str, str]]</span>
+<dt id="create_python_project.create_python_project.get_category_impact"><code class="name flex">
+<span>def <span class="ident">get_category_impact</span></span>(<span>category_name: str) ‑> str</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_project_info() -&gt; Tuple[bool, Dict[str, str]]:
+<pre><code class="python">def get_category_impact(category_name: str) -&gt; str:
+    &#34;&#34;&#34;
+    Get a description of how a technology category impacts the project.
+
+    Args:
+        category_name: Name of the technology category
+
+    Returns:
+        A string describing the impact of this category
+    &#34;&#34;&#34;
+    category_impacts = {
+        &#34;Backend Framework&#34;: &#34;handle web requests, organize your code, and determine the project architecture&#34;,
+        &#34;Database&#34;: &#34;store and retrieve data efficiently and securely&#34;,
+        &#34;Authentication&#34;: &#34;secure user accounts and manage user sessions&#34;,
+        &#34;Email Processing&#34;: &#34;parse and extract information from incoming emails&#34;,
+        &#34;Frontend&#34;: &#34;create the user interface and determine the user experience&#34;,
+        &#34;Deployment&#34;: &#34;host your application and make it available to users&#34;,
+        &#34;Testing Tools&#34;: &#34;ensure your code works correctly and catch bugs early&#34;,
+        &#34;API Integration&#34;: &#34;connect with external services and data sources&#34;,
+        &#34;Caching&#34;: &#34;improve performance by storing frequently accessed data&#34;,
+        &#34;Message Queue&#34;: &#34;handle asynchronous tasks and background processing&#34;,
+    }
+
+    return category_impacts.get(
+        category_name, &#34;influence a critical part of your application&#34;
+    )</code></pre>
+</details>
+<div class="desc"><p>Get a description of how a technology category impacts the project.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>category_name</code></strong></dt>
+<dd>Name of the technology category</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A string describing the impact of this category</p></div>
+</dd>
+<dt id="create_python_project.create_python_project.get_project_info"><code class="name flex">
+<span>def <span class="ident">get_project_info</span></span>(<span>) ‑> Tuple[bool, Dict[str, Any]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_project_info() -&gt; Tuple[bool, Dict[str, Any]]:
     &#34;&#34;&#34;
     Get project information from the user.
 
@@ -438,7 +790,7 @@ It handles the CLI interface and orchestrates the project creation process.</p>
     )
     console.print(f&#34;Enter project directory (default: {default_dir}): &#34;, end=&#34;&#34;)
     # Use the default value as initial text to avoid repetition
-    project_dir = pt_prompt() or default_dir
+    project_dir = pt_prompt(default=default_dir) or default_dir
     project_info[&#34;project_dir&#34;] = project_dir
 
     # Author information - make it clearly optional
@@ -463,6 +815,65 @@ It handles the CLI interface and orchestrates the project creation process.</p>
 <div class="desc"><p>Get project information from the user.</p>
 <h2 id="returns">Returns</h2>
 <p>Tuple containing success status and project info dictionary</p></div>
+</dd>
+<dt id="create_python_project.create_python_project.get_technology_use_case"><code class="name flex">
+<span>def <span class="ident">get_technology_use_case</span></span>(<span>tech_name: str) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_technology_use_case(tech_name: str) -&gt; str:
+    &#34;&#34;&#34;
+    Get a description of when a specific technology is most appropriate.
+
+    Args:
+        tech_name: Name of the technology
+
+    Returns:
+        A string describing the ideal use case
+    &#34;&#34;&#34;
+    tech_use_cases = {
+        # Backend Frameworks
+        &#34;FastAPI&#34;: &#34;high-performance APIs with automatic documentation and modern Python features&#34;,
+        &#34;Flask&#34;: &#34;lightweight applications with flexible routing and minimal constraints&#34;,
+        &#34;Django&#34;: &#34;full-featured applications needing built-in admin, auth, and ORM&#34;,
+        # Databases
+        &#34;PostgreSQL&#34;: &#34;complex queries, relational data, and production applications requiring reliability&#34;,
+        &#34;MongoDB&#34;: &#34;document-based storage with flexible schemas and JSON-like data structures&#34;,
+        &#34;SQLite&#34;: &#34;development environments, small applications, or embedded databases&#34;,
+        # Authentication
+        &#34;PyJWT&#34;: &#34;token-based authentication with minimal dependencies&#34;,
+        &#34;Authlib&#34;: &#34;OAuth and OpenID Connect integration with multiple providers&#34;,
+        &#34;Passlib&#34;: &#34;password hashing and verification with configurable security&#34;,
+        &#34;Magic Link Authentication&#34;: &#34;passwordless authentication via email links for improved user experience&#34;,
+        # Email Processing
+        &#34;Email-Parser&#34;: &#34;extracting structured data from email content with specialized parsing&#34;,
+        &#34;Imaplib + BeautifulSoup&#34;: &#34;direct IMAP access with powerful HTML parsing capabilities&#34;,
+        &#34;Mailparser&#34;: &#34;automated email processing with predefined templates and rules&#34;,
+        # Frontend
+        &#34;Vue.js&#34;: &#34;reactive applications with a gentler learning curve and excellent component system&#34;,
+        &#34;React&#34;: &#34;complex UIs with a robust ecosystem and strong community support&#34;,
+        &#34;Alpine.js&#34;: &#34;adding interactivity to existing HTML with minimal JavaScript&#34;,
+        # Deployment
+        &#34;Docker + Nginx&#34;: &#34;containerized deployments with scalability and production-grade web serving&#34;,
+        &#34;Gunicorn + Heroku&#34;: &#34;quick deployment with managed infrastructure and easy scaling&#34;,
+        &#34;Uvicorn + DigitalOcean&#34;: &#34;modern ASGI applications on customizable cloud VMs&#34;,
+    }
+
+    return tech_use_cases.get(
+        tech_name, &#34;projects that match its specific strengths and features&#34;
+    )</code></pre>
+</details>
+<div class="desc"><p>Get a description of when a specific technology is most appropriate.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tech_name</code></strong></dt>
+<dd>Name of the technology</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A string describing the ideal use case</p></div>
 </dd>
 <dt id="create_python_project.create_python_project.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>) ‑> int</span>
@@ -518,13 +929,22 @@ It handles the CLI interface and orchestrates the project creation process.</p>
    cd {project_dir}
    ```
 
-2. Start coding in the `src/` directory
-
-3. Add your tests in the `tests/` directory
-
-4. Use Poetry to manage dependencies:
+2. Activate the Poetry environment:
    ```bash
+   poetry shell
+   ```
+
+3. Start coding in the `src/` directory
+
+4. Add your tests in the `tests/` directory
+
+5. Use Poetry to manage dependencies:
+   ```bash
+   # Add a production dependency
    poetry add &lt;package-name&gt;
+
+   # Add a development dependency
+   poetry add --group dev &lt;package-name&gt;
    ```
         &#34;&#34;&#34;.format(
             project_dir=project_info[&#34;project_dir&#34;]
@@ -543,6 +963,61 @@ It handles the CLI interface and orchestrates the project creation process.</p>
         return 1</code></pre>
 </details>
 <div class="desc"><p>Main entry point for the application.</p></div>
+</dd>
+<dt id="create_python_project.create_python_project.manual_project_type_selection"><code class="name flex">
+<span>def <span class="ident">manual_project_type_selection</span></span>(<span>project_types: Dict[str, Dict[str, str]]) ‑> Tuple[bool, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def manual_project_type_selection(
+    project_types: Dict[str, Dict[str, str]]
+) -&gt; Tuple[bool, str]:
+    &#34;&#34;&#34;
+    Allow manual selection of project type when AI is unavailable or not chosen.
+
+    Args:
+        project_types: Dictionary of available project types
+
+    Returns:
+        Tuple containing success status and selected project type
+    &#34;&#34;&#34;
+    # Manual selection
+    console.print(&#34;\n[bold]Please select a project type:[/bold]&#34;)
+
+    project_type_list = []
+    for type_key, type_info in project_types.items():
+        project_type_list.append(f&#34;{type_info[&#39;name&#39;]} - {type_info[&#39;description&#39;]}&#34;)
+
+    for i, item in enumerate(project_type_list, 1):
+        console.print(f&#34;[cyan]{i}.[/cyan] {item}&#34;)
+
+    try:
+        selection = Prompt.ask(
+            &#34;[bold cyan]Select project type[/bold cyan]&#34;,
+            choices=[str(i) for i in range(1, len(project_type_list) + 1)],
+            default=&#34;1&#34;,
+        )
+        index = int(selection) - 1
+
+        # Extract type key from selection
+        type_key = list(project_types.keys())[index]
+        return True, type_key
+
+    except Exception as e:
+        console.print(f&#34;[bold red]Error selecting project type:[/bold red] {str(e)}&#34;)
+        return False, &#34;Failed to select project type&#34;</code></pre>
+</details>
+<div class="desc"><p>Allow manual selection of project type when AI is unavailable or not chosen.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>project_types</code></strong></dt>
+<dd>Dictionary of available project types</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple containing success status and selected project type</p></div>
 </dd>
 </dl>
 </section>
@@ -563,8 +1038,11 @@ It handles the CLI interface and orchestrates the project creation process.</p>
 <ul class="">
 <li><code><a title="create_python_project.create_python_project.create_project" href="#create_python_project.create_python_project.create_project">create_project</a></code></li>
 <li><code><a title="create_python_project.create_python_project.determine_project_type" href="#create_python_project.create_python_project.determine_project_type">determine_project_type</a></code></li>
+<li><code><a title="create_python_project.create_python_project.get_category_impact" href="#create_python_project.create_python_project.get_category_impact">get_category_impact</a></code></li>
 <li><code><a title="create_python_project.create_python_project.get_project_info" href="#create_python_project.create_python_project.get_project_info">get_project_info</a></code></li>
+<li><code><a title="create_python_project.create_python_project.get_technology_use_case" href="#create_python_project.create_python_project.get_technology_use_case">get_technology_use_case</a></code></li>
 <li><code><a title="create_python_project.create_python_project.main" href="#create_python_project.create_python_project.main">main</a></code></li>
+<li><code><a title="create_python_project.create_python_project.manual_project_type_selection" href="#create_python_project.create_python_project.manual_project_type_selection">manual_project_type_selection</a></code></li>
 </ul>
 </li>
 </ul>

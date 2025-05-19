@@ -7,7 +7,7 @@ It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.
 """
 import logging
 import os
-from typing import TYPE_CHECKING, Dict, Optional, Tuple
+from typing import TYPE_CHECKING
 
 import requests
 from rich.console import Console
@@ -42,7 +42,7 @@ except ImportError:
 class AIProvider:
     """Base class for AI providers."""
 
-    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
+    def __init__(self, api_key: str | None = None, model: str | None = None):
         """Initialize the AI provider."""
         self.api_key = api_key or os.environ.get(self._get_api_key_env_var(), "")
         self.model = model or os.environ.get(self._get_model_env_var(), "")
@@ -61,7 +61,7 @@ class AIProvider:
         """Get a user-friendly display name for the model."""
         raise NotImplementedError
 
-    def generate_response(self, prompt: str) -> Tuple[bool, str]:
+    def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response from the AI provider."""
         raise NotImplementedError
 
@@ -89,7 +89,7 @@ class OpenAIProvider(AIProvider):
         else:
             return model
 
-    def generate_response(self, prompt: str) -> Tuple[bool, str]:
+    def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using OpenAI API."""
         try:
             if openai is None:
@@ -138,7 +138,7 @@ class AnthropicProvider(AIProvider):
         else:
             return model
 
-    def generate_response(self, prompt: str) -> Tuple[bool, str]:
+    def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using Anthropic API."""
         try:
             if anthropic is None:
@@ -163,9 +163,13 @@ class AnthropicProvider(AIProvider):
 
             # Safely extract text to avoid union type errors
             content = message.content
-            if content and len(content) > 0:
-                if isinstance(content[0], dict) and "text" in content[0]:
-                    return True, content[0]["text"]
+            if (
+                content
+                and len(content) > 0
+                and isinstance(content[0], dict)
+                and "text" in content[0]
+            ):
+                return True, content[0]["text"]
 
             return True, str(content)
         except Exception as e:
@@ -193,7 +197,7 @@ class PerplexityProvider(AIProvider):
         else:
             return model
 
-    def generate_response(self, prompt: str) -> Tuple[bool, str]:
+    def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using Perplexity API."""
         try:
             if not self.api_key:
@@ -277,7 +281,7 @@ class DeepSeekProvider(AIProvider):
         else:
             return model
 
-    def generate_response(self, prompt: str) -> Tuple[bool, str]:
+    def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using DeepSeek API."""
         try:
             url = "https://api.deepseek.com/v1/chat/completions"
@@ -330,7 +334,7 @@ class GeminiProvider(AIProvider):
         else:
             return model
 
-    def generate_response(self, prompt: str) -> Tuple[bool, str]:
+    def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using Google Gemini API."""
         try:
             if genai is None:
@@ -358,7 +362,7 @@ class GeminiProvider(AIProvider):
             return False, f"Gemini API error: {str(e)}"
 
 
-def get_available_ai_providers() -> Dict[str, str]:
+def get_available_ai_providers() -> dict[str, str]:
     """
     Get a list of available AI providers based on environment variables.
 
@@ -395,7 +399,7 @@ def get_available_ai_providers() -> Dict[str, str]:
     return providers
 
 
-def select_ai_provider(providers: Dict[str, str]) -> Tuple[bool, Optional[AIProvider]]:
+def select_ai_provider(providers: dict[str, str]) -> tuple[bool, AIProvider | None]:
     """
     Select an AI provider from the available providers.
 
@@ -415,7 +419,7 @@ def select_ai_provider(providers: Dict[str, str]) -> Tuple[bool, Optional[AIProv
         model = providers[provider]
 
         # Create the appropriate provider instance to get display name
-        provider_instance: Optional[AIProvider] = None
+        provider_instance: AIProvider | None = None
         if provider == "OpenAI":
             provider_instance = OpenAIProvider(model=model)
         elif provider == "Anthropic":
@@ -449,7 +453,7 @@ def select_ai_provider(providers: Dict[str, str]) -> Tuple[bool, Optional[AIProv
         model = providers[provider_name]
 
         # Create the appropriate provider instance
-        selected_provider: Optional[AIProvider] = None
+        selected_provider: AIProvider | None = None
 
         if provider_name == "OpenAI":
             selected_provider = OpenAIProvider(model=model)

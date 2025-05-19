@@ -9,7 +9,7 @@ from templates based on the project type and user inputs.
 import os
 import string
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 
 def get_template_path(template_name: str) -> Path:
@@ -34,7 +34,7 @@ def get_template_path(template_name: str) -> Path:
     return Path(template_path)
 
 
-def render_template(template_content: str, context: Dict[str, Any]) -> str:
+def render_template(template_content: str, context: dict[str, Any]) -> str:
     """
     Render a template string with the given context.
 
@@ -55,8 +55,8 @@ def render_template(template_content: str, context: Dict[str, Any]) -> str:
 def create_file_from_template(
     template_content: str,
     output_path: str,
-    context: Dict[str, Any],
-) -> Tuple[bool, str]:
+    context: dict[str, Any],
+) -> tuple[bool, str]:
     """
     Create a file from a template.
 
@@ -84,7 +84,7 @@ def create_file_from_template(
         return False, f"Failed to create file: {str(e)}"
 
 
-def get_template_variables(template_content: str) -> List[str]:
+def get_template_variables(template_content: str) -> list[str]:
     """
     Get the variables required for a specific template.
 

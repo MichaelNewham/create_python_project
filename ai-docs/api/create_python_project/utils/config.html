@@ -69,7 +69,7 @@ It manages .env files, project-specific settings, and default configurations.</p
     try:
         env_file_path = os.path.join(project_dir, &#34;.env&#34;)
 
-        with open(env_file_path, &#34;w&#34;) as file:
+        with open(env_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as file:
             file.write(&#34;# Environment variables for the project\n\n&#34;)
 
             for key, value in variables.items():
@@ -81,7 +81,7 @@ It manages .env files, project-specific settings, and default configurations.</p
 
         # Create a .env.example file without sensitive values
         example_path = os.path.join(project_dir, &#34;.env.example&#34;)
-        with open(example_path, &#34;w&#34;) as file:
+        with open(example_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as file:
             file.write(&#34;# Example environment variables for the project\n&#34;)
             file.write(&#34;# Copy this file to .env and fill in the values\n\n&#34;)
 
@@ -94,13 +94,13 @@ It manages .env files, project-specific settings, and default configurations.</p
         # Check if .gitignore exists and if .env is already in it
         gitignore_content = &#34;&#34;
         if os.path.exists(gitignore_path):
-            with open(gitignore_path, &#34;r&#34;) as file:
+            with open(gitignore_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as file:
                 gitignore_content = file.read()
 
         # Add .env to .gitignore if not already present
         updated = False
         if &#34;.env&#34; not in gitignore_content:
-            with open(gitignore_path, &#34;a&#34;) as file:
+            with open(gitignore_path, &#34;a&#34;, encoding=&#34;utf-8&#34;) as file:
                 if not gitignore_content.endswith(&#34;\n&#34;):
                     file.write(&#34;\n&#34;)
                 file.write(&#34;\n# Environment variables\n.env\n&#34;)
@@ -192,7 +192,7 @@ It manages .env files, project-specific settings, and default configurations.</p
         return env_vars
 
     try:
-        with open(env_file, &#34;r&#34;) as file:
+        with open(env_file, &#34;r&#34;, encoding=&#34;utf-8&#34;) as file:
             for line in file:
                 line = line.strip()
 

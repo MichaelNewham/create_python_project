@@ -11,9 +11,10 @@ Contains configuration and system files for .claude.
 
 ```
 .claude/
+├── aboutthisfolder.md
 └── settings.local.json
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-19 23:06:30
+This documentation was automatically generated on: 2025-05-20 00:52:06

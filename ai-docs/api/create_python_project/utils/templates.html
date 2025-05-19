@@ -79,7 +79,7 @@ from templates based on the project type and user inputs.</p>
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
         # Write the rendered content to the output file
-        with open(output_path, &#34;w&#34;) as file:
+        with open(output_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as file:
             file.write(rendered_content)
 
         return True, f&#34;Created file at {output_path}&#34;

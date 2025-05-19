@@ -30,7 +30,7 @@ def fix_unused_status_variable(filepath: str) -> bool:
     Returns:
         bool: True if changes were made, False otherwise
     """
-    with open(filepath, "r", encoding="utf-8") as file:
+    with open(filepath, encoding="utf-8") as file:
         content = file.read()
 
     # Find and fix the console.status pattern with unused 'status' variable
@@ -61,7 +61,7 @@ def fix_undefined_names(filepath: str) -> bool:
     Returns:
         bool: True if changes were made, False otherwise
     """
-    with open(filepath, "r", encoding="utf-8") as file:
+    with open(filepath, encoding="utf-8") as file:
         content = file.read()
 
     made_changes = False
@@ -139,7 +139,7 @@ def fix_whitespace_around_braces(filepath: str) -> bool:
     Returns:
         bool: True if changes were made, False otherwise
     """
-    with open(filepath, "r", encoding="utf-8") as file:
+    with open(filepath, encoding="utf-8") as file:
         content = file.read()
 
     # Fix E201: whitespace after '{'
@@ -186,7 +186,7 @@ def fix_long_lines(filepath: str, max_length: int = 150) -> bool:
     Returns:
         bool: True if changes were made, False otherwise
     """
-    with open(filepath, "r", encoding="utf-8") as file:
+    with open(filepath, encoding="utf-8") as file:
         lines = file.readlines()
 
     made_changes = False
@@ -241,7 +241,7 @@ def fix_mypy_issues(filepath: str) -> bool:
     Returns:
         bool: True if changes were made, False otherwise
     """
-    with open(filepath, "r", encoding="utf-8") as file:
+    with open(filepath, encoding="utf-8") as file:
         content = file.read()
 
     made_changes = False

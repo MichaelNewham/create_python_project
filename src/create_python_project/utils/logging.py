@@ -8,10 +8,9 @@ It configures loggers, handlers, and formatters for proper logging.
 
 import logging
 import os
-from typing import Optional, Tuple
 
 
-def setup_logging(log_dir: Optional[str] = None) -> logging.Logger:
+def setup_logging(log_dir: str | None = None) -> logging.Logger:
     """
     Set up and configure logging for the application.
 
@@ -51,7 +50,7 @@ def setup_logging(log_dir: Optional[str] = None) -> logging.Logger:
     return logger
 
 
-def create_logging_module(project_dir: str, project_name: str) -> Tuple[bool, str]:
+def create_logging_module(project_dir: str, project_name: str) -> tuple[bool, str]:
     """
     Create a logging module in the new project.
 
@@ -107,7 +106,7 @@ def setup_logging(log_dir: Optional[str] = None) -> logging.Logger:
     console_format = logging.Formatter('%(levelname)s: %(message)s')
     console_handler.setFormatter(console_format)
     logger.addHandler(console_handler)
-    
+
     # Create file handler if log_dir is provided
     if log_dir:
         os.makedirs(log_dir, exist_ok=True)
@@ -117,7 +116,7 @@ def setup_logging(log_dir: Optional[str] = None) -> logging.Logger:
         file_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(file_format)
         logger.addHandler(file_handler)
-    
+
     return logger
 '''
 

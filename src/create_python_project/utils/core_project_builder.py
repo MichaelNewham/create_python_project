@@ -9,7 +9,7 @@ It handles file creation, directory structure, and template rendering.
 import os
 import shutil
 import subprocess
-from typing import Any, Tuple
+from typing import Any
 
 
 def create_project_structure(
@@ -17,9 +17,9 @@ def create_project_structure(
     project_dir: str,
     project_type: str,
     with_ai: bool = True,
-    tech_stack: dict = None,
+    tech_stack: dict[Any, Any] | None = None,
     **kwargs: Any,
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """
     Create the base project structure.
 
@@ -142,7 +142,7 @@ logs/
 
         # Add dependencies based on project type and tech stack
         # Define common technology mappings
-        tech_mapping = {
+        tech_mapping: dict[str, dict[str, Any]] = {
             # Web frameworks
             "fastapi": {
                 "package": "fastapi",
@@ -193,25 +193,30 @@ logs/
             if tech_key in tech_mapping:
                 tech_info = tech_mapping[tech_key]
 
+                tech_dict: dict[str, Any] = tech_info  # Type cast for mypy
+
                 # Skip frontend technologies that don't need Python packages
-                if tech_info.get("is_frontend", False):
+                if tech_dict.get("is_frontend", False):
                     continue
 
                 # Add the package
-                package_info = f"{tech_info['package']} = \"{tech_info['version']}\""
+                package_info = f"{tech_dict['package']} = \"{tech_dict['version']}\""
                 if package_info not in dependencies:
                     dependencies.append(package_info)
 
                 # Add any required dependencies
-                for req in tech_info.get("requires", []):
+                for req in tech_dict.get("requires", []):
                     if req not in dependencies:
                         dependencies.append(req)
 
                 # Add suggested dependencies
-                for suggestion in tech_info.get("suggests", []):
+                for suggestion in tech_dict.get("suggests", []):
                     if suggestion in tech_mapping:
                         suggestion_info = tech_mapping[suggestion]
-                        package_info = f"{suggestion_info['package']} = \"{suggestion_info['version']}\""
+                        suggestion_dict: dict[
+                            str, Any
+                        ] = suggestion_info  # Type cast for mypy
+                        package_info = f"{suggestion_dict['package']} = \"{suggestion_dict['version']}\""
                         if package_info not in dependencies:
                             dependencies.append(package_info)
             else:
@@ -251,17 +256,25 @@ logs/
                         break
 
                 # If we found a match and it's a Python package, add it
-                if (
-                    custom_match
-                    and "package" in custom_match
-                    and not custom_match.get("is_frontend", False)
-                    and not custom_match.get("is_deployment", False)
-                ):
-                    package_info = (
-                        f"{custom_match['package']} = \"{custom_match['version']}\""
-                    )
-                    if package_info not in dependencies:
-                        dependencies.append(package_info)
+                if custom_match is not None:
+                    # Ensure the custom_match is a dictionary
+                    if not isinstance(custom_match, dict):
+                        custom_match = {
+                            "package": str(custom_match),
+                            "version": "^1.0.0",
+                        }
+
+                    custom_dict: dict[str, Any] = custom_match  # Type cast for mypy
+                    if (
+                        "package" in custom_dict
+                        and not custom_dict.get("is_frontend", False)
+                        and not custom_dict.get("is_deployment", False)
+                    ):
+                        package_info = (
+                            f"{custom_dict['package']} = \"{custom_dict['version']}\""
+                        )
+                        if package_info not in dependencies:
+                            dependencies.append(package_info)
 
         # Add default dependencies based on project type if no matching technologies were found
         if not dependencies:
@@ -550,7 +563,7 @@ if __name__ == "__main__":
 <body>
     <h1>Welcome to {project_name}</h1>
     <p>{kwargs.get('description', 'A web application.')}</p>
-    
+
     <script src="{{url_for('static', filename='js/main.js')}}"></script>
 </body>
 </html>
@@ -642,32 +655,32 @@ except ImportError:
 
 class AIModel:
     """Base class for AI models."""
-    
+
     def __init__(self, api_key: str = None):
         """Initialize the AI model."""
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
-        
+
     def generate(self, prompt: str) -> str:
         """Generate a response from the AI model."""
         raise NotImplementedError("Subclasses must implement this method")
-        
+
 class OpenAIModel(AIModel):
     """OpenAI API integration."""
-    
+
     def __init__(self, api_key: str = None, model: str = "gpt-3.5-turbo"):
         """Initialize the OpenAI model."""
         super().__init__(api_key)
         self.model = model
-        
+
         if not OPENAI_AVAILABLE:
             raise ImportError("OpenAI package is not installed. Run 'pip install openai'")
-            
+
         if not self.api_key:
             raise ValueError("OpenAI API key is required")
-            
+
         # Initialize OpenAI client
         openai.api_key = self.api_key
-        
+
     def generate(self, prompt: str) -> str:
         """Generate a response from the OpenAI model."""
         try:
@@ -680,9 +693,9 @@ class OpenAIModel(AIModel):
                 max_tokens=1000,
             )
             return response.choices[0].message.content
-        except Exception as error:
-            return f"Error: {str(error)}"
-'''
+        except Exception as e:
+            return f"Error: {str(e)}"
+'''  # type: ignore
                 )
 
         elif project_type == "data":
@@ -705,16 +718,16 @@ from typing import Dict, List, Any, Tuple
 
 def load_data(file_path: str) -> pd.DataFrame:
     """Load data from a file into a pandas DataFrame."""
-    _, file_extension = os.path.splitext(file_path)
-    
-    if file_extension.lower() == '.csv':
+    _, file_ext = os.path.splitext(file_path)
+
+    if file_ext.lower() == '.csv':
         return pd.read_csv(file_path)
-    elif file_extension.lower() in ['.xls', '.xlsx']:
+    elif file_ext.lower() in ['.xls', '.xlsx']:
         return pd.read_excel(file_path)
-    elif file_extension.lower() == '.json':
+    elif file_ext.lower() == '.json':
         return pd.read_json(file_path)
     else:
-        raise ValueError(f"Unsupported file extension: {file_extension}")
+        raise ValueError(f"Unsupported file extension: {file_ext}")
 
 def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
     """Perform basic data analysis."""
@@ -727,21 +740,22 @@ def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
 def visualize_data(df: pd.DataFrame, column_name: str, output_path: str = None) -> None:
     """Create a simple visualization for a column."""
     plt.figure(figsize=(10, 6))
-    
+
+    # Use the column_name parameter directly
     if pd.api.types.is_numeric_dtype(df[column_name]):
         df[column_name].hist()
         plt.title(f"Histogram of {column_name}")
     else:
         df[column_name].value_counts().plot(kind=\'bar\')
         plt.title(f"Value counts of {column_name}")
-        
+
     plt.tight_layout()
-    
+
     if output_path:
         plt.savefig(output_path)
     else:
         plt.show()
-'''
+'''  # type: ignore
                 )
 
             # Create a simple Jupyter notebook
@@ -862,7 +876,7 @@ def visualize_data(df: pd.DataFrame, column_name: str, output_path: str = None) 
         return False, f"Failed to create project structure: {str(e)}"
 
 
-def setup_virtual_environment(project_dir: str) -> Tuple[bool, str]:
+def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
     """
     Set up a virtual environment using Poetry.
 
@@ -900,8 +914,8 @@ def initialize_git_repo(
     with_github_config: bool = False,
     project_description: str = "",
     project_type: str = "",
-    tech_stack: dict = None,
-) -> Tuple[bool, str]:
+    tech_stack: dict[Any, Any] | None = None,
+) -> tuple[bool, str]:
     """
     Initialize a Git repository and set up GitHub and GitLab remotes.
 
@@ -1177,7 +1191,7 @@ This directory contains configuration for deploying {project_name} using Cloudfl
    # On Linux
    curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
    sudo dpkg -i cloudflared.deb
-   
+
    # On MacOS
    brew install cloudflare/cloudflare/cloudflared
    ```
@@ -1343,7 +1357,7 @@ def create_github_config_files(
     project_name: str,
     project_description: str,
     project_type: str,
-    tech_stack: dict = None,
+    tech_stack: dict[Any, Any] | None = None,
 ) -> None:
     """
     Create GitHub configuration files for Copilot and other tools.
@@ -1417,7 +1431,8 @@ These files provide reusable templates for common development tasks:
 
 ### Using Instruction Files
 
-Instruction files are automatically applied to relevant files based on the `applyTo` pattern in their front matter. The main `copilot-instructions.md` file is applied to all requests when enabled in settings.
+Instruction files are automatically applied to relevant files based on the `applyTo` pattern in their front matter.
+The main `copilot-instructions.md` file is applied to all requests when enabled in settings.
 
 ### Using Prompt Files
 
@@ -1852,7 +1867,7 @@ applyTo: "{apply_pattern}"
 ---
 # Web Development Guidelines
 
-## {'FastAPI' if web_framework == 'fastapi' else 'Flask' if web_framework == 'flask' else 'Django' if web_framework == 'django' else 'Web Framework'} Best Practices
+## {f"{web_framework.capitalize()} Best Practices" if web_framework else "Web Framework Best Practices"}
 """
             )
 
@@ -1964,14 +1979,20 @@ applyTo: "{apply_pattern}"
             )
 
         # Create frontend-specific instructions if applicable
-        if has_frontend:
-            frontend_file_name = f"{frontend_tech.replace('.', '')}.instructions.md"
+        if (
+            has_frontend and frontend_tech is not None
+        ):  # Check if frontend_tech is defined
+            # Convert to str and then replace to avoid None attribute error
+            frontend_str = str(frontend_tech)
+            frontend_file_name = f"{frontend_str.replace('.', '')}.instructions.md"
             with open(
                 os.path.join(instructions_dir, frontend_file_name),
                 "w",
                 encoding="utf-8",
             ) as file:
-                if "vue" in frontend_tech:
+                if (
+                    frontend_tech and "vue" in frontend_tech
+                ):  # Check if frontend_tech is not None
                     file.write(
                         """---
 applyTo: "**/*.vue"
@@ -2014,7 +2035,7 @@ applyTo: "**/*.vue"
 - Write end-to-end tests for critical user flows
 """
                     )
-                elif "react" in frontend_tech:
+                elif frontend_tech and "react" in frontend_tech:
                     file.write(
                         """---
 applyTo: "**/*.jsx"
@@ -2057,7 +2078,7 @@ applyTo: "**/*.jsx"
 - Write end-to-end tests for critical user flows
 """
                     )
-                elif "angular" in frontend_tech:
+                elif frontend_tech and "angular" in frontend_tech:
                     file.write(
                         """---
 applyTo: "**/*.ts"

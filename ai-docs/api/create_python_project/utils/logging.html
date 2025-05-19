@@ -126,7 +126,7 @@ def setup_logging(log_dir: Optional[str] = None) -&gt; logging.Logger:
 &#39;&#39;&#39;
 
         # Write the content to the file
-        with open(logging_file_path, &#34;w&#34;) as f:
+        with open(logging_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
             f.write(logging_content)
 
         return True, f&#34;Created logging module at {logging_file_path}&#34;

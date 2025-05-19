@@ -23,10 +23,8 @@ import os
 import re
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 
 @dataclass
@@ -88,7 +86,7 @@ class LintFixer:
             print("Please install with: poetry add --group dev " + " ".join(missing))
             sys.exit(1)
 
-    def find_python_files(self) -> List[Path]:
+    def find_python_files(self) -> list[Path]:
         """Find all Python files in the specified path.
 
         Returns:
@@ -120,7 +118,7 @@ class LintFixer:
 
         return python_files
 
-    def run_black(self, files: List[Path]) -> LintResult:
+    def run_black(self, files: list[Path]) -> LintResult:
         """Run Black code formatter on the files.
 
         Args:
@@ -161,7 +159,7 @@ class LintFixer:
             output=output,
         )
 
-    def run_isort(self, files: List[Path]) -> LintResult:
+    def run_isort(self, files: list[Path]) -> LintResult:
         """Run isort to sort imports.
 
         Args:
@@ -202,7 +200,7 @@ class LintFixer:
             output=output,
         )
 
-    def run_autoflake(self, files: List[Path]) -> LintResult:
+    def run_autoflake(self, files: list[Path]) -> LintResult:
         """Run autoflake to remove unused imports.
 
         Args:
@@ -263,7 +261,7 @@ class LintFixer:
             output=output,
         )
 
-    def run_pylint(self, files: List[Path]) -> LintResult:
+    def run_pylint(self, files: list[Path]) -> LintResult:
         """Run pylint to check for issues.
 
         Args:
@@ -329,7 +327,7 @@ class LintFixer:
         )
 
     def _fix_common_pylint_issues(
-        self, files: List[Path], issues: List[Tuple[str, str, str, str, str]]
+        self, files: list[Path], issues: list[tuple[str, str, str, str, str]]
     ) -> int:
         """Try to fix some common pylint issues automatically.
 
@@ -343,7 +341,7 @@ class LintFixer:
         fixed_count = 0
 
         # Group issues by file
-        file_issues: Dict[str, List[Tuple[str, str, str, str, str]]] = {}
+        file_issues: dict[str, list[tuple[str, str, str, str, str]]] = {}
         for file_path, line, col, code, message in issues:
             if file_path not in file_issues:
                 file_issues[file_path] = []
@@ -376,7 +374,7 @@ class LintFixer:
             # Read file content
             path = Path(file_path)
             try:
-                with open(path, "r", encoding="utf-8") as f:
+                with open(path, encoding="utf-8") as f:
                     content = f.read()
 
                 # Apply fixes
@@ -416,7 +414,7 @@ class LintFixer:
 
         return fixed_count
 
-    def run_mypy(self, files: List[Path]) -> LintResult:
+    def run_mypy(self, files: list[Path]) -> LintResult:
         """Run mypy to check types.
 
         Args:
@@ -459,7 +457,7 @@ class LintFixer:
             output=output,
         )
 
-    def run_all(self) -> Dict[str, LintResult]:
+    def run_all(self) -> dict[str, LintResult]:
         """Run all linters and fixers.
 
         Returns:
@@ -470,17 +468,16 @@ class LintFixer:
 
         results = {}
 
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            # Run linters in sequence
-            results["black"] = self.run_black(files)
-            results["isort"] = self.run_isort(files)
-            results["autoflake"] = self.run_autoflake(files)
-            results["pylint"] = self.run_pylint(files)
-            results["mypy"] = self.run_mypy(files)
+        # Run linters in sequence
+        results["black"] = self.run_black(files)
+        results["isort"] = self.run_isort(files)
+        results["autoflake"] = self.run_autoflake(files)
+        results["pylint"] = self.run_pylint(files)
+        results["mypy"] = self.run_mypy(files)
 
         return results
 
-    def print_summary(self, results: Dict[str, LintResult]) -> None:
+    def print_summary(self, results: dict[str, LintResult]) -> None:
         """Print a summary of all linting results.
 
         Args:
