@@ -95,6 +95,10 @@ MIT
 
 ## Last Updated
 
+This project was last updated on: 2025-05-20 01:22:28
+
+Run `./scripts/update_documentation.sh` to update documentation.
+
 This project was last updated on: 2025-05-20 00:52:06
 
 Run `./scripts/update_documentation.sh` to update documentation.

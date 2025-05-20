@@ -157,9 +157,9 @@ download_info = f1e_downloadPhoto({"id": photo_id, "size": "medium"})
 ```
 # Execute a single terminal command to download and create attribution
 cmd = f"""
-cd /path/to/project && \
-curl -s "{download_info.download_link}" -o "path/to/images/filename.jpeg" && \
-cat > "path/to/images/attribution.md" << 'EOL'
+cd /path/to/project/imagesandvids && \\
+curl -s "{download_info.download_link}" -o "filename.jpeg" && \\
+cat > "filename_attribution.md" << 'EOL'
 # Photo Attribution
 
 ## {photo_title}
@@ -211,16 +211,16 @@ filenames = [f"{i+1}_subject.jpeg" for i in range(len(download_links))]
 4. **Download all photos and create a single attribution file:**
 ```
 cmd = f"""
-cd /path/to/project && \
+cd /path/to/project/imagesandvids && \\
 """
 
 # Add download commands for each photo
 for i, (link, filename) in enumerate(zip(download_links, filenames)):
-    cmd += f'curl -s "{link}" -o "path/to/images/{filename}" && \\\n'
+    cmd += f'curl -s "{link}" -o "{filename}" && \\\n'
 
 # Add attribution file creation
 cmd += f"""
-cat > "path/to/images/all_photos_attribution.md" << 'EOL'
+cat > "all_photos_attribution.md" << 'EOL'
 # Photos Attribution
 
 """
@@ -246,6 +246,20 @@ EOL"""
 run_in_terminal({"command": cmd, "explanation": "Downloading multiple photos with combined attribution", "isBackground": false})
 ```
 
+## File Structure Guidelines
+
+To maintain a clean and organized workspace:
+
+1. **Place all downloaded images directly in the main `imagesandvids` folder** - Do not create or use subfolders for organizing images.
+
+2. **Use consistent naming patterns** - Name files clearly with descriptive terms like `combat_fighter_jet.jpeg`.
+
+3. **Keep attribution files alongside images** - Name attribution files to match their images, e.g., `combat_fighter_jet_attribution.md`.
+
+4. **Use a single attribution file for related sets** - When downloading multiple related images (like a series), create a combined attribution file (e.g., `dublin_photos_attribution.md`).
+
+This flat organization structure makes it easier to find and reference images within the project.
+
 ## Attribution Requirements
 
 When using content from Pexels, you must follow these attribution guidelines:
@@ -267,9 +281,11 @@ The download tools provide the proper attribution information with each download
 
 5. **Consider resolution needs** - Only download the resolution you need; "large" is sufficient for most web uses, while "original" provides the highest quality for print or editing.
 
-6. **Optimize with single commands** - When downloading photos, combine the curl command with file creation in a single terminal command to minimize steps.
+6. **Download to the main images folder** - Always download images directly to the main `/imagesandvids` folder rather than to subfolders to maintain a flat, organized structure.
 
-7. **Use heredocs for attribution** - Use shell heredocs (`<< 'EOL'`) to create attribution files in a single terminal command alongside downloads.
+7. **Optimize with single commands** - When downloading photos, combine the curl command with file creation in a single terminal command to minimize steps.
+
+8. **Use heredocs for attribution** - Use shell heredocs (`<< 'EOL'`) to create attribution files in a single terminal command alongside downloads.
 
 8. **Standardize filenames** - Use consistent naming patterns like `1_subject.jpeg` when downloading multiple related images.
 

@@ -70,6 +70,7 @@ venv.bak/
 
 # Logs
 *.log
+logs/
 
 # Documentation build
 docs/
@@ -97,6 +98,9 @@ package-lock.json
 
 # TaskMaster - ignore the entire directory
 TaskMasterTasks/
+
+# Downloaded images and media
+imagesandvids/downloaded/
 
 # Other cache and config directories
 .cursor/
