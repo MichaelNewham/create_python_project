@@ -72,8 +72,7 @@ venv.bak/
 *.log
 logs/
 
-# Documentation build
-docs/
+# Auto-generated documentation build
 .docs/
 
 # Temporary and backup files

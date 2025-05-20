@@ -33,6 +33,26 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -e .
 ```
 
+## Configuration
+
+This project requires some configuration for MCP and VS Code integration:
+
+1. **Environment Variables**: Copy the example .env file and fill in your API keys
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys
+   ```
+
+2. **VS Code Settings**:
+   ```bash
+   cp .vscode/settings.json.template .vscode/settings.json
+   cp .vscode/mcp.json.template .vscode/mcp.json
+   ```
+
+For more information on security best practices:
+- [MCP Setup Guide](docs/MCP_SETUP.md)
+- [VS Code Security Guide](docs/VSCODE_SECURITY.md)
+
 ## Usage
 
 ```bash
