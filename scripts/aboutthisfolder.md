@@ -28,12 +28,15 @@ scripts/
 ├── pexels_instructions.sh
 ├── post_commit_push.sh
 ├── remove_large_file.sh
+├── remove_sensitive_file.sh
 ├── run_mypy.sh
+├── setup_env_template.sh
 ├── truncate_md_files.sh
 ├── update_documentation.sh
-└── update_documentation.sh.bak
+├── update_documentation.sh.bak
+└── verify_security.sh
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-20 00:52:06
+This documentation was automatically generated on: 2025-05-21 00:55:41

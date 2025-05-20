@@ -1,4 +1,4 @@
-Documentation update on 2025-05-20 01:22:28
+Documentation update on 2025-05-21 00:55:41
 ----------------------------------------
 Files modified during this documentation update:
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
@@ -6,11 +6,17 @@ Files modified during this documentation update:
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/project_structure.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/bin/python_projects/create_python_project/docs/aboutthisfolder.md
+/home/michaelnewham/bin/python_projects/create_python_project/docs/MCP_SETUP.md
+/home/michaelnewham/bin/python_projects/create_python_project/scripts/aboutthisfolder.md
+/home/michaelnewham/bin/python_projects/create_python_project/scripts/setup_env_template.sh
+/home/michaelnewham/bin/python_projects/create_python_project/scripts/verify_security.sh
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api_documentation.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/project_structure.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/bin/python_projects/create_python_project/tests/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/README.md
 ----------------------------------------
-Total files updated: 11
+Total files updated: 17

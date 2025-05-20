@@ -11,10 +11,11 @@ Contains project files related to docs functionality.
 
 ```
 docs/
+├── aboutthisfolder.md
 ├── MCP_SETUP.md
 └── VSCODE_SECURITY.md
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-21 00:47:08
+This documentation was automatically generated on: 2025-05-21 00:55:41
