@@ -1,4 +1,4 @@
-Documentation update on 2025-05-21 00:55:41
+Documentation update on 2025-05-22 01:07:57
 ----------------------------------------
 Files modified during this documentation update:
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
@@ -6,17 +6,20 @@ Files modified during this documentation update:
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/project_structure.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/bin/python_projects/create_python_project/.config/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/docs/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/docs/MCP_SETUP.md
 /home/michaelnewham/bin/python_projects/create_python_project/scripts/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/scripts/setup_env_template.sh
-/home/michaelnewham/bin/python_projects/create_python_project/scripts/verify_security.sh
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api_documentation.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/project_structure.md
 /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/updated_files.txt
 /home/michaelnewham/bin/python_projects/create_python_project/tests/aboutthisfolder.md
+/home/michaelnewham/bin/python_projects/create_python_project/tests/conftest.py
+/home/michaelnewham/bin/python_projects/create_python_project/tests/__pycache__/conftest.cpython-313-pytest-8.3.5.pyc
+/home/michaelnewham/bin/python_projects/create_python_project/src/aboutthisfolder.md
+/home/michaelnewham/bin/python_projects/create_python_project/src/create_python_project/__pycache__/create_python_project.cpython-313.pyc
+/home/michaelnewham/bin/python_projects/create_python_project/src/create_python_project/utils/__pycache__/core_project_builder.cpython-313.pyc
 /home/michaelnewham/bin/python_projects/create_python_project/README.md
 ----------------------------------------
-Total files updated: 17
+Total files updated: 20

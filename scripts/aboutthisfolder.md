@@ -13,7 +13,9 @@ Contains helper scripts for development, documentation, and automation tasks.
 scripts/
 ├── aboutthisfolder.md
 ├── ai_commit_workflow.sh
+├── check_ai_services.sh
 ├── check_gitlab_connection.sh
+├── clean_run.py
 ├── commit_with_docs_fix.sh
 ├── commit_with_docs.sh
 ├── create_gitlab_branch.sh
@@ -29,7 +31,9 @@ scripts/
 ├── post_commit_push.sh
 ├── remove_large_file.sh
 ├── remove_sensitive_file.sh
+├── run_app.sh
 ├── run_mypy.sh
+├── run_perplexity_mcp.sh
 ├── setup_env_template.sh
 ├── truncate_md_files.sh
 ├── update_documentation.sh
@@ -39,4 +43,4 @@ scripts/
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-21 00:55:41
+This documentation was automatically generated on: 2025-05-22 01:05:10
