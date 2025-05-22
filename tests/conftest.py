@@ -51,4 +51,3 @@ def mock_env_vars(monkeypatch: Any) -> dict[str, str]:
         monkeypatch.setenv(key, value)
 
     return env_vars
-    return env_vars

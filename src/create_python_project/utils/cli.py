@@ -18,11 +18,23 @@ def enhanced_input(prompt: str, default: str | None = None) -> str:
     Returns:
         User input
     """
-    if default is None:
-        return input(prompt)
+    # Ensure prompt ends with a colon
+    if not prompt.endswith(":"):
+        prompt = f"{prompt}:"
 
-    # Note the space after the prompt and before the brackets
-    return input(f"{prompt} [{default}]: ") or default
+    if default is None:
+        # Add a space after the colon for better readability
+        return input(f"{prompt} ")
+
+    # For long default values, display them on a new line
+    if default and len(default) > 40:
+        print(f"{prompt}")
+        print(f"[Default: {default}]")
+        user_input = input("> ")
+        return user_input or default
+    else:
+        # For shorter defaults, show them inline
+        return input(f"{prompt} [default: {default}] ") or default
 
 
 def select_from_list(

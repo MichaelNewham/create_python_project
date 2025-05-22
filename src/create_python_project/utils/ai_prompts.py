@@ -61,7 +61,11 @@ Project Type: {project_type}
 Please recommend a complete technology stack organized by categories.
 For each category, recommend 1-3 options with the first being your top recommendation.
 
-Your response should follow this JSON format exactly:
+IMPORTANT: Your response MUST be a valid JSON object and NOTHING ELSE.
+Do not include any explanatory text, markdown formatting, or code blocks before or after the JSON.
+The response should be parseable by Python's json.loads() function.
+
+Your response must follow this JSON format exactly:
 
 {{
   "categories": [
@@ -103,6 +107,8 @@ For a {project_type} project, include relevant technology categories such as:
 
 Analyze the project description carefully to identify the key requirements and recommend appropriate technologies.
 Choose technologies that will best suit this specific project's needs. Always mark exactly one option as recommended=true in each category.
+
+REMEMBER: Your entire response must be a single, valid JSON object with no additional text or formatting.
 """
 
 

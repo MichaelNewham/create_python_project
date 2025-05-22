@@ -20,8 +20,7 @@ except ImportError:
         "Warning: python-dotenv not installed. Install it using 'poetry add python-dotenv' to load environment variables from .env files."
     )
 
-# Better input handling with arrow keys
-from prompt_toolkit import prompt as pt_prompt
+# Rich formatting
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -52,6 +51,10 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     Returns:
         Tuple containing success status and project info dictionary
     """
+    # Clear any previous output that might be in the terminal
+    console.clear()
+
+    # Display welcome banner
     console.print("\n")
     title_panel = Panel(
         Text(
@@ -77,15 +80,17 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     )
     console.print("\n")
 
-    welcome_text = "[bold cyan]Welcome to Create Python Project![/bold cyan] Let's set up your new project."
+    welcome_text = "[bold cyan]Welcome to Python Project Initializer![/bold cyan] Let's set up your new project."
     console.print(welcome_text)
 
     project_info = {}
 
+    # Import the enhanced_input function from our CLI utilities
+    from create_python_project.utils.cli import enhanced_input
+
     # Get project name
     console.print("\n[bold magenta]Step 1: Project Name[/bold magenta]")
-    console.print("Please enter a name for your project: ", end="")
-    project_name = pt_prompt()
+    project_name = enhanced_input("Please enter a name for your project")
     if not project_name:
         console.print("[bold red]Error:[/bold red] Project name is required")
         return False, {"error": "Project name is required"}
@@ -95,9 +100,15 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     default_dir = os.path.join(
         os.getcwd(), project_name.replace(" ", "_").replace("-", "_").lower()
     )
-    console.print(f"Enter project directory (default: {default_dir}): ", end="")
-    # Use the default value as initial text to avoid repetition
-    project_dir = pt_prompt(default=default_dir) or default_dir
+
+    # Display the default directory on a separate line for better readability
+    console.print("\nProject Directory:")
+    console.print(f"[dim]Default: {default_dir}[/dim]")
+    console.print("Press Enter to accept the default or type a new path:")
+    user_input = input("> ")
+
+    # Use user input or default
+    project_dir = user_input if user_input else default_dir
     project_info["project_dir"] = project_dir
 
     # Author information - make it clearly optional
@@ -105,14 +116,14 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     console.print(
         "[italic]Used for project metadata, Git configuration, and documentation.[/italic]"
     )
-    console.print("Enter your name (optional, press Enter to skip): ", end="")
-    author_name = pt_prompt()
+    author_name = enhanced_input("Enter your name (optional, press Enter to skip)")
     project_info["author_name"] = author_name
 
     # Make email field optional with clear skip instructions
     if author_name:  # Only ask for email if name was provided
-        console.print("Enter your email (optional, press Enter to skip): ", end="")
-        author_email = pt_prompt()
+        author_email = enhanced_input(
+            "Enter your email (optional, press Enter to skip)"
+        )
         project_info["author_email"] = author_email
     else:
         project_info["author_email"] = ""
@@ -227,20 +238,45 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     # Create a new dictionary specifically for tech_stack
     project_info["tech_stack"] = {}
 
-    # Show AI analysis header
+    # Show AI analysis header with provider name
     console.print("\n")
+    provider_name = selected_provider.__class__.__name__.replace("Provider", "")
+    model_name = selected_provider.display_name
+
     ai_header = Panel(
-        Text("🤖 AI ANALYSIS COMPLETE", justify="center", style="bold white"),
+        Text(
+            f"🤖 AI ANALYSIS WITH {provider_name.upper()} ({model_name}) BEGINNING",
+            justify="center",
+            style="bold white",
+        ),
         border_style="cyan",
         expand=True,
     )
     console.print(ai_header)
 
-    # Display project type recommendation
+    # Display project type recommendation with more detailed description
     type_info = project_types.get(project_type, {"name": project_type.capitalize()})
+
+    # Define more detailed descriptions for each project type
+    detailed_descriptions = {
+        "basic": "Standard Python package with modular structure and clean organization",
+        "cli": "Command-line interface application with argument parsing and terminal interaction",
+        "web": "Browser-based application with HTML rendering and user interface components",
+        "api": "RESTful or GraphQL service with data endpoints and request validation",
+        "data": "Data analysis project with processing pipelines and visualization capabilities",
+        "ai": "Machine learning project with model training and inference components",
+        "gui": "Desktop application with interactive graphical user interface elements",
+    }
+
+    # Get the detailed description or use a fallback
+    detailed_description = detailed_descriptions.get(
+        project_type,
+        f"Project with {type_info.get('description', 'specialized functionality')}",
+    )
+
     console.print("\nBased on your description, I recommend a ", end="")
-    console.print(f"[bold green]'{project_type}'[/bold green]", end="")
-    console.print(f" project ({type_info['name']}).")
+    console.print(f"[bold green]{detailed_description}[/bold green]", end="")
+    console.print(f" ({type_info['name']}).")
     console.print(f"[italic]{explanation.strip()}[/italic]\n")
 
     # Generate technology stack prompt
@@ -259,6 +295,44 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
         # Get AI response for technology stack
         tech_success, tech_response = selected_provider.generate_response(tech_prompt)
+
+        # Try up to 2 more times with the same provider if successful but response might not be valid JSON
+        max_retries = 2
+        retry_count = 0
+
+        # Check if we have a successful response but it doesn't look like valid JSON
+        if tech_success and not (
+            tech_response.strip().startswith("{")
+            and tech_response.strip().endswith("}")
+        ):
+            logger.debug("Response doesn't look like valid JSON, will retry")
+            while retry_count < max_retries:
+                retry_count += 1
+                console.print(
+                    f"[bold yellow]Response format may not be valid JSON. Retrying ({retry_count}/{max_retries})...[/bold yellow]",
+                    end="\r",
+                )
+                # Add stronger emphasis on JSON format in the retry
+                retry_prompt = (
+                    tech_prompt
+                    + "\n\nCRITICAL: Your response MUST be ONLY a valid JSON object with no additional text."
+                )
+                tech_success, retry_response = selected_provider.generate_response(
+                    retry_prompt
+                )
+                if (
+                    tech_success
+                    and retry_response.strip().startswith("{")
+                    and retry_response.strip().endswith("}")
+                ):
+                    tech_response = retry_response
+                    logger.debug(
+                        f"Retry {retry_count} successful, response looks like valid JSON"
+                    )
+                    break
+                logger.debug(
+                    f"Retry {retry_count} failed or response still doesn't look like valid JSON"
+                )
 
         # If selected provider fails, try DeepSeek as fallback
         if (
@@ -287,8 +361,61 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     # Parse the JSON response and display technology stack recommendations
     try:
         import json
+        import re
 
-        tech_data = json.loads(tech_response)
+        # Handle empty or invalid responses
+        if not tech_response or tech_response.strip() == "":
+            console.print(
+                "[bold yellow]No technology stack recommendations received.[/bold yellow]"
+            )
+            # Create a default tech stack structure
+            tech_data = create_default_tech_stack(project_type)
+            project_info["tech_stack"] = tech_data
+            return True, project_type
+
+        # Log the raw response for debugging
+        logger.debug(f"Raw technology stack response: {tech_response}")
+
+        # First try direct JSON parsing
+        try:
+            tech_data = json.loads(tech_response)
+            logger.debug("Successfully parsed JSON directly")
+        except json.JSONDecodeError:
+            # If direct parsing fails, try to extract JSON using regex
+            logger.debug("Direct JSON parsing failed, trying regex extraction")
+
+            # Try to extract JSON from the response (in case the AI included extra text)
+            # This improved regex looks for the most complete JSON object in the response
+            json_match = re.search(
+                r"(\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})", tech_response
+            )
+
+            if json_match:
+                json_str = json_match.group(1)
+                logger.debug(f"Extracted JSON using regex: {json_str[:100]}...")
+
+                try:
+                    tech_data = json.loads(json_str)
+                    logger.debug("Successfully parsed extracted JSON")
+                except json.JSONDecodeError as e:
+                    logger.debug(f"JSON parsing error after extraction: {str(e)}")
+                    console.print(
+                        "[bold yellow]Invalid technology stack response format. Using default configuration.[/bold yellow]"
+                    )
+                    # Create a default tech stack structure
+                    tech_data = create_default_tech_stack(project_type)
+                    project_info["tech_stack"] = tech_data
+                    return True, project_type
+            else:
+                # No JSON found in the response
+                logger.debug("No JSON pattern found in the response")
+                console.print(
+                    "[bold yellow]Invalid technology stack response format. Using default configuration.[/bold yellow]"
+                )
+                # Create a default tech stack structure
+                tech_data = create_default_tech_stack(project_type)
+                project_info["tech_stack"] = tech_data
+                return True, project_type
 
         # Display key project features identified by AI
         if "analysis" in tech_data and tech_data["analysis"]:
@@ -424,10 +551,13 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
                     # Handle "Other" option
                     if selected_index == len(options):  # User selected "Other"
-                        console.print(
-                            "\nPlease describe your preferred technology in plain English:"
+                        console.print("\n")
+                        # Import the enhanced_input function if not already imported
+                        from create_python_project.utils.cli import enhanced_input
+
+                        user_description = enhanced_input(
+                            "Please describe your preferred technology in plain English"
                         )
-                        user_description = pt_prompt()
 
                         console.print(
                             "\n[bold cyan]Processing your preference...[/bold cyan]"
@@ -435,7 +565,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
                         # Generate a prompt to determine the appropriate technology based on user's description
                         tech_inference_prompt = f"""
-                        The user is setting up a {project_type} project and wants to use a different {category['name']} than those offered.
+                        The user is setting up a {project_type} project and wants to use a different {category["name"]} than those offered.
 
                         User's preference: "{user_description}"
 
@@ -597,7 +727,7 @@ def get_technology_use_case(tech_name: str) -> str:
 
 
 def manual_project_type_selection(
-    project_types: dict[str, dict[str, str]]
+    project_types: dict[str, dict[str, str]],
 ) -> tuple[bool, str]:
     """
     Allow manual selection of project type when AI is unavailable or not chosen.
@@ -677,13 +807,24 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
         if isinstance(tech_stack_from_info, dict):
             tech_stack_dict = tech_stack_from_info
 
+        # Extract specific parameters to avoid duplicate keyword arguments
+        project_name = project_info["project_name"]
+        project_dir = project_info["project_dir"]
+
+        # Create a copy of project_info without project_name, project_dir, project_type, and tech_stack
+        extra_info = {
+            k: v
+            for k, v in project_info.items()
+            if k not in ["project_name", "project_dir", "project_type", "tech_stack"]
+        }
+
         structure_success, message = core_project_builder.create_project_structure(
-            project_name=project_info["project_name"],
-            project_dir=project_info["project_dir"],
+            project_name=project_name,
+            project_dir=project_dir,
             project_type=project_type,
             with_ai=True,
             tech_stack=tech_stack_dict,
-            **project_info,
+            **extra_info,
         )
 
         if not structure_success:
@@ -713,16 +854,18 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
         # Ask for GitHub username
         console.print("\n[bold]Remote Repository Setup (optional)[/bold]")
         console.print("[italic]Configure remotes for GitHub and GitLab[/italic]")
-        console.print(
-            "Enter your GitHub username (optional, press Enter to skip): ", end=""
+
+        # Import the enhanced_input function if not already imported
+        from create_python_project.utils.cli import enhanced_input
+
+        github_username = enhanced_input(
+            "Enter your GitHub username (optional, press Enter to skip)"
         )
-        github_username = pt_prompt()
 
         # Ask for GitLab username
-        console.print(
-            "Enter your GitLab username (optional, press Enter to skip): ", end=""
+        gitlab_username = enhanced_input(
+            "Enter your GitLab username (optional, press Enter to skip)"
         )
-        gitlab_username = pt_prompt()
 
         # Ask for GitHub Copilot configuration
         setup_github_config = Confirm.ask(
@@ -838,6 +981,12 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
 def main() -> int:
     """Main entry point for the application."""
     try:
+        # Clear the terminal completely at startup
+        os.system("clear")
+
+        # Add debug print statements
+        print("Starting Python Project Initializer...")
+
         # Log available AI providers for debugging
         available_providers = ai_integration.get_available_ai_providers()
         logger.debug(f"Available AI providers: {available_providers}")
@@ -913,6 +1062,214 @@ def main() -> int:
         logger.exception(f"Unexpected error: {str(e)}")
         console.print(f"\n[bold red]❌ An error occurred:[/bold red] {str(e)}")
         return 1
+
+
+def create_default_tech_stack(project_type: str) -> dict[str, Any]:
+    """
+    Create a default technology stack structure based on project type.
+
+    Args:
+        project_type: Type of the project (web, cli, etc.)
+
+    Returns:
+        Dictionary containing default technology stack
+    """
+    # Create a basic structure for the tech stack
+    tech_stack: dict[str, Any] = {
+        "categories": [],  # This will be a list of category dictionaries
+        "analysis": [
+            "Using default configuration",
+            "Customized for your project type",
+            "Based on industry best practices",
+            "Optimized for developer productivity",
+        ],
+    }
+
+    # Add categories based on project type
+    if project_type == "web":
+        tech_stack["categories"] = [
+            {
+                "name": "Backend Framework",
+                "description": "The foundation of your web application",
+                "options": [
+                    {
+                        "name": "Flask",
+                        "description": "Lightweight and flexible web framework",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "FastAPI",
+                        "description": "Modern, high-performance web framework with automatic API documentation",
+                        "recommended": False,
+                    },
+                ],
+            },
+            {
+                "name": "Database",
+                "description": "Storage solution for your application data",
+                "options": [
+                    {
+                        "name": "SQLite",
+                        "description": "Lightweight file-based database for development and small applications",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "PostgreSQL",
+                        "description": "Powerful open-source relational database",
+                        "recommended": False,
+                    },
+                ],
+            },
+        ]
+    elif project_type == "cli":
+        tech_stack["categories"] = [
+            {
+                "name": "CLI Framework",
+                "description": "Framework for building command-line interfaces",
+                "options": [
+                    {
+                        "name": "Click",
+                        "description": "Composable command-line interface toolkit",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "Typer",
+                        "description": "Modern CLI framework based on type hints",
+                        "recommended": False,
+                    },
+                ],
+            }
+        ]
+    elif project_type == "api":
+        tech_stack["categories"] = [
+            {
+                "name": "API Framework",
+                "description": "Framework for building APIs",
+                "options": [
+                    {
+                        "name": "FastAPI",
+                        "description": "Modern, high-performance API framework with automatic documentation",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "Flask-RESTful",
+                        "description": "Extension for Flask that adds support for quickly building REST APIs",
+                        "recommended": False,
+                    },
+                ],
+            },
+            {
+                "name": "Database",
+                "description": "Storage solution for your application data",
+                "options": [
+                    {
+                        "name": "PostgreSQL",
+                        "description": "Powerful open-source relational database",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "MongoDB",
+                        "description": "NoSQL document database for flexible data models",
+                        "recommended": False,
+                    },
+                ],
+            },
+        ]
+    elif project_type == "data":
+        tech_stack["categories"] = [
+            {
+                "name": "Data Processing",
+                "description": "Libraries for data manipulation and analysis",
+                "options": [
+                    {
+                        "name": "Pandas",
+                        "description": "Data analysis and manipulation library",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "NumPy",
+                        "description": "Fundamental package for scientific computing",
+                        "recommended": False,
+                    },
+                ],
+            },
+            {
+                "name": "Visualization",
+                "description": "Libraries for data visualization",
+                "options": [
+                    {
+                        "name": "Matplotlib",
+                        "description": "Comprehensive library for creating static, animated, and interactive visualizations",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "Seaborn",
+                        "description": "Statistical data visualization based on matplotlib",
+                        "recommended": False,
+                    },
+                ],
+            },
+        ]
+    elif project_type == "ai":
+        tech_stack["categories"] = [
+            {
+                "name": "Machine Learning",
+                "description": "Libraries for machine learning",
+                "options": [
+                    {
+                        "name": "Scikit-learn",
+                        "description": "Simple and efficient tools for data analysis and modeling",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "TensorFlow",
+                        "description": "End-to-end open source platform for machine learning",
+                        "recommended": False,
+                    },
+                ],
+            }
+        ]
+    else:  # basic or other types
+        tech_stack["categories"] = [
+            {
+                "name": "Testing",
+                "description": "Libraries for testing your code",
+                "options": [
+                    {
+                        "name": "Pytest",
+                        "description": "Simple and powerful testing framework",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "Unittest",
+                        "description": "Built-in Python testing framework",
+                        "recommended": False,
+                    },
+                ],
+            }
+        ]
+
+    # Add common categories for all project types
+    tech_stack["categories"].append(
+        {
+            "name": "Testing",
+            "description": "Libraries for testing your code",
+            "options": [
+                {
+                    "name": "Pytest",
+                    "description": "Simple and powerful testing framework",
+                    "recommended": True,
+                },
+                {
+                    "name": "Unittest",
+                    "description": "Built-in Python testing framework",
+                    "recommended": False,
+                },
+            ],
+        }
+    )
+
+    return tech_stack
 
 
 if __name__ == "__main__":

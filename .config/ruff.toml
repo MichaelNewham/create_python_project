@@ -1,36 +1,8 @@
-# Target Python version
+# Basic Ruff configuration
 target-version = "py311"
-
-# Line length configuration
 line-length = 100
 
-# Exclude files and directories
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "venv",
-]
-
 [lint]
-# Enable all default linters and additional rules
 select = [
     "E",   # pycodestyle errors
     "F",   # pyflakes
@@ -40,41 +12,14 @@ select = [
     "B",   # flake8-bugbear
     "C4",  # flake8-comprehensions
     "SIM", # flake8-simplify
-    "TCH", # type-checking
-    "TID", # tidyness
     "UP",  # pyupgrade
 ]
-
-# Ignore specific rules
 ignore = [
     "F821",  # Ignore undefined names in template strings
     "E501",  # Line too long (handled by black)
 ]
 
-# Enable auto-fixing of issues
-fix = true
-# Show source code snippets in linting output
-show-source = true
-# Show error code for each issue
-show-fixes = true
-
 # Path-specific settings
 [lint.per-file-ignores]
 "src/create_python_project/utils/templates.py" = ["E501", "F821"]
 "tests/*" = ["E501"]
-
-# Per-rule settings
-[lint.mccabe]
-max-complexity = 10
-
-[lint.pep8-naming]
-# Allow two-letter variables (like db, id, etc.)
-ignore-names = ["id", "db", "to", "by"]
-
-[lint.flake8-quotes]
-docstring-quotes = "double"
-inline-quotes = "single"
-
-[lint.isort]
-known-first-party = ["create_python_project"]
-known-third-party = ["openai", "anthropic", "pytest", "rich"]

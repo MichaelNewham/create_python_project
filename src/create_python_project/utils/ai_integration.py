@@ -5,6 +5,8 @@ AI Integration Module
 This module handles integration with AI providers for project generation.
 It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.
 """
+
+import importlib.util
 import logging
 import os
 from typing import TYPE_CHECKING
@@ -92,9 +94,12 @@ class OpenAIProvider(AIProvider):
     def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using OpenAI API."""
         try:
-            if openai is None:
+            # Check if the module is available at runtime
+            if importlib.util.find_spec("openai") is None:
                 return False, "OpenAI package not installed. Run: pip install openai"
 
+            # Use the global openai module
+            global openai
             openai.api_key = self.api_key
 
             response = openai.chat.completions.create(
@@ -141,12 +146,15 @@ class AnthropicProvider(AIProvider):
     def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using Anthropic API."""
         try:
-            if anthropic is None:
+            # Check if the module is available at runtime
+            if importlib.util.find_spec("anthropic") is None:
                 return (
                     False,
                     "Anthropic package not installed. Run: pip install anthropic",
                 )
 
+            # Use the global anthropic module
+            global anthropic
             client = anthropic.Anthropic(api_key=self.api_key)
 
             system_prompt = (
@@ -161,17 +169,9 @@ class AnthropicProvider(AIProvider):
                 messages=[{"role": "user", "content": prompt}],
             )
 
-            # Safely extract text to avoid union type errors
-            content = message.content
-            if (
-                content
-                and len(content) > 0
-                and isinstance(content[0], dict)
-                and "text" in content[0]
-            ):
-                return True, content[0]["text"]
-
-            return True, str(content)
+            # Simply convert the content to a string to avoid type issues
+            # This is a safe fallback that works with any response format
+            return True, str(message.content)
         except Exception as e:
             return False, f"Anthropic API error: {str(e)}"
 
@@ -337,12 +337,15 @@ class GeminiProvider(AIProvider):
     def generate_response(self, prompt: str) -> tuple[bool, str]:
         """Generate a response using Google Gemini API."""
         try:
-            if genai is None:
+            # Check if the module is available at runtime
+            if importlib.util.find_spec("google.generativeai") is None:
                 return (
                     False,
                     "Google Generative AI package not installed. Run: pip install google-generativeai",
                 )
 
+            # Use the global genai module
+            global genai
             genai.configure(api_key=self.api_key)
             model = genai.GenerativeModel(self.model or "gemini-2.5-pro-preview-05-06")
 

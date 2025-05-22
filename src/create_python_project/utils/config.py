@@ -122,24 +122,30 @@ def get_project_types() -> dict[str, dict[str, str]]:
     return {
         "basic": {
             "name": "Basic Python Package",
-            "description": "A simple Python package with minimal structure",
+            "description": "Modular code with standard structure",
         },
         "cli": {
             "name": "Command-Line Interface",
-            "description": "A Python package with a command-line interface",
+            "description": "Terminal-based tools with argument parsing",
         },
         "web": {
             "name": "Web Application",
-            "description": "A web application using Flask or FastAPI",
+            "description": "Browser-based apps with HTML rendering",
         },
-        "api": {"name": "API Service", "description": "A RESTful API service"},
+        "api": {
+            "name": "API Service",
+            "description": "Data endpoints with request validation",
+        },
         "data": {
             "name": "Data Analysis/Science",
-            "description": "A data analysis or data science project",
+            "description": "Analytics with visualization and processing",
         },
         "ai": {
             "name": "AI/ML Project",
-            "description": "An AI or machine learning project",
+            "description": "Models with training and inference",
         },
-        "gui": {"name": "GUI Application", "description": "A desktop GUI application"},
+        "gui": {
+            "name": "GUI Application",
+            "description": "Desktop apps with interactive interfaces",
+        },
     }

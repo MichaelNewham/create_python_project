@@ -1,246 +1,41 @@
-Running Ruff linting (attempt 1/2)...
-ruff.....................................................................Failed
-- hook id: ruff
-- exit code: 1
+Mypy extension activated, version 0.4.2
+Registering listener for interpreter changed event
+Waiting for Python extension to load
+Python extension loaded
+Listener registered
+[1] Check folder: /home/michaelnewham/bin/python_projects/create_python_project
+[1] Using config file: ${workspaceFolder}/.config/mypy.ini
+Activation complete
+Active interpreter changed for resource: /home/michaelnewham/bin/python_projects/create_python_project
+[1] Received Python path from Python extension: /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python
+[1] Running dmypy in folder /home/michaelnewham/bin/python_projects/create_python_project
+/home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python -m mypy.dmypy --status-file '/home/michaelnewham/.config/Code - Insiders/User/workspaceStorage/e7d1106deb9ef76f39b30357bd8c70d9/matangover.mypy/dmypy-ef91c0e0de293289e8fbf819fa0b29ba0ae0348a-150228.json' run --log-file '/home/michaelnewham/.config/Code - Insiders/User/workspaceStorage/e7d1106deb9ef76f39b30357bd8c70d9/matangover.mypy/dmypy-ef91c0e0de293289e8fbf819fa0b29ba0ae0348a.log' -- --python-executable /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python . --show-error-end --no-error-summary --no-pretty --no-color-output --config-file '${workspaceFolder}/.config/mypy.ini'
+[1] stderr:
+usage: mypy [-h] [-v] [-V] [more options; see below]
+            [-m MODULE] [-p PACKAGE] [-c PROGRAM_TEXT] [files ...]
+mypy: error: Cannot find config file '${workspaceFolder}/.config/mypy.ini'
 
-src/create_python_project/utils/core_project_builder.py:684:34: F821 Undefined name `error`
-    |
-682 |             return response.choices[0].message.content
-683 |         except Exception as error:
-684 |             return f"Error: {str(error)}"
-    |                                  ^^^^^ F821
-685 | '''
-686 |                 )
-    |
+[1] Error running mypy in /home/michaelnewham/bin/python_projects/create_python_project: mypy failed with error: "usage: mypy [-h] [-v] [-V] [more options; see below]". See Output panel for details.
+[2] Check folder: /home/michaelnewham/bin/python_projects/create_python_project
+[2] Using config file: ${workspaceFolder}/.config/mypy.ini
+[2] Received Python path from Python extension: /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python
+[2] Running dmypy in folder /home/michaelnewham/bin/python_projects/create_python_project
+/home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python -m mypy.dmypy --status-file '/home/michaelnewham/.config/Code - Insiders/User/workspaceStorage/e7d1106deb9ef76f39b30357bd8c70d9/matangover.mypy/dmypy-ef91c0e0de293289e8fbf819fa0b29ba0ae0348a-150228.json' run --log-file '/home/michaelnewham/.config/Code - Insiders/User/workspaceStorage/e7d1106deb9ef76f39b30357bd8c70d9/matangover.mypy/dmypy-ef91c0e0de293289e8fbf819fa0b29ba0ae0348a.log' -- --python-executable /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python . --show-error-end --no-error-summary --no-pretty --no-color-output --config-file '${workspaceFolder}/.config/mypy.ini'
+[2] stderr:
+usage: mypy [-h] [-v] [-V] [more options; see below]
+            [-m MODULE] [-p PACKAGE] [-c PROGRAM_TEXT] [files ...]
+mypy: error: Cannot find config file '${workspaceFolder}/.config/mypy.ini'
 
-src/create_python_project/utils/core_project_builder.py:717:57: F821 Undefined name `file_extension`
-    |
-715 |         return pd.read_json(file_path)
-716 |     else:
-717 |         raise ValueError(f"Unsupported file extension: {file_extension}")
-    |                                                         ^^^^^^^^^^^^^^ F821
-718 |
-719 | def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
-    |
+[2] Error running mypy in /home/michaelnewham/bin/python_projects/create_python_project: mypy failed with error: "usage: mypy [-h] [-v] [-V] [more options; see below]". See Output panel for details.
+Active interpreter changed for resource: unknown
+[3] Check folder: /home/michaelnewham/bin/python_projects/create_python_project
+[3] Using config file: ${workspaceFolder}/.config/mypy.ini
+[3] Received Python path from Python extension: /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python
+[3] Running dmypy in folder /home/michaelnewham/bin/python_projects/create_python_project
+/home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python -m mypy.dmypy --status-file '/home/michaelnewham/.config/Code - Insiders/User/workspaceStorage/e7d1106deb9ef76f39b30357bd8c70d9/matangover.mypy/dmypy-ef91c0e0de293289e8fbf819fa0b29ba0ae0348a-150228.json' run --log-file '/home/michaelnewham/.config/Code - Insiders/User/workspaceStorage/e7d1106deb9ef76f39b30357bd8c70d9/matangover.mypy/dmypy-ef91c0e0de293289e8fbf819fa0b29ba0ae0348a.log' -- --python-executable /home/michaelnewham/bin/python_projects/create_python_project/.venv/bin/python . --show-error-end --no-error-summary --no-pretty --no-color-output --config-file '${workspaceFolder}/.config/mypy.ini'
+[3] stderr:
+usage: mypy [-h] [-v] [-V] [more options; see below]
+            [-m MODULE] [-p PACKAGE] [-c PROGRAM_TEXT] [files ...]
+mypy: error: Cannot find config file '${workspaceFolder}/.config/mypy.ini'
 
-src/create_python_project/utils/core_project_builder.py:733:35: F821 Undefined name `column_name`
-    |
-731 |     if pd.api.types.is_numeric_dtype(df[column_name]):
-732 |         df[column_name].hist()
-733 |         plt.title(f"Histogram of {column_name}")
-    |                                   ^^^^^^^^^^^ F821
-734 |     else:
-735 |         df[column_name].value_counts().plot(kind=\'bar\')
-    |
-
-src/create_python_project/utils/core_project_builder.py:736:38: F821 Undefined name `column_name`
-    |
-734 |     else:
-735 |         df[column_name].value_counts().plot(kind=\'bar\')
-736 |         plt.title(f"Value counts of {column_name}")
-    |                                      ^^^^^^^^^^^ F821
-737 |         
-738 |     plt.tight_layout()
-    |
-
-Found 4 errors.
-
-⚠️ Ruff linting failed. Attempting to fix issues automatically...
-error: unexpected argument '--fix' found
-
-Usage: ruff [OPTIONS] <COMMAND>
-
-For more information, try '--help'.
-Running Ruff linting (attempt 2/2)...
-ruff.....................................................................Failed
-- hook id: ruff
-- exit code: 1
-- files were modified by this hook
-
-scripts/fix_lint_issues.py:473:51: F841 Local variable `executor` is assigned to but never used
-    |
-471 |         results = {}
-472 |
-473 |         with ThreadPoolExecutor(max_workers=1) as executor:
-    |                                                   ^^^^^^^^ F841
-474 |             # Run linters in sequence
-475 |             results["black"] = self.run_black(files)
-    |
-    = help: Remove assignment to unused variable `executor`
-
-src/create_python_project/utils/core_project_builder.py:684:34: F821 Undefined name `error`
-    |
-682 |             return response.choices[0].message.content
-683 |         except Exception as error:
-684 |             return f"Error: {str(error)}"
-    |                                  ^^^^^ F821
-685 | '''
-686 |                 )
-    |
-
-src/create_python_project/utils/core_project_builder.py:717:57: F821 Undefined name `file_extension`
-    |
-715 |         return pd.read_json(file_path)
-716 |     else:
-717 |         raise ValueError(f"Unsupported file extension: {file_extension}")
-    |                                                         ^^^^^^^^^^^^^^ F821
-718 |
-719 | def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
-    |
-
-src/create_python_project/utils/core_project_builder.py:733:35: F821 Undefined name `column_name`
-    |
-731 |     if pd.api.types.is_numeric_dtype(df[column_name]):
-732 |         df[column_name].hist()
-733 |         plt.title(f"Histogram of {column_name}")
-    |                                   ^^^^^^^^^^^ F821
-734 |     else:
-735 |         df[column_name].value_counts().plot(kind=\'bar\')
-    |
-
-src/create_python_project/utils/core_project_builder.py:736:38: F821 Undefined name `column_name`
-    |
-734 |     else:
-735 |         df[column_name].value_counts().plot(kind=\'bar\')
-736 |         plt.title(f"Value counts of {column_name}")
-    |                                      ^^^^^^^^^^^ F821
-737 |         
-738 |     plt.tight_layout()
-    |
-
-Found 15 errors (10 fixed, 5 remaining).
-No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
-
-❌ Ruff linting failed after 2 attempts.
-Running Flake8 linting (attempt 1/2)...
-flake8...................................................................Failed
-- hook id: flake8
-- exit code: 1
-
-scripts/fix_lint_issues.py:473:51: F841 local variable 'executor' is assigned to but never used
-scripts/fix_specific_lint_issues.py:214:50: E203 whitespace before ':'
-src/create_python_project/utils/ai_prompts.py:78:-2: E202 whitespace before ']'
-src/create_python_project/utils/ai_prompts.py:78:4: E202 whitespace before '}'
-src/create_python_project/utils/ai_prompts.py:89:-170: E202 whitespace before ']'
-src/create_python_project/utils/ai_prompts.py:89:-2: E202 whitespace before ']'
-src/create_python_project/utils/core_project_builder.py:684:-140: E202 whitespace before ']'
-src/create_python_project/utils/core_project_builder.py:684:-92: E202 whitespace before ')'
-src/create_python_project/utils/core_project_builder.py:684:34: F821 undefined name 'error'
-src/create_python_project/utils/core_project_builder.py:717:57: F821 undefined name 'file_extension'
-src/create_python_project/utils/core_project_builder.py:733:35: F821 undefined name 'column_name'
-src/create_python_project/utils/core_project_builder.py:736:38: F821 undefined name 'column_name'
-src/create_python_project/utils/core_project_builder.py:1161:-176: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1161:-105: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1161:-29: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1315:4: E202 whitespace before '}'
-src/create_python_project/utils/core_project_builder.py:1403:-606: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1403:-214: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1435:-820: E221 multiple spaces before operator
-
-⚠️ Flake8 linting failed. Attempting to fix issues automatically...
-Running Flake8 linting (attempt 2/2)...
-flake8...................................................................Failed
-- hook id: flake8
-- exit code: 1
-
-scripts/fix_lint_issues.py:473:51: F841 local variable 'executor' is assigned to but never used
-scripts/fix_specific_lint_issues.py:214:50: E203 whitespace before ':'
-src/create_python_project/utils/ai_prompts.py:78:-2: E202 whitespace before ']'
-src/create_python_project/utils/ai_prompts.py:78:4: E202 whitespace before '}'
-src/create_python_project/utils/ai_prompts.py:89:-170: E202 whitespace before ']'
-src/create_python_project/utils/ai_prompts.py:89:-2: E202 whitespace before ']'
-src/create_python_project/utils/core_project_builder.py:684:-140: E202 whitespace before ']'
-src/create_python_project/utils/core_project_builder.py:684:-92: E202 whitespace before ')'
-src/create_python_project/utils/core_project_builder.py:684:34: F821 undefined name 'error'
-src/create_python_project/utils/core_project_builder.py:717:57: F821 undefined name 'file_extension'
-src/create_python_project/utils/core_project_builder.py:733:35: F821 undefined name 'column_name'
-src/create_python_project/utils/core_project_builder.py:736:38: F821 undefined name 'column_name'
-src/create_python_project/utils/core_project_builder.py:1161:-176: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1161:-105: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1161:-29: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1315:4: E202 whitespace before '}'
-src/create_python_project/utils/core_project_builder.py:1403:-606: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1403:-214: E221 multiple spaces before operator
-src/create_python_project/utils/core_project_builder.py:1435:-820: E221 multiple spaces before operator
-
-❌ Flake8 linting failed after 2 attempts.
-Running mypy type checking (attempt 1/2)...
-mypy.....................................................................Failed
-- hook id: mypy
-- exit code: 1
-
-src/create_python_project/utils/core_project_builder.py:20: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
-src/create_python_project/utils/core_project_builder.py:20: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
-src/create_python_project/utils/core_project_builder.py:20: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
-src/create_python_project/utils/core_project_builder.py:197: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:201: error: Value of type "object" is not indexable  [index]
-src/create_python_project/utils/core_project_builder.py:206: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:211: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:214: error: Value of type "object" is not indexable  [index]
-src/create_python_project/utils/core_project_builder.py:256: error: Unsupported right operand type for in ("object")  [operator]
-src/create_python_project/utils/core_project_builder.py:257: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:258: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:261: error: Value of type "object" is not indexable  [index]
-src/create_python_project/utils/core_project_builder.py:684: error: Name "error" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:717: error: Name "file_extension" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:733: error: Name "column_name" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:736: error: Name "column_name" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:903: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
-src/create_python_project/utils/core_project_builder.py:903: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
-src/create_python_project/utils/core_project_builder.py:903: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
-src/create_python_project/utils/core_project_builder.py:1346: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
-src/create_python_project/utils/core_project_builder.py:1346: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
-src/create_python_project/utils/core_project_builder.py:1346: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
-src/create_python_project/utils/core_project_builder.py:1968: error: Item "None" of "Any | None" has no attribute "replace"  [union-attr]
-src/create_python_project/utils/core_project_builder.py:1974: error: Unsupported right operand type for in ("Any | None")  [operator]
-src/create_python_project/utils/core_project_builder.py:2017: error: Unsupported right operand type for in ("Any | None")  [operator]
-src/create_python_project/utils/core_project_builder.py:2060: error: Unsupported right operand type for in ("Any | None")  [operator]
-src/create_python_project/create_python_project.py:227: error: Incompatible types in assignment (expression has type "dict[Never, Never]", target has type "str")  [assignment]
-src/create_python_project/create_python_project.py:448: error: Incompatible types in assignment (expression has type "AIProvider", variable has type "DeepSeekProvider")  [assignment]
-src/create_python_project/create_python_project.py:654: error: Argument "tech_stack" to "create_project_structure" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
-src/create_python_project/create_python_project.py:726: error: Argument "tech_stack" to "initialize_git_repo" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
-Found 24 errors in 2 files (checked 23 source files)
-
-⚠️ mypy type checking failed. Attempting to fix issues automatically...
-Running mypy type checking (attempt 2/2)...
-mypy.....................................................................Failed
-- hook id: mypy
-- exit code: 1
-
-src/create_python_project/utils/core_project_builder.py:20: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
-src/create_python_project/utils/core_project_builder.py:20: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
-src/create_python_project/utils/core_project_builder.py:20: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
-src/create_python_project/utils/core_project_builder.py:197: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:201: error: Value of type "object" is not indexable  [index]
-src/create_python_project/utils/core_project_builder.py:206: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:211: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:214: error: Value of type "object" is not indexable  [index]
-src/create_python_project/utils/core_project_builder.py:256: error: Unsupported right operand type for in ("object")  [operator]
-src/create_python_project/utils/core_project_builder.py:257: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:258: error: "object" has no attribute "get"  [attr-defined]
-src/create_python_project/utils/core_project_builder.py:261: error: Value of type "object" is not indexable  [index]
-src/create_python_project/utils/core_project_builder.py:684: error: Name "error" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:717: error: Name "file_extension" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:733: error: Name "column_name" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:736: error: Name "column_name" is not defined  [name-defined]
-src/create_python_project/utils/core_project_builder.py:903: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
-src/create_python_project/utils/core_project_builder.py:903: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
-src/create_python_project/utils/core_project_builder.py:903: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
-src/create_python_project/utils/core_project_builder.py:1346: error: Incompatible default for argument "tech_stack" (default has type "None", argument has type "dict[Any, Any]")  [assignment]
-src/create_python_project/utils/core_project_builder.py:1346: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
-src/create_python_project/utils/core_project_builder.py:1346: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
-src/create_python_project/utils/core_project_builder.py:1968: error: Item "None" of "Any | None" has no attribute "replace"  [union-attr]
-src/create_python_project/utils/core_project_builder.py:1974: error: Unsupported right operand type for in ("Any | None")  [operator]
-src/create_python_project/utils/core_project_builder.py:2017: error: Unsupported right operand type for in ("Any | None")  [operator]
-src/create_python_project/utils/core_project_builder.py:2060: error: Unsupported right operand type for in ("Any | None")  [operator]
-src/create_python_project/create_python_project.py:227: error: Incompatible types in assignment (expression has type "dict[Never, Never]", target has type "str")  [assignment]
-src/create_python_project/create_python_project.py:448: error: Incompatible types in assignment (expression has type "AIProvider", variable has type "DeepSeekProvider")  [assignment]
-src/create_python_project/create_python_project.py:654: error: Argument "tech_stack" to "create_project_structure" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
-src/create_python_project/create_python_project.py:726: error: Argument "tech_stack" to "initialize_git_repo" has incompatible type "str | dict[Any, Any]"; expected "dict[Any, Any]"  [arg-type]
-Found 24 errors in 2 files (checked 23 source files)
-
-❌ mypy type checking failed after 2 attempts.
-Running Pylint comprehensive linting...
-Pylint score: 9.89/10.0
-✅ Pylint check passed (score >= 9.0)!
-❌ Some linting checks failed.
+[3] Error running mypy in /home/michaelnewham/bin/python_projects/create_python_project: mypy failed with error: "usage: mypy [-h] [-v] [-V] [more options; see below]". See Output panel for details.

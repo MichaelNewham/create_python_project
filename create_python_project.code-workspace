@@ -15,7 +15,9 @@
         "python.testing.unittestEnabled": false,
         "python.analysis.extraPaths": [
             "${workspaceFolder}"
-        ]
+        ],
+        "mcp.envFile": "${workspaceFolder}/.env",
+        "mcp.secretsFile": "${workspaceFolder}/.vscode/mcp-secrets.json"
     },
     "extensions": {
         "recommendations": [
@@ -23,7 +25,10 @@
             "ms-python.vscode-pylance",
             "njpwerner.autodocstring",
             "streetsidesoftware.code-spell-checker",
-            "eamodio.gitlens"
+            "eamodio.gitlens",
+            "github.copilot",
+            "github.copilot-chat",
+            "f1e.mcp"
         ]
     }
 }

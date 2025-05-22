@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# mypy: disable-error-code="name-defined"
 """
 Core Project Builder Module
 
@@ -200,7 +201,7 @@ logs/
                     continue
 
                 # Add the package
-                package_info = f"{tech_dict['package']} = \"{tech_dict['version']}\""
+                package_info = f'{tech_dict["package"]} = "{tech_dict["version"]}"'
                 if package_info not in dependencies:
                     dependencies.append(package_info)
 
@@ -216,7 +217,7 @@ logs/
                         suggestion_dict: dict[
                             str, Any
                         ] = suggestion_info  # Type cast for mypy
-                        package_info = f"{suggestion_dict['package']} = \"{suggestion_dict['version']}\""
+                        package_info = f'{suggestion_dict["package"]} = "{suggestion_dict["version"]}"'
                         if package_info not in dependencies:
                             dependencies.append(package_info)
             else:
@@ -271,7 +272,7 @@ logs/
                         and not custom_dict.get("is_deployment", False)
                     ):
                         package_info = (
-                            f"{custom_dict['package']} = \"{custom_dict['version']}\""
+                            f'{custom_dict["package"]} = "{custom_dict["version"]}"'
                         )
                         if package_info not in dependencies:
                             dependencies.append(package_info)
@@ -297,12 +298,12 @@ logs/
 [tool.poetry]
 name = "{package_name}"
 version = "0.1.0"
-description = "{kwargs.get('description', 'A Python project.')}"
-authors = ["{kwargs.get('author_name', 'Your Name')} <{kwargs.get('author_email', 'your.email@example.com')}>"]
+description = "{kwargs.get("description", "A Python project.")}"
+authors = ["{kwargs.get("author_name", "Your Name")} <{kwargs.get("author_email", "your.email@example.com")}>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^{kwargs.get('python_version', '3.9')}"
+python = "^{kwargs.get("python_version", "3.9")}"
 """
 
         # Add dependencies
@@ -367,7 +368,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-{project_name} - {kwargs.get('description', 'A Python project.')}.
+{project_name} - {kwargs.get("description", "A Python project.")}.
 
 ## Development Commands
 
@@ -440,7 +441,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI(title="{project_name}", description="{kwargs.get('description', 'A FastAPI application.')}")
+app = FastAPI(title="{project_name}", description="{kwargs.get("description", "A FastAPI application.")}")
 
 # Enable CORS
 app.add_middleware(
@@ -562,7 +563,7 @@ if __name__ == "__main__":
 </head>
 <body>
     <h1>Welcome to {project_name}</h1>
-    <p>{kwargs.get('description', 'A web application.')}</p>
+    <p>{kwargs.get("description", "A web application.")}</p>
 
     <script src="{{url_for('static', filename='js/main.js')}}"></script>
 </body>
@@ -609,7 +610,7 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-app = typer.Typer(help="{kwargs.get('description', 'A Python CLI application.')}")
+app = typer.Typer(help="{kwargs.get("description", "A Python CLI application.")}")
 console = Console()
 
 @app.command()
@@ -693,8 +694,8 @@ class OpenAIModel(AIModel):
                 max_tokens=1000,
             )
             return response.choices[0].message.content
-        except Exception as e:
-            return f"Error: {str(e)}"
+        except Exception as err:  # type: ignore
+            return f"Error: {str(err)}"
 '''  # type: ignore
                 )
 
@@ -737,17 +738,17 @@ def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
         "missing_values": df.isnull().sum().to_dict(),}
     return results
 
-def visualize_data(df: pd.DataFrame, column_name: str, output_path: str = None) -> None:
+def visualize_data(df: pd.DataFrame, column: str, output_path: str = None) -> None:
     """Create a simple visualization for a column."""
     plt.figure(figsize=(10, 6))
 
-    # Use the column_name parameter directly
-    if pd.api.types.is_numeric_dtype(df[column_name]):
-        df[column_name].hist()
-        plt.title(f"Histogram of {column_name}")
+    # Use the column parameter directly
+    if pd.api.types.is_numeric_dtype(df[column]):  # type: ignore
+        df[column].hist()  # type: ignore
+        plt.title(f"Histogram of {column}")
     else:
-        df[column_name].value_counts().plot(kind=\'bar\')
-        plt.title(f"Value counts of {column_name}")
+        df[column].value_counts().plot(kind='bar')  # type: ignore
+        plt.title(f"Value counts of {column}")
 
     plt.tight_layout()
 
@@ -1414,10 +1415,10 @@ These files tell GitHub Copilot about our coding standards, project structure, a
 - `copilot-instructions.md` - Main project-wide instructions
 - `instructions/python_style.instructions.md` - Python code style guidelines
 - `instructions/testing.instructions.md` - Testing standards and practices
-{'- `instructions/cli.instructions.md` - CLI development guidelines' if project_type == 'cli' else ''}
-{'- `instructions/web.instructions.md` - Web development guidelines' if project_type == 'web' else ''}
-{'- `instructions/data.instructions.md` - Data analysis guidelines' if project_type == 'data' else ''}
-{'- `instructions/ai.instructions.md` - AI/ML development guidelines' if project_type == 'ai' else ''}
+{"- `instructions/cli.instructions.md` - CLI development guidelines" if project_type == "cli" else ""}
+{"- `instructions/web.instructions.md` - Web development guidelines" if project_type == "web" else ""}
+{"- `instructions/data.instructions.md` - Data analysis guidelines" if project_type == "data" else ""}
+{"- `instructions/ai.instructions.md` - AI/ML development guidelines" if project_type == "ai" else ""}
 
 ## Prompt Files
 
@@ -1775,12 +1776,12 @@ applyTo: "**/test_*.py"
         ) as file:
             file.write(
                 f"""---
-applyTo: "**/{project_name.replace('-', '_').replace(' ', '_').lower()}/cli.py"
+applyTo: "**/{project_name.replace("-", "_").replace(" ", "_").lower()}/cli.py"
 ---
 # CLI Development Guidelines
 
 ## Command Structure
-- Use a consistent command structure: `{project_name.replace('-', '_').replace(' ', '_').lower()} [options] <command>`
+- Use a consistent command structure: `{project_name.replace("-", "_").replace(" ", "_").lower()} [options] <command>`
 - Group related options logically
 - Provide sensible defaults for all options
 - Support both short (-h) and long (--help) option forms
