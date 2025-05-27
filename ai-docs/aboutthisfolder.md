@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md -->
 # Ai-docs Folder
 
 AI documentation for the Create Python Project.
@@ -28,4 +28,4 @@ ai-docs/
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-22 01:07:57
+This documentation was automatically generated on: 2025-05-27 01:21:48

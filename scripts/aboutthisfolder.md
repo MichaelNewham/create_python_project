@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/scripts/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/scripts/aboutthisfolder.md -->
 # Scripts Folder
 
 Utility scripts for the Create Python Project.
@@ -27,6 +27,7 @@ scripts/
 ├── fix_pylint_issues.sh
 ├── fix_specific_lint_issues.py
 ├── force_push_to_remotes.sh
+├── manage_logs.sh
 ├── pexels_instructions.sh
 ├── post_commit_push.sh
 ├── remove_large_file.sh
@@ -43,4 +44,4 @@ scripts/
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-22 01:05:10
+This documentation was automatically generated on: 2025-05-27 00:57:00

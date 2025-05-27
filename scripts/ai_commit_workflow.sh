@@ -381,49 +381,76 @@ run_linter() {
     local description=$2
     local success=false
     local attempt=1
-    local max_attempts=2
+    local max_attempts=3  # Increased from 2 to 3 attempts
+    local log_file="${PROJECT_DIR}/logs/linter_${linter}_$(date +%Y%m%d).log"
 
     while [ $attempt -le $max_attempts ] && [ "$success" = "false" ]; do
         print_message "$YELLOW" "Running $description (attempt $attempt/$max_attempts)..."
-
-        if poetry run pre-commit run $linter --all-files; then
+        
+        # Log the attempt
+        echo "=== Attempt $attempt ===" >> "$log_file"
+        
+        if poetry run pre-commit run $linter --all-files 2>&1 | tee -a "$log_file"; then
             print_message "$GREEN" "✅ $description passed!"
             success=true
         else
             if [ $attempt -lt $max_attempts ]; then
                 print_message "$YELLOW" "⚠️ $description failed. Attempting to fix issues automatically..."
-
+                
                 case $linter in
                     black)
-                        poetry run black .
+                        poetry run black . --quiet 2>&1 | tee -a "$log_file"
                         ;;
                     isort)
-                        poetry run isort .
+                        poetry run isort . --quiet 2>&1 | tee -a "$log_file"
                         ;;
                     ruff)
-                        poetry run ruff --fix .
+                        # Enable unsafe fixes and fix all available rules
+                        poetry run ruff . --fix --unsafe-fixes --show-fixes 2>&1 | tee -a "$log_file"
                         ;;
                     flake8)
-                        # No auto-fix for flake8
+                        # Use autopep8 for Flake8 auto-fixing
+                        poetry run autopep8 --in-place --aggressive --aggressive --max-line-length=100 --recursive . 2>&1 | tee -a "$log_file"
                         ;;
                     mypy)
-                        # No auto-fix for mypy
+                        # Generate detailed error report
+                        poetry run mypy . --txt-report "${LOGS_DIR}/linter_mypy_$(date +%Y%m%d).log" 2>&1 | tee -a "$log_file"
                         ;;
                     pylint)
-                        # No auto-fix for pylint
+                        # Generate detailed report and attempt auto-fixes
+                        poetry run pylint --output-format=parseable . > "${LOGS_DIR}/linter_pylint_$(date +%Y%m%d).log" 2>&1
+                        # Use pyupgrade to fix some common issues
+                        poetry run pyupgrade --py311-plus --keep-runtime-typing $(find . -name "*.py") 2>&1 | tee -a "$log_file"
                         ;;
                 esac
 
                 # Re-add files after auto-fixing
                 git add .
+                
+                # Run additional fixers for specific error types
+                if grep -q "line too long" "$log_file"; then
+                    poetry run black . --line-length=88 --quiet
+                fi
+                
+                if grep -q "import" "$log_file"; then
+                    poetry run isort . --profile black --quiet
+                fi
+                
+                if grep -q "whitespace" "$log_file"; then
+                    poetry run autopep8 --in-place --select=E2,E3 --recursive .
+                fi
             else
                 print_message "$RED" "❌ $description failed after $max_attempts attempts."
+                print_message "$YELLOW" "See detailed error log at: $log_file"
                 return 1
             fi
         fi
 
         attempt=$((attempt + 1))
     done
+
+    # Run log management script
+    "${PROJECT_DIR}/scripts/manage_logs.sh"
 
     return 0
 }

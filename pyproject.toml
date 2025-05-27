@@ -32,6 +32,10 @@ pre-commit = "^4.2.0"
 mypy = "^1.15.0"
 ruff = "^0.11.9"
 flake8 = "^7.2.0"
+autopep8 = "^2.1.0"
+pyupgrade = "^3.15.0"
+autoflake = "^2.3.0"
+lxml = "^5.4.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

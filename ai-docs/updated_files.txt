@@ -1,25 +1,23 @@
-Documentation update on 2025-05-22 01:07:57
+Documentation update on 2025-05-27 01:21:48
 ----------------------------------------
 Files modified during this documentation update:
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api_documentation.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/doc_updates.log
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/project_structure.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/updated_files.txt
-/home/michaelnewham/bin/python_projects/create_python_project/.config/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/docs/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/scripts/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api_documentation.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/doc_updates.log
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/api/project_structure.md
-/home/michaelnewham/bin/python_projects/create_python_project/ai-docs/updated_files.txt
-/home/michaelnewham/bin/python_projects/create_python_project/tests/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/tests/conftest.py
-/home/michaelnewham/bin/python_projects/create_python_project/tests/__pycache__/conftest.cpython-313-pytest-8.3.5.pyc
-/home/michaelnewham/bin/python_projects/create_python_project/src/aboutthisfolder.md
-/home/michaelnewham/bin/python_projects/create_python_project/src/create_python_project/__pycache__/create_python_project.cpython-313.pyc
-/home/michaelnewham/bin/python_projects/create_python_project/src/create_python_project/utils/__pycache__/core_project_builder.cpython-313.pyc
-/home/michaelnewham/bin/python_projects/create_python_project/README.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/api_documentation.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/api/doc_updates.log
+/home/michaelnewham/Projects/create_python_project/ai-docs/api/project_structure.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/Projects/create_python_project/.config/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/docs/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/docs/errors.txt
+/home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/api_documentation.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/api/doc_updates.log
+/home/michaelnewham/Projects/create_python_project/ai-docs/api/project_structure.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/Projects/create_python_project/src/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/src/create_python_project/utils/core_project_builder.py
+/home/michaelnewham/Projects/create_python_project/src/create_python_project/utils/__pycache__/ai_integration.cpython-313.pyc
+/home/michaelnewham/Projects/create_python_project/src/create_python_project/utils/__pycache__/core_project_builder.cpython-313.pyc
+/home/michaelnewham/Projects/create_python_project/README.md
 ----------------------------------------
-Total files updated: 20
+Total files updated: 18

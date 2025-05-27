@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/tests/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/tests/aboutthisfolder.md -->
 # Tests Folder
 
 Tests for the Create Python Project package.
@@ -26,4 +26,4 @@ tests/
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-22 01:05:10
+This documentation was automatically generated on: 2025-05-27 00:50:10

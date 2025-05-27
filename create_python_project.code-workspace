@@ -3,6 +3,9 @@
         {
             "name": "Create Python Project Folder",
             "path": "."
+        },
+        {
+            "path": "../../../.config/Code - Insiders/User/profiles/3fff5bb2"
         }
     ],
     "settings": {

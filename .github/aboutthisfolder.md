@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/.github/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/.github/aboutthisfolder.md -->
 # .github Folder
 
 Hidden directory for the Create Python Project.

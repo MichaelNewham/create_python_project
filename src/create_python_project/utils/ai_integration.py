@@ -98,8 +98,9 @@ class OpenAIProvider(AIProvider):
             if importlib.util.find_spec("openai") is None:
                 return False, "OpenAI package not installed. Run: pip install openai"
 
-            # Use the global openai module
-            global openai
+            # Import openai locally
+            import openai
+
             openai.api_key = self.api_key
 
             response = openai.chat.completions.create(
@@ -153,8 +154,9 @@ class AnthropicProvider(AIProvider):
                     "Anthropic package not installed. Run: pip install anthropic",
                 )
 
-            # Use the global anthropic module
-            global anthropic
+            # Import anthropic locally
+            import anthropic
+
             client = anthropic.Anthropic(api_key=self.api_key)
 
             system_prompt = (
@@ -335,7 +337,7 @@ class GeminiProvider(AIProvider):
             return model
 
     def generate_response(self, prompt: str) -> tuple[bool, str]:
-        """Generate a response using Google Gemini API."""
+        """Generate a response using Gemini API."""
         try:
             # Check if the module is available at runtime
             if importlib.util.find_spec("google.generativeai") is None:
@@ -344,23 +346,28 @@ class GeminiProvider(AIProvider):
                     "Google Generative AI package not installed. Run: pip install google-generativeai",
                 )
 
-            # Use the global genai module
-            global genai
-            genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel(self.model or "gemini-2.5-pro-preview-05-06")
+            # Import google.generativeai locally
+            import google.generativeai as genai
 
+            genai.configure(api_key=self.api_key)
+
+            # Set up the model
+            model = genai.GenerativeModel(self.model or "gemini-pro")
+
+            # Generate the response
             response = model.generate_content(
-                contents=[{"role": "user", "parts": [prompt]}],
+                prompt,
+                generation_config={
+                    "temperature": 0.7,
+                    "max_output_tokens": 1000,
+                },
             )
 
-            # Safely access text attribute
-            if hasattr(response, "text"):
-                return True, response.text
-            else:
-                parts = getattr(response, "parts", [])
-                if parts and len(parts) > 0:
-                    return True, str(parts[0])
-                return True, str(response)
+            # Check if the response is valid
+            if not response.text:
+                return False, "Gemini API returned no content. Please try again."
+
+            return True, response.text
         except Exception as e:
             return False, f"Gemini API error: {str(e)}"
 

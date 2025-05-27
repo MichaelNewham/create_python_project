@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/logs/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/logs/aboutthisfolder.md -->
 # Logs Folder
 
 Log files for the Create Python Project.

@@ -81,11 +81,9 @@ Your response must follow this JSON format exactly:
           "recommended": false}}
       ]
     }},
-    {{
-      "name": "Next category...",
+    {{"name": "Next category...",
       "description": "Description of this category",
-      "options": []
-    }}
+      "options": []}}
   ],
   "analysis": [
     "Key feature needed: Feature 1",

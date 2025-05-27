@@ -1,4 +1,3 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/imagesandvids/aboutthisfolder.md -->
 # Imagesandvids Folder
 
 Project folder for the Create Python Project.

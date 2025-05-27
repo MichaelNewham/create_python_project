@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/.claude/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/.claude/aboutthisfolder.md -->
 # .claude Folder
 
 Hidden directory for the Create Python Project.

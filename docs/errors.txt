@@ -1,0 +1,78 @@
+Running mypy type checking (attempt 1/3)...
+/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh: line 391: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+src/create_python_project/create_python_project.py:963: error: Module has no attribute "initialize_git_repo"  [attr-defined]
+Found 1 error in 1 file (checked 25 source files)
+
+⚠️ mypy type checking failed. Attempting to fix issues automatically...
+tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+Traceback (most recent call last):
+  File "/home/michaelnewham/Projects/create_python_project/.venv/bin/mypy", line 8, in <module>
+    sys.exit(console_entry())
+             ~~~~~~~~~~~~~^^
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/mypy/__main__.py", line 15, in console_entry
+    main()
+    ~~~~^^
+  File "mypy/main.py", line 119, in main
+  File "mypy/main.py", line 203, in run_build
+  File "mypy/build.py", line 191, in build
+  File "mypy/build.py", line 232, in _build
+  File "mypy/report.py", line 61, in __init__
+  File "mypy/report.py", line 79, in add_report
+  File "mypy/report.py", line 815, in __init__
+  File "mypy/report.py", line 711, in __init__
+  File "mypy/report.py", line 103, in __init__
+  File "<frozen os>", line 227, in makedirs
+PermissionError: [Errno 13] Permission denied: '/linter_mypy_20250527.log'
+grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+Running mypy type checking (attempt 2/3)...
+/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh: line 391: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+src/create_python_project/create_python_project.py:963: error: Module has no attribute "initialize_git_repo"  [attr-defined]
+Found 1 error in 1 file (checked 25 source files)
+
+⚠️ mypy type checking failed. Attempting to fix issues automatically...
+tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+Traceback (most recent call last):
+  File "/home/michaelnewham/Projects/create_python_project/.venv/bin/mypy", line 8, in <module>
+    sys.exit(console_entry())
+             ~~~~~~~~~~~~~^^
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/mypy/__main__.py", line 15, in console_entry
+    main()
+    ~~~~^^
+  File "mypy/main.py", line 119, in main
+  File "mypy/main.py", line 203, in run_build
+  File "mypy/build.py", line 191, in build
+  File "mypy/build.py", line 232, in _build
+  File "mypy/report.py", line 61, in __init__
+  File "mypy/report.py", line 79, in add_report
+  File "mypy/report.py", line 815, in __init__
+  File "mypy/report.py", line 711, in __init__
+  File "mypy/report.py", line 103, in __init__
+  File "<frozen os>", line 227, in makedirs
+PermissionError: [Errno 13] Permission denied: '/linter_mypy_20250527.log'
+grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+Running mypy type checking (attempt 3/3)...
+/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh: line 391: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+src/create_python_project/create_python_project.py:963: error: Module has no attribute "initialize_git_repo"  [attr-defined]
+Found 1 error in 1 file (checked 25 source files)
+
+❌ mypy type checking failed after 3 attempts.
+See detailed error log at: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log

@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/docs/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/docs/aboutthisfolder.md -->
 # Docs Folder
 
 Project folder for the Create Python Project.
@@ -12,11 +12,12 @@ Contains project files related to docs functionality.
 ```
 docs/
 ├── aboutthisfolder.md
+├── errors.txt
 ├── MCP_SETUP.md
-├── Some text.md
+├── package-lock.json
 └── VSCODE_SECURITY.md
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-22 01:05:10
+This documentation was automatically generated on: 2025-05-27 01:21:48

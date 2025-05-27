@@ -1,4 +1,4 @@
-<!-- filepath: /home/michaelnewham/bin/python_projects/create_python_project/src/aboutthisfolder.md -->
+<!-- filepath: /home/michaelnewham/Projects/create_python_project/src/aboutthisfolder.md -->
 # Src Folder
 
 Source code for the Create Python Project package.
@@ -12,20 +12,21 @@ Contains the main application code, utilities, and implementation of all feature
 ```
 src/
 ├── aboutthisfolder.md
-└── create_python_project
-    ├── create_python_project.py
-    ├── __init__.py
-    └── utils
-        ├── ai_integration.py
-        ├── ai_prompts.py
-        ├── cli.py
-        ├── config.py
-        ├── core_project_builder.py
-        ├── __init__.py
-        ├── logging.py
-        └── templates.py
+├── create_python_project
+│   ├── create_python_project.py
+│   ├── __init__.py
+│   └── utils
+│       ├── ai_integration.py
+│       ├── ai_prompts.py
+│       ├── cli.py
+│       ├── config.py
+│       ├── core_project_builder.py
+│       ├── __init__.py
+│       ├── logging.py
+│       └── templates.py
+└── test_cursor_rules.py
 ```
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-22 01:05:10
+This documentation was automatically generated on: 2025-05-27 01:21:48
