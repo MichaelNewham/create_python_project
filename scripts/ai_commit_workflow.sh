@@ -288,6 +288,76 @@ except Exception as e:
     fi
 }
 
+# Function to check and fix log file issues
+check_log_file() {
+    local log_file="$1"
+    if [[ -d "$log_file" ]]; then
+        print_message "$YELLOW" "Warning: $log_file is a directory, removing..."
+        rm -rf "$log_file"
+    fi
+    if [[ ! -f "$log_file" ]]; then
+        touch "$log_file"
+        chmod 644 "$log_file"
+    fi
+}
+
+# Function to handle temporary files
+handle_temp_file() {
+    local temp_file="$1"
+    local final_file="$2"
+    
+    if [[ -f "$temp_file" ]]; then
+        mv "$temp_file" "$final_file"
+    else
+        print_message "$YELLOW" "Warning: Temporary file $temp_file not found, skipping move operation"
+    fi
+}
+
+# Function to verify expected changes
+verify_changes() {
+    local changed_files=$(git diff --name-only)
+    local expected_files=("$@")
+    
+    for file in "${expected_files[@]}"; do
+        if ! echo "$changed_files" | grep -q "$file"; then
+            print_message "$YELLOW" "Warning: Expected file $file was not modified"
+        fi
+    done
+}
+
+# Function to update documentation and stage changes
+update_and_stage_docs() {
+    local message="$1"
+    print_message "$BLUE" "📚 $message"
+
+    if [ ! -f "./scripts/manage_docs.sh" ]; then
+        print_message "$RED" "❌ Documentation management script not found"
+        exit 1
+    fi
+
+    # Run documentation update
+    print_message "$YELLOW" "Running documentation update..."
+    chmod +x ./scripts/manage_docs.sh
+    if ! ./scripts/manage_docs.sh; then
+        print_message "$RED" "❌ Documentation update failed"
+        exit 1
+    fi
+
+    # Verify documentation was updated
+    if ! find . -name "aboutthisfolder.md" -type f -mmin -1 | grep -q .; then
+        print_message "$RED" "❌ Documentation update check failed. No recent updates found."
+        exit 1
+    fi
+
+    # Stage documentation changes
+    print_message "$BLUE" "📎 Adding documentation changes to git"
+    git add "**/aboutthisfolder.md"
+    git add "docs/"
+    git add "ai-docs/"
+
+    print_message "$GREEN" "✅ Documentation updated and staged successfully"
+}
+
 # Banner
 print_message "$GREEN" "================================================================"
 print_message "$GREEN" "                  AI-ASSISTED COMMIT WORKFLOW                   "
@@ -325,7 +395,7 @@ git rm --cached ai-docs/*.tmp 2>/dev/null || true
 git rm --cached mypy_report.txt 2>/dev/null || true
 git rm --cached pylint_report.txt 2>/dev/null || true
 
-# Add only the files we created/modified
+# Add workflow files
 print_message "$YELLOW" "Adding workflow files..."
 git add scripts/ai_commit_workflow.sh
 git add .vscode/tasks.json
@@ -335,35 +405,11 @@ git add .gitignore
 
 print_message "$GREEN" "Files added successfully"
 
-# Step 2: Run focused documentation update
-print_message "$BLUE" "📚 Step 2: Running focused documentation update"
-
-# Update only specific documentation files
-print_message "$YELLOW" "Updating git_workflow.md..."
-if ! grep -q "AI-assisted commit workflow" ai-docs/git_workflow.md; then
-    print_message "$RED" "❌ Documentation update check failed. Please fix the issues before committing."
-    exit 1
-fi
-
-print_message "$YELLOW" "Updating scripts/aboutthisfolder.md..."
-if ! grep -q "ai_commit_workflow.sh" scripts/aboutthisfolder.md; then
-    print_message "$RED" "❌ Documentation update check failed. Please fix the issues before committing."
-    exit 1
-fi
-
-print_message "$GREEN" "Documentation checks passed"
-
-# Add any documentation changes
-print_message "$BLUE" "📎 Adding documentation changes to git"
-git add ai-docs/git_workflow.md
-git add scripts/aboutthisfolder.md
+# Step 2: Run documentation update
+update_and_stage_docs "Step 2: Running documentation update"
 
 # Step 3: Run full linting and code quality checks
 print_message "$BLUE" "🔍 Step 3: Running full linting and code quality checks"
-
-# First, remove any backup or temporary files that might cause issues
-print_message "$YELLOW" "Removing backup and temporary files..."
-rm -f ai-docs/*.bak ai-docs/*.tmp mypy_report.txt pylint_report.txt
 
 # Create a temporary pre-commit config without the documentation hook
 if [ -f ".config/.pre-commit-config.yaml.no-docs" ]; then
@@ -619,13 +665,8 @@ else
     POST_COMMIT_DISABLED=false
 fi
 
-# Run documentation update manually first
-print_message "$YELLOW" "Running documentation update before commit..."
-if [ -f "./scripts/update_documentation.sh" ]; then
-    ./scripts/update_documentation.sh
-    # Add any files that were modified by the documentation update
-    git add .
-fi
+# Run final documentation update
+update_and_stage_docs "Running final documentation update before commit"
 
 # Clean up the commit message one more time to ensure it's properly formatted
 # Add debugging to see what's in COMMIT_MESSAGE
@@ -655,7 +696,6 @@ if [ -z "$CLEAN_COMMIT_MESSAGE" ]; then
 fi
 
 # Commit changes with --no-verify to bypass pre-commit hooks
-# This is necessary because the documentation hook would run again otherwise
 print_message "$YELLOW" "Committing with --no-verify to avoid documentation hook loop..."
 git commit --no-verify -m "$CLEAN_COMMIT_MESSAGE"
 

@@ -1,5 +1,16 @@
 # Engineering Assessment for Create Python Project
 
+## Latest Updates (2025-05-27)
+
+### Changes Made
+<!-- doc_update_20250527 -->
+1. **Documentation and Workflow System Refactoring**
+   - Centralized documentation management with new `manage_docs.sh` script
+   - Enhanced systemd service for continuous documentation updates
+   - Improved AI commit workflow with unified documentation handling
+   - Added robust error handling and logging for all documentation operations
+   - Eliminated task duplication across scripts
+
 ## Latest Updates (2025-05-19)
 
 ### Changes Made

@@ -1,78 +1,136 @@
+================================================================
+                  AI-ASSISTED COMMIT WORKFLOW                   
+================================================================
+Checking Python dependencies in Poetry environment...
+Loaded environment variables from .env file.
+✅ DeepSeek API key found.
+   Using model: deepseek-chat
+📋 Step 1: Cleaning up and adding specific files for this commit
+Cleaning up problematic files...
+Adding workflow files...
+Files added successfully
+📚 Step 2: Running focused documentation update
+Updating git_workflow.md...
+Updating scripts/aboutthisfolder.md...
+Documentation checks passed
+📎 Adding documentation changes to git
+🔍 Step 3: Running full linting and code quality checks
+Removing backup and temporary files...
+Running Black code formatting (attempt 1/3)...
+black....................................................................Failed
+- hook id: black
+- files were modified by this hook
+
+reformatted src/create_python_project/utils/core_project_builder.py
+
+All done! ✨ 🍰 ✨
+1 file reformatted, 24 files left unchanged.
+
+✅ Black code formatting passed!
+Running isort import sorting (attempt 1/3)...
+isort....................................................................Passed
+✅ isort import sorting passed!
+Running Ruff linting (attempt 1/3)...
+ruff.....................................................................Failed
+- hook id: ruff
+- files were modified by this hook
+
+Found 6 errors (6 fixed, 0 remaining).
+
+✅ Ruff linting passed!
+Running Flake8 linting (attempt 1/3)...
+flake8...................................................................Passed
+✅ Flake8 linting passed!
 Running mypy type checking (attempt 1/3)...
-/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh: line 391: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-mypy.....................................................................Failed
-- hook id: mypy
-- exit code: 1
+mypy.....................................................................Passed
+✅ mypy type checking passed!
+Running Pylint comprehensive linting...
+Pylint score: 9.91/10.0
+✅ Pylint check passed (score >= 9.0)!
+✅ All linting and code quality checks passed!
+💭 Step 4: Generating commit message
+Generated commit message: 
 
-src/create_python_project/create_python_project.py:963: error: Module has no attribute "initialize_git_repo"  [attr-defined]
-Found 1 error in 1 file (checked 25 source files)
+    Refactor project structure and update configuration files
+    Restructure project directories and update configuration files to improve maintainability. Update flake8 rules to handle template strings better. Add new dmypy.json config for mypy daemon. Remove outdated docs and add new project setup documentation. Refactor core project builder and AI integration components.
 
-⚠️ mypy type checking failed. Attempting to fix issues automatically...
-tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-Traceback (most recent call last):
-  File "/home/michaelnewham/Projects/create_python_project/.venv/bin/mypy", line 8, in <module>
-    sys.exit(console_entry())
-             ~~~~~~~~~~~~~^^
-  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/mypy/__main__.py", line 15, in console_entry
-    main()
-    ~~~~^^
-  File "mypy/main.py", line 119, in main
-  File "mypy/main.py", line 203, in run_build
-  File "mypy/build.py", line 191, in build
-  File "mypy/build.py", line 232, in _build
-  File "mypy/report.py", line 61, in __init__
-  File "mypy/report.py", line 79, in add_report
-  File "mypy/report.py", line 815, in __init__
-  File "mypy/report.py", line 711, in __init__
-  File "mypy/report.py", line 103, in __init__
-  File "<frozen os>", line 227, in makedirs
-PermissionError: [Errno 13] Permission denied: '/linter_mypy_20250527.log'
-grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-Running mypy type checking (attempt 2/3)...
-/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh: line 391: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-mypy.....................................................................Failed
-- hook id: mypy
-- exit code: 1
+Do you want to edit this commit message? (y/n): 
+n
+Using AI-generated commit message.
+✅ Step 5: Committing changes (bypassing hooks)
+Running documentation update before commit...
+=== Create Python Project Documentation Generator ===
+Started: 2025-05-27 01:21:48
+==========================================
+================================================================
+Starting documentation update process - 2025-05-27 01:21:48
+================================================================
+Generating API documentation...
+File '/home/michaelnewham/Projects/create_python_project/ai-docs/api/create_python_project/index.html' already exists. Delete it, or run with --force
+API documentation generated successfully in ai-docs/api/
+Updating folder documentation files...
+Created/updated documentation for docs folder
+Created/updated documentation for ai-docs folder
+Created/updated documentation for src folder
+Created/updated documentation for .config folder
+Created/updated documentation for .git folder
+Updating README.md with project overview...
+README.md updated successfully
+Updating convo.md with documentation changes...
+mv: cannot stat '/home/michaelnewham/Projects/create_python_project/ai-docs/convo.md.tmp': No such file or directory
+convo.md updated successfully
+Checking for sensitive information in ai-docs...
+✅ No sensitive information detected in ai-docs folder.
+✅ The ai-docs folder is not in .gitignore. Documentation changes will be tracked by Git.
+Limiting all markdown files to 500 lines maximum...
+Truncated /home/michaelnewham/Projects/create_python_project/Proj_Setup.md from 503 lines to 500 lines
+All markdown files limited to 500 lines maximum
+Tracking all updated files...
 
-src/create_python_project/create_python_project.py:963: error: Module has no attribute "initialize_git_repo"  [attr-defined]
-Found 1 error in 1 file (checked 25 source files)
+📋 Update Summary:
+----------------------------------------
+Documentation updated on: 2025-05-27 01:21:48
+Total files updated: 18
 
-⚠️ mypy type checking failed. Attempting to fix issues automatically...
-tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-Traceback (most recent call last):
-  File "/home/michaelnewham/Projects/create_python_project/.venv/bin/mypy", line 8, in <module>
-    sys.exit(console_entry())
-             ~~~~~~~~~~~~~^^
-  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/mypy/__main__.py", line 15, in console_entry
-    main()
-    ~~~~^^
-  File "mypy/main.py", line 119, in main
-  File "mypy/main.py", line 203, in run_build
-  File "mypy/build.py", line 191, in build
-  File "mypy/build.py", line 232, in _build
-  File "mypy/report.py", line 61, in __init__
-  File "mypy/report.py", line 79, in add_report
-  File "mypy/report.py", line 815, in __init__
-  File "mypy/report.py", line 711, in __init__
-  File "mypy/report.py", line 103, in __init__
-  File "<frozen os>", line 227, in makedirs
-PermissionError: [Errno 13] Permission denied: '/linter_mypy_20250527.log'
-grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-grep: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-Running mypy type checking (attempt 3/3)...
-/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh: line 391: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-tee: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log: Is a directory
-mypy.....................................................................Failed
-- hook id: mypy
-- exit code: 1
+Full list saved to: /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
 
-src/create_python_project/create_python_project.py:963: error: Module has no attribute "initialize_git_repo"  [attr-defined]
-Found 1 error in 1 file (checked 25 source files)
+To see all updated files, run:
+cat /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
 
-❌ mypy type checking failed after 3 attempts.
-See detailed error log at: /home/michaelnewham/Projects/create_python_project/logs/linter_mypy_20250527.log
+Or run with --verbose next time:
+./scripts/update_documentation.sh --verbose
+================================================================
+Documentation process completed - 2025-05-27 01:22:01
+================================================================
+Committing with --no-verify to avoid documentation hook loop...
+[main cd54341] Refactor project structure and update configuration files Restructure project directories and update configuration files to improve maintainability. Update flake8 rules to handle template strings better. Add new dmypy.json config for mypy daemon. Remove outdated docs and add new project setup documentation. Refactor core project builder and AI integration components.
+ 32 files changed, 1461 insertions(+), 2773 deletions(-)
+ create mode 100644 .dmypy.json
+ create mode 100644 Proj_Setup.md
+ delete mode 100644 docs/Some text.md
+ create mode 100644 docs/errors.txt
+ delete mode 100644 scripts/errors.txt
+ mode change 100644 => 100755 scripts/fix_lint_issues.py
+ create mode 100755 scripts/manage_logs.sh
+ create mode 100644 src/test_cursor_rules.py
+🚀 Step 6: Pushing changes
+Do you need to force push? (Only use if you've rewritten git history)
+Force push? (y/n): n
+Pushing to github...
+Enumerating objects: 75, done.
+Counting objects: 100% (75/75), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (43/43), done.
+Writing objects: 100% (45/45), 25.79 KiB | 1.61 MiB/s, done.
+Total 45 (delta 23), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (23/23), completed with 23 local objects.
+To https://github.com/MichaelNewham/create_python_project.git
+   fc83618..cd54341  main -> main
+Pushing to gitlab...
+fatal: unable to access 'https://gitlab.michaelnewham.me/python_projects/create_python_project.git/': The requested URL returned error: 530
+⚠️ Push to gitlab failed, continuing anyway...
+✨ Push completed (any errors are shown above)
+================================================================
+✨ AI-assisted commit workflow completed successfully!
+================================================================
+ *  Terminal will be reused by tasks, press any key to close it. 
