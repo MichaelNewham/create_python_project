@@ -1,0 +1,17 @@
+[Unit]
+Description=Documentation Watcher Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStartPre=/bin/bash -c 'command -v inotifywait >/dev/null 2>&1 || exit 1'
+ExecStart=/bin/bash -c 'cd %h/Projects/create_python_project && ./scripts/manage_docs.sh --watch'
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/home/michaelnewham/Projects/create_python_project/logs/doc_watcher_service.log
+StandardError=append:/home/michaelnewham/Projects/create_python_project/logs/doc_watcher_service.log
+
+[Install]
+WantedBy=default.target 

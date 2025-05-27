@@ -1,4 +1,4 @@
-Documentation update on 2025-05-27 01:21:48
+Documentation update on 2025-05-27 02:16:16
 ----------------------------------------
 Files modified during this documentation update:
 /home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
@@ -7,17 +7,12 @@ Files modified during this documentation update:
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/project_structure.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
 /home/michaelnewham/Projects/create_python_project/.config/aboutthisfolder.md
-/home/michaelnewham/Projects/create_python_project/docs/aboutthisfolder.md
-/home/michaelnewham/Projects/create_python_project/docs/errors.txt
 /home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/api_documentation.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/project_structure.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
-/home/michaelnewham/Projects/create_python_project/src/aboutthisfolder.md
-/home/michaelnewham/Projects/create_python_project/src/create_python_project/utils/core_project_builder.py
-/home/michaelnewham/Projects/create_python_project/src/create_python_project/utils/__pycache__/ai_integration.cpython-313.pyc
-/home/michaelnewham/Projects/create_python_project/src/create_python_project/utils/__pycache__/core_project_builder.cpython-313.pyc
+/home/michaelnewham/Projects/create_python_project/test_docs/aboutthisfolder.md
 /home/michaelnewham/Projects/create_python_project/README.md
 ----------------------------------------
-Total files updated: 18
+Total files updated: 13
