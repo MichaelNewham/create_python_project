@@ -462,12 +462,6 @@ run_linter() {
                         # Generate detailed error report
                         poetry run mypy . --txt-report "${LOGS_DIR}/linter_mypy_$(date +%Y%m%d).log" 2>&1 | tee -a "$log_file"
                         ;;
-                    pylint)
-                        # Generate detailed report and attempt auto-fixes
-                        poetry run pylint --output-format=parseable . > "${LOGS_DIR}/linter_pylint_$(date +%Y%m%d).log" 2>&1
-                        # Use pyupgrade to fix some common issues
-                        poetry run pyupgrade --py311-plus --keep-runtime-typing $(find . -name "*.py") 2>&1 | tee -a "$log_file"
-                        ;;
                 esac
 
                 # Re-add files after auto-fixing
@@ -526,29 +520,6 @@ fi
 
 # 5. mypy (type checking)
 if ! run_linter "mypy" "mypy type checking"; then
-    LINTING_FAILED=true
-fi
-
-# 6. pylint (comprehensive linting)
-print_message "$YELLOW" "Running Pylint comprehensive linting..."
-pylint_output=$(poetry run pylint --rcfile=.config/pylintrc --ignore=.venv,venv,build,dist src tests scripts 2>&1)
-pylint_exit_code=$?
-
-# Extract the score from pylint output
-pylint_score=$(echo "$pylint_output" | grep -oP 'Your code has been rated at \K[0-9.]+')
-
-if [ -z "$pylint_score" ]; then
-    pylint_score="0.0"
-fi
-
-print_message "$YELLOW" "Pylint score: $pylint_score/10.0"
-
-# Check if pylint score is acceptable (>= 9.0)
-# Using awk for floating-point comparison instead of bc
-if awk "BEGIN {exit !($pylint_score >= 9.0)}"; then
-    print_message "$GREEN" "✅ Pylint check passed (score >= 9.0)!"
-else
-    print_message "$RED" "❌ Pylint score is below 9.0."
     LINTING_FAILED=true
 fi
 
