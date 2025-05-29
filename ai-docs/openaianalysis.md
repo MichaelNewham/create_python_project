@@ -28,7 +28,7 @@
  - Python ≥3.9, Poetry for packaging
  - Rich, Prompt-Toolkit, python-dotenv
  - AI SDKs (openai, anthropic, google.generativeai) imported conditionally
- - Dev-tools: black, pylint, mypy, pytest, pytest-cov
+ - Dev-tools: black, mypy, pytest, pytest-cov
  - Shell scripts for linting/CI/commit workflows
 
  ## 4. Testing
@@ -48,7 +48,7 @@
 
  - Missing actual `src/.../templates/` directory even though `get_template_path()` points at one
  - Top-level `package.json` contains unused Node deps and entrypoint; clarify or remove
- - README’s "Last Updated" block repeats multiple times—streamline or generate once
+ - README's "Last Updated" block repeats multiple times—streamline or generate once
  - `ai_integration.py` imports unused `requests`—prune unused imports
  - Align `render_template` and `get_template_variables` tests with real template content
  - Consider relocating generated API docs HTML to a dedicated `docs/` subtree
