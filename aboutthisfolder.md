@@ -14,10 +14,10 @@ Create Python Project ⭐
 ├── .config
 ├── create_python_project.code-workspace
 ├── .cursor
+├── .cursorignore
 ├── .dmypy.json
 ├── docs
 ├── .env
-├── .env.example
 ├── .env.template
 ├── .flake8
 ├── .git
@@ -49,24 +49,22 @@ Create Python Project ⭐
 ## Contents Description
 
 - `ai-docs/`: Directory containing 10 items
-- `.augmentignore`: .env
+- `.augmentignore`: // ... existing code ...
 - `.claude/`: Directory containing 2 items
 - `CLAUDE.md`: CLAUDE.md
-- `.config/`: Directory containing 5 items
+- `.config/`: Directory containing 4 items
 - `create_python_project.code-workspace`: {
-- `.cursor/`: Directory containing 1 items
+- `.cursor/`: Directory containing 4 items
+- `.cursorignore`: Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
 - `.dmypy.json`: {"pid": 223500, "connection_name": "/tmp/tmpfki5k_rf/dmypy.sock"}
 - `docs/`: Directory containing 6 items
 - `.env`: API Keys for AI Providers
-- `.env.example`: API Keys for AI Providers
 - `.env.template`: API Keys for AI Providers
-- `.flake8`: [flake8]
 - `.git/`: Directory containing 15 items
 - `.github/`: Directory containing 5 items
 - `.gitignore`: Byte-compiled / optimized / DLL files
 - `imagesandvids/`: Directory containing 11 items
-- `.isort.cfg`: [settings]
-- `logs/`: Directory containing 18 items
+- `logs/`: Directory containing 5 items
 - `.mypy_cache/`: Directory containing 2 items
 - `node_modules/`: Directory containing 233 items
 - `package.json`: {
@@ -78,14 +76,14 @@ Create Python Project ⭐
 - `.pytest_cache/`: Directory containing 3 items
 - `README.md`: Create Python Project ⭐
 - `.ruff_cache/`: Directory containing 3 items
-- `scripts/`: Directory containing 30 items
-- `src/`: Directory containing 4 items
+- `scripts/`: Directory containing 28 items
+- `src/`: Directory containing 3 items
 - `TaskMasterTasks/`: Directory containing 3 items
-- `test_docs/`: Directory containing 1 items
-- `tests/`: Directory containing 12 items
+- `test_docs/`: Directory containing 2 items
+- `tests/`: Directory containing 11 items
 - `.venv/`: Directory containing 5 items
 - `.vscode/`: Directory containing 11 items
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-27 02:06:25
+This documentation was automatically generated on: 2025-05-30 23:45:32

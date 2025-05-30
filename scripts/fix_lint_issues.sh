@@ -25,15 +25,15 @@ for file in $(grep -l "Any" --include="*.py" . | grep -v "__pycache__"); do
     fi
 done
 
-# Run isort to fix import formatting
-echo "2. Running isort to organize imports..."
-poetry run isort src/ tests/
-
-# Run black to fix code formatting and line length where possible
-echo "3. Running black to format code..."
+# Run Black to fix code formatting
+echo "2. Running Black to format code..."
 poetry run black src/ tests/
 
-# Run isort to fix import formatting
+# Run Ruff to fix linting issues (replaces isort, flake8, autopep8, etc.)
+echo "3. Running Ruff to fix imports and linting..."
+poetry run ruff check --fix src/ tests/
+
+# Run pre-commit to fix remaining issues
 echo "4. Running pre-commit to fix remaining issues..."
 pre-commit run -a
 

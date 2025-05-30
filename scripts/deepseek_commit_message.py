@@ -13,17 +13,13 @@ from dotenv import load_dotenv
 
 def main():
     """Main function to generate a commit message."""
-    # Get the prompt from the command line arguments
     if len(sys.argv) < 2:
         print("Update project files")
         return
 
     prompt = sys.argv[1]
-
-    # Load environment variables
     load_dotenv()
 
-    # Get API key and model from environment
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 
@@ -32,7 +28,6 @@ def main():
         return
 
     try:
-        # Set up the API request
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -54,7 +49,6 @@ def main():
             "max_tokens": 300,
         }
 
-        # Make the API request
         response = requests.post(
             "https://api.deepseek.com/v1/chat/completions",
             headers=headers,
@@ -62,15 +56,12 @@ def main():
         )
 
         if response.status_code == 200:
-            # Extract the commit message
             result = response.json()
             commit_message = result["choices"][0]["message"]["content"].strip()
             print(commit_message)
         else:
-            print(f"Error: {response.status_code}")
             print("Update project files")
-    except Exception as e:
-        print(f"Exception: {e}")
+    except Exception:
         print("Update project files")
 
 

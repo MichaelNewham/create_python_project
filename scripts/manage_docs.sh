@@ -37,11 +37,7 @@ create_doc_content() {
 <!-- filepath: $dir/aboutthisfolder.md -->
 # ${dir_name^} Folder
 
-$(if [ -f "$dir/README.md" ]; then
-    head -n 1 "$dir/README.md" | sed 's/^#* //'
-else
-    echo "Documentation for the $dir_name directory."
-fi)
+Documentation for the $dir_name directory.
 
 ## Directory Structure
 
@@ -54,13 +50,31 @@ $(echo "$contents" | sed 's/^/├── /')
 
 $(while read -r item; do
     if [ -f "$dir/$item" ]; then
-        desc=$(head -n 1 "$dir/$item" 2>/dev/null | sed 's/^#* //' | sed 's/"""//' || echo "No description available")
+        # Get better file description
+        if [[ "$item" == *.py ]]; then
+            desc=$(head -5 "$dir/$item" 2>/dev/null | grep -E '^""".*"""$|^""".*|^#.*' | head -1 | sed 's/^[#"]*\s*//' | sed 's/"""$//')
+        elif [[ "$item" == *.sh ]]; then
+            desc=$(head -5 "$dir/$item" 2>/dev/null | grep '^#' | grep -v '^#!/' | head -1 | sed 's/^#\s*//')
+        elif [[ "$item" == *.md ]]; then
+            desc=$(head -1 "$dir/$item" 2>/dev/null | sed 's/^#*\s*//')
+        else
+            desc=$(file "$dir/$item" 2>/dev/null | cut -d: -f2- | sed 's/^\s*//')
+        fi
+        [ -z "$desc" ] && desc="No description available"
         echo "- \`$item\`: $desc"
     elif [ -d "$dir/$item" ]; then
         count=$(ls -1 "$dir/$item" 2>/dev/null | wc -l)
         echo "- \`$item/\`: Directory containing $count items"
     fi
 done <<< "$contents")
+
+## Change History
+
+$(if [ -f "$dir/.doc_history" ]; then
+    tail -5 "$dir/.doc_history"
+else
+    echo "No change history available"
+fi)
 
 ## Last Updated
 
@@ -72,14 +86,34 @@ EOF
 update_folder_doc() {
     local dir="$1"
     local doc_file="$dir/aboutthisfolder.md"
+    local history_file="$dir/.doc_history"
     
-    # Check directory permissions
     if [ ! -w "$dir" ]; then
         log_message "ERROR" "No write permission for directory: $dir"
         return 1
     fi
     
-    # Create the documentation
+    # Track changes
+    local current_files=$(ls -1 "$dir" 2>/dev/null | grep -v aboutthisfolder.md | sort)
+    local previous_files=""
+    
+    if [ -f "$history_file" ]; then
+        previous_files=$(grep "FILES:" "$history_file" | tail -1 | cut -d: -f2-)
+    fi
+    
+    if [ "$current_files" != "$previous_files" ]; then
+        echo "$(date): FILES:$current_files" >> "$history_file"
+        
+        # Log specific changes
+        if [ -n "$previous_files" ]; then
+            local added=$(comm -13 <(echo "$previous_files" | tr ' ' '\n' | sort) <(echo "$current_files" | tr ' ' '\n' | sort) | tr '\n' ' ')
+            local removed=$(comm -23 <(echo "$previous_files" | tr ' ' '\n' | sort) <(echo "$current_files" | tr ' ' '\n' | sort) | tr '\n' ' ')
+            
+            [ -n "$added" ] && echo "$(date): ADDED: $added" >> "$history_file"
+            [ -n "$removed" ] && echo "$(date): REMOVED: $removed" >> "$history_file"
+        fi
+    fi
+    
     create_doc_content "$dir" > "$doc_file"
     
     if [ $? -eq 0 ]; then
@@ -96,17 +130,16 @@ should_document_dir() {
     local dir="$1"
     local base_dir=$(basename "$dir")
     
-    # Skip hidden directories and specific folders
-    if [ "$base_dir" = "." ] || \
+    # Skip hidden directories, venv, and build folders
+    if [[ "$dir" == *"/.venv"* ]] || \
+       [[ "$dir" == *"/venv"* ]] || \
+       [ "$base_dir" = "." ] || \
        [ "$base_dir" = ".." ] || \
-       [ "$base_dir" = "venv" ] || \
        [ "$base_dir" = "__pycache__" ] || \
        [ "$base_dir" = "build" ] || \
        [ "$base_dir" = "dist" ] || \
        [ "$base_dir" = "node_modules" ] || \
-       [ "$base_dir" = ".pytest_cache" ] || \
-       [ "$base_dir" = ".mypy_cache" ] || \
-       [ "$base_dir" = ".ruff_cache" ]; then
+       [[ "$base_dir" == .* ]]; then
         return 1
     fi
     return 0
@@ -150,15 +183,13 @@ main() {
     
     log_message "INFO" "Starting documentation management script"
     
-    # Only update documentation for specific project directories
-    local project_dirs=(
-        "$PROJECT_ROOT"
-        "$PROJECT_ROOT/src"
-        "$PROJECT_ROOT/tests"
-        "$PROJECT_ROOT/scripts"
-        "$PROJECT_ROOT/docs"
-        "$PROJECT_ROOT/ai-docs"
-    )
+    # Only document first-level directories under project root
+    local project_dirs=()
+    for dir in "$PROJECT_ROOT"/*; do
+        if [ -d "$dir" ] && should_document_dir "$dir"; then
+            project_dirs+=("$dir")
+        fi
+    done
     
     for dir in "${project_dirs[@]}"; do
         if [ -d "$dir" ]; then

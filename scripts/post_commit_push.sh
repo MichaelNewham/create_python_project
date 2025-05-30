@@ -10,6 +10,18 @@ set -e  # Exit on error
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+# Check for required commands
+check_command() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        echo "❌ Error: $1 is required but not installed."
+        exit 1
+    fi
+}
+
+check_command git
+check_command poetry
+check_command yq  # For YAML parsing
+
 # Default configuration values
 AUTO_STAGE=true
 AUTO_COMMIT=true
@@ -21,50 +33,67 @@ RUN_TESTS=false
 BUILD_PACKAGE=false
 NOTIFY=false
 
-# Function to parse YAML (simple version)
+# Function to parse YAML using yq if available, fallback to grep
 parse_yaml() {
     local file=$1
     if [ -f "$file" ]; then
-        # Extract auto_stage value
-        if grep -q "auto_stage:" "$file"; then
-            AUTO_STAGE=$(grep "auto_stage:" "$file" | awk '{print $2}')
-        fi
+        if command -v yq >/dev/null 2>&1; then
+            # Use yq for better YAML parsing
+            AUTO_STAGE=$(yq eval '.auto_stage // true' "$file")
+            AUTO_COMMIT=$(yq eval '.auto_commit // true' "$file")
+            AUTO_PUSH=$(yq eval '.auto_push // true' "$file")
+            DOC_COMMIT_MESSAGE=$(yq eval '.doc_commit_message // "📚 Update documentation [Auto-generated]"' "$file")
+            PUSH_ALL=$(yq eval '.push_all // false' "$file")
+            RUN_TESTS=$(yq eval '.run_tests // false' "$file")
+            BUILD_PACKAGE=$(yq eval '.build_package // false' "$file")
+            NOTIFY=$(yq eval '.notify // false' "$file")
+            
+            # Parse remotes array
+            if yq eval '.specific_remotes' "$file" >/dev/null 2>&1; then
+                readarray -t SPECIFIC_REMOTES < <(yq eval '.specific_remotes[]' "$file")
+            fi
+        else
+            # Fallback to grep-based parsing
+            if grep -q "auto_stage:" "$file"; then
+                AUTO_STAGE=$(grep "auto_stage:" "$file" | awk '{print $2}')
+            fi
 
-        # Extract auto_commit value
-        if grep -q "auto_commit:" "$file"; then
-            AUTO_COMMIT=$(grep "auto_commit:" "$file" | awk '{print $2}')
-        fi
+            # Extract auto_commit value
+            if grep -q "auto_commit:" "$file"; then
+                AUTO_COMMIT=$(grep "auto_commit:" "$file" | awk '{print $2}')
+            fi
 
-        # Extract auto_push value
-        if grep -q "auto_push:" "$file"; then
-            AUTO_PUSH=$(grep "auto_push:" "$file" | awk '{print $2}')
-        fi
+            # Extract auto_push value
+            if grep -q "auto_push:" "$file"; then
+                AUTO_PUSH=$(grep "auto_push:" "$file" | awk '{print $2}')
+            fi
 
-        # Extract doc_commit_message value
-        if grep -q "doc_commit_message:" "$file"; then
-            DOC_COMMIT_MESSAGE=$(grep "doc_commit_message:" "$file" | cut -d ':' -f2- | sed 's/^[ \t]*//')
-            # Remove quotes if present
-            DOC_COMMIT_MESSAGE=$(echo "$DOC_COMMIT_MESSAGE" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
-        fi
+            # Extract doc_commit_message value
+            if grep -q "doc_commit_message:" "$file"; then
+                DOC_COMMIT_MESSAGE=$(grep "doc_commit_message:" "$file" | cut -d ':' -f2- | sed 's/^[ \t]*//')
+                # Remove quotes if present
+                DOC_COMMIT_MESSAGE=$(echo "$DOC_COMMIT_MESSAGE" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
+            fi
 
-        # Extract push_all value
-        if grep -q "push_all:" "$file"; then
-            PUSH_ALL=$(grep "push_all:" "$file" | awk '{print $2}')
-        fi
+            # Extract push_all value
+            if grep -q "push_all:" "$file"; then
+                PUSH_ALL=$(grep "push_all:" "$file" | awk '{print $2}')
+            fi
 
-        # Extract run_tests value
-        if grep -q "run_tests:" "$file"; then
-            RUN_TESTS=$(grep "run_tests:" "$file" | awk '{print $2}')
-        fi
+            # Extract run_tests value
+            if grep -q "run_tests:" "$file"; then
+                RUN_TESTS=$(grep "run_tests:" "$file" | awk '{print $2}')
+            fi
 
-        # Extract build_package value
-        if grep -q "build_package:" "$file"; then
-            BUILD_PACKAGE=$(grep "build_package:" "$file" | awk '{print $2}')
-        fi
+            # Extract build_package value
+            if grep -q "build_package:" "$file"; then
+                BUILD_PACKAGE=$(grep "build_package:" "$file" | awk '{print $2}')
+            fi
 
-        # Extract notify value
-        if grep -q "notify:" "$file"; then
-            NOTIFY=$(grep "notify:" "$file" | awk '{print $2}')
+            # Extract notify value
+            if grep -q "notify:" "$file"; then
+                NOTIFY=$(grep "notify:" "$file" | awk '{print $2}')
+            fi
         fi
     fi
 }
@@ -88,26 +117,20 @@ echo "  - Push to all remotes: ${PUSH_ALL}"
 # Run tests if configured
 if [ "$RUN_TESTS" = "true" ]; then
     echo "🧪 Running tests..."
-    cd "$PROJECT_DIR" && poetry run pytest --cov=create_python_project tests/
-
-    if [ $? -ne 0 ]; then
+    if ! cd "$PROJECT_DIR" && poetry run pytest --cov=create_python_project tests/; then
         echo "❌ Error: Tests failed. Please fix the issues before pushing."
         exit 1
     fi
-
     echo "✅ Tests completed successfully."
 fi
 
 # Build package if configured
 if [ "$BUILD_PACKAGE" = "true" ]; then
     echo "📦 Building package..."
-    cd "$PROJECT_DIR" && poetry build
-
-    if [ $? -ne 0 ]; then
+    if ! cd "$PROJECT_DIR" && poetry build; then
         echo "❌ Error: Package build failed. Please fix the issues before pushing."
         exit 1
     fi
-
     echo "✅ Package built successfully."
 fi
 
@@ -116,15 +139,18 @@ if [ "$AUTO_STAGE" = "true" ] && git status --porcelain | grep -q "^?? \|^ M \|^
     echo "📝 Found unstaged changes after pre-commit hooks ran."
 
     # Stage all changes
-    git add .
+    if ! git add .; then
+        echo "❌ Error: Failed to stage changes."
+        exit 1
+    fi
     echo "✅ Changes staged."
 
     if [ "$AUTO_COMMIT" = "true" ]; then
         # Create a separate commit for documentation updates
-        git commit -m "${DOC_COMMIT_MESSAGE}" || {
+        if ! git commit -m "${DOC_COMMIT_MESSAGE}"; then
             echo "❌ Error: Could not create documentation commit. Manual intervention required."
             exit 1
-        }
+        fi
         echo "✅ Documentation changes committed."
     fi
 fi
@@ -134,18 +160,18 @@ if [ "$AUTO_PUSH" = "true" ]; then
     if [ "$PUSH_ALL" = "true" ]; then
         # Push to all remotes
         echo "🚀 Pushing changes to all remotes..."
-        git push --all || {
+        if ! git push --all; then
             echo "❌ Error: Push failed. You may need to pull changes first or resolve conflicts."
             exit 1
-        }
+        fi
     else
         # Push to specific remotes
         for remote in "${SPECIFIC_REMOTES[@]}"; do
             echo "🚀 Pushing changes to ${remote}..."
-            git push "$remote" || {
+            if ! git push "$remote"; then
                 echo "❌ Error: Push to ${remote} failed. You may need to pull changes first or resolve conflicts."
                 exit 1
-            }
+            fi
         done
     fi
     echo "✅ Push completed successfully."
@@ -153,8 +179,11 @@ if [ "$AUTO_PUSH" = "true" ]; then
     # Send notification if configured
     if [ "$NOTIFY" = "true" ]; then
         echo "🔔 Sending notification..."
-        # This would be replaced with an actual notification command
-        # For example: notify-send "Git Push" "Changes pushed successfully"
+        if command -v notify-send >/dev/null 2>&1; then
+            notify-send "Git Push" "Changes pushed successfully"
+        elif command -v osascript >/dev/null 2>&1; then
+            osascript -e 'display notification "Changes pushed successfully" with title "Git Push"'
+        fi
         echo "✅ Notification sent."
     fi
 fi

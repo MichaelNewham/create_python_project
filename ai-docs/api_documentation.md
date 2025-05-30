@@ -19,12 +19,12 @@ The documentation is organized following the package structure:
 
 - `create_python_project/` - Main package documentation
 - `create_python_project.html` - Documentation for Create Python Project
+  - `utils/__init__.html` - Documentation for   Init  
   - `utils/ai_integration.html` - Documentation for Ai Integration
   - `utils/ai_prompts.html` - Documentation for Ai Prompts
   - `utils/cli.html` - Documentation for Cli
   - `utils/config.html` - Documentation for Config
   - `utils/core_project_builder.html` - Documentation for Core Project Builder
-  - `utils/__init__.html` - Documentation for   Init  
   - `utils/logging.html` - Documentation for Logging
   - `utils/templates.html` - Documentation for Templates
 
@@ -39,4 +39,4 @@ To ensure high-quality documentation:
 
 ## Last Updated
 
-This documentation was last updated on: 2025-05-27 02:16:16
+This documentation was last updated on: 2025-05-31 00:46:12

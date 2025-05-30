@@ -7,18 +7,17 @@ Documentation for the scripts directory.
 
 ```
 scripts/
+├── .doc_history
 ├── ai_commit_workflow.sh
 ├── check_ai_services.sh
 ├── check_gitlab_connection.sh
 ├── clean_run.py
-├── commit_with_docs_fix.sh
 ├── commit_with_docs.sh
+├── commit_with_docs_fix.sh
 ├── create_gitlab_branch.sh
 ├── deepseek_commit_message.py
 ├── download_pexels_image.sh
-├── fix_lint_issues.py
 ├── fix_lint_issues.sh
-├── fix_pylint_issues.sh
 ├── fix_specific_lint_issues.py
 ├── force_push_to_remotes.sh
 ├── manage_docs.sh
@@ -32,6 +31,7 @@ scripts/
 ├── run_perplexity_mcp.sh
 ├── setup_doc_watcher.sh
 ├── setup_env_template.sh
+├── test_new_file.sh
 ├── truncate_md_files.sh
 ├── update_documentation.sh
 ├── update_documentation.sh.bak
@@ -40,36 +40,44 @@ scripts/
 
 ## Contents Description
 
-- `ai_commit_workflow.sh`: #!/bin/bash
-- `check_ai_services.sh`: #!/bin/bash
-- `check_gitlab_connection.sh`: #!/bin/bash
-- `clean_run.py`: #!/usr/bin/env python3
-- `commit_with_docs_fix.sh`: #!/bin/bash
-- `commit_with_docs.sh`: #!/bin/bash
-- `create_gitlab_branch.sh`: #!/bin/bash
-- `deepseek_commit_message.py`: #!/usr/bin/env python3
-- `download_pexels_image.sh`: #!/bin/bash
-- `fix_lint_issues.py`: #!/usr/bin/env python
-- `fix_lint_issues.sh`: #!/bin/bash
-- `fix_pylint_issues.sh`: 
-- `fix_specific_lint_issues.py`: #!/usr/bin/env python
-- `force_push_to_remotes.sh`: #!/bin/bash
-- `manage_docs.sh`: #!/bin/bash
-- `manage_logs.sh`: #!/bin/bash
-- `pexels_instructions.sh`: #!/bin/bash
-- `post_commit_push.sh`: #!/bin/bash
-- `remove_large_file.sh`: #!/bin/bash
-- `remove_sensitive_file.sh`: #!/bin/bash
-- `run_app.sh`: #!/bin/bash
-- `run_mypy.sh`: #!/bin/bash
-- `run_perplexity_mcp.sh`: #!/bin/bash
-- `setup_doc_watcher.sh`: #!/bin/bash
-- `setup_env_template.sh`: #!/bin/bash
-- `truncate_md_files.sh`: #!/bin/bash
-- `update_documentation.sh`: #!/bin/bash
-- `update_documentation.sh.bak`: #!/bin/bash
-- `verify_security.sh`: #!/bin/bash
+- `.doc_history`: ASCII text, with very long lines (628)
+- `ai_commit_workflow.sh`: AI-assisted commit workflow script
+- `check_ai_services.sh`: This script checks the connection to Context7 and Perplexity services
+- `check_gitlab_connection.sh`: This script checks the connection to GitLab and provides troubleshooting information
+- `clean_run.py`: !/usr/bin/env python3
+- `commit_with_docs.sh`: Script to commit changes with documentation updates
+- `commit_with_docs_fix.sh`: Script to update documentation and commit changes without running into pre-commit loops
+- `create_gitlab_branch.sh`: Script to create a new branch for GitLab when branch protection is enabled
+- `deepseek_commit_message.py`: !/usr/bin/env python3
+- `download_pexels_image.sh`: Script to download an image from Pexels using curl
+- `fix_lint_issues.sh`: Quick script to fix common linting issues in the codebase
+- `fix_specific_lint_issues.py`: !/usr/bin/env python
+- `force_push_to_remotes.sh`: This script bypasses pre-commit hooks and pushes to both GitHub and GitLab
+- `manage_docs.sh`: Documentation management script
+- `manage_logs.sh`: Log management script with improved handling and documentation
+- `pexels_instructions.sh`: Get image location from Pexels API
+- `post_commit_push.sh`: This script runs after a successful commit
+- `remove_large_file.sh`: Script to remove a large file from git history
+- `remove_sensitive_file.sh`: Script to remove sensitive files from git repository history
+- `run_app.sh`: Script to run the main application without showing virtual environment activation messages
+- `run_mypy.sh`: This script is a wrapper for mypy that VS Code can use
+- `run_perplexity_mcp.sh`: This script runs the Perplexity MCP server with environment variables from .env
+- `setup_doc_watcher.sh`: Setup script for documentation watcher service
+- `setup_env_template.sh`: Script to create a clean .env template file with all required variables
+- `test_new_file.sh`: No description available
+- `truncate_md_files.sh`: Script to immediately truncate all markdown files to 150 lines maximum
+- `update_documentation.sh`: This script generates comprehensive documentation for the create_python_project package
+- `update_documentation.sh.bak`: Bourne-Again shell script, Unicode text, UTF-8 text executable
+- `verify_security.sh`: Quick security verification script
+
+## Change History
+
+update_documentation.sh
+update_documentation.sh.bak
+verify_security.sh
+Sat May 31 00:43:09 IST 2025: ADDED: ai_commit_workflow.sh check_ai_services.sh check_gitlab_connection.sh clean_run.py commit_with_docs.sh commit_with_docs_fix.sh create_gitlab_branch.sh deepseek_commit_message.py download_pexels_image.sh fix_lint_issues.sh fix_specific_lint_issues.py force_push_to_remotes.sh manage_docs.sh manage_logs.sh pexels_instructions.sh post_commit_push.sh remove_large_file.sh remove_sensitive_file.sh run_app.sh run_mypy.sh run_perplexity_mcp.sh setup_doc_watcher.sh setup_env_template.sh test_new_file.sh truncate_md_files.sh update_documentation.sh update_documentation.sh.bak verify_security.sh 
+Sat May 31 00:43:09 IST 2025: REMOVED:      2025: 2025: 2025: 20:32 20:43 21:58 25:14 26:36 39:59 FILES:ai_commit_workflow.sh IST IST IST IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-29 21:57:24
+This documentation was automatically generated on: 2025-05-31 00:43:08

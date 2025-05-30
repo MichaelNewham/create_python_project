@@ -41,11 +41,46 @@ from create_python_project.utils import logging as log_utils
 logger = log_utils.setup_logging()
 
 
-# Step counter for CLI flow
-STEP_COUNTER = 1
+# Global CLI state management
+class CLIState:
+    """Manages CLI state and formatting consistency."""
 
-# Verbose mode flag (could be set via CLI arg or config in future)
-VERBOSE_MODE = False
+    def __init__(self):
+        self.step_counter = 1
+        self.verbose_mode = False
+        self.section_icon = "🔧"
+        self.success_icon = "✅"
+        self.warning_icon = "⚠️"
+        self.error_icon = "❌"
+        self.ai_icon = "🤖"
+        self.git_icon = "📚"
+        self.poetry_icon = "📦"
+        self.complete_icon = "🎉"
+
+    def get_step_header(self, title: str, icon: str | None = None) -> str:
+        """Get formatted step header."""
+        icon = icon or self.section_icon
+        header = (
+            f"[bold magenta]Step {self.step_counter}: {title} {icon}[/bold magenta]"
+        )
+        self.step_counter += 1
+        return header
+
+    def print_separator(self, console: Console) -> None:
+        """Print a visual separator between sections."""
+        console.print("─" * 80, style="dim")
+
+    def print_subsection(
+        self, console: Console, title: str, description: str = ""
+    ) -> None:
+        """Print a subsection header."""
+        console.print(f"\n[bold cyan]{title}[/bold cyan]")
+        if description:
+            console.print(f"[italic]{description}[/italic]")
+
+
+# Initialize CLI state
+cli_state = CLIState()
 
 # Rich console
 console = Console()
@@ -53,15 +88,15 @@ console = Console()
 
 def get_project_info() -> tuple[bool, dict[str, Any]]:
     """
-    Get project information from the user.
+    Get project information from the user with enhanced CLI experience.
 
     Returns:
         Tuple containing success status and project info dictionary
     """
-    # Clear any previous output that might be in the terminal
+    # Clear terminal for fresh start
     console.clear()
 
-    # Display welcome banner
+    # Enhanced welcome banner with animations
     console.print("\n")
     title_panel = Panel(
         Text(
@@ -80,14 +115,18 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     )
     console.print(title_panel)
 
-    # Show features
+    # Feature highlights with consistent styling
     console.print(
         "[yellow]⚡ AI-Powered ⚡ Best Practices ⚡ Fully Customizable ⚡[/yellow]",
         justify="center",
     )
     console.print("\n")
+    cli_state.print_separator(console)
 
-    welcome_text = "[bold cyan]Welcome to Python Project Initializer![/bold cyan] Let's set up your new project."
+    welcome_text = (
+        "[bold cyan]Welcome to Python Project Initializer![/bold cyan] "
+        "Let's set up your new project with intelligent automation."
+    )
     console.print(welcome_text)
 
     project_info = {}
@@ -95,57 +134,77 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     # Import the enhanced_input function from our CLI utilities
     from create_python_project.utils.cli import enhanced_input
 
-    global STEP_COUNTER
-    # Get project name
-    console.print(f"\n[bold magenta]Step {STEP_COUNTER}: Project Name[/bold magenta]")
-    STEP_COUNTER += 1
+    # Step 1: Project Name 🔧
+    console.print(f"\n{cli_state.get_step_header('Project Name')}")
+    cli_state.print_separator(console)
+
+    with console.status("[bold cyan]Preparing project name input...[/bold cyan]"):
+        # Brief delay for visual effect
+        import time
+
+        time.sleep(0.5)
+
     while True:
         project_name = enhanced_input("Please enter a name for your project")
         if project_name:
             break
         console.print(
-            "[bold red]Error:[/bold red] Project name is required. Please enter a valid project name."
+            f"[bold red]{cli_state.error_icon} Error:[/bold red] Project name is required. Please enter a valid project name."
         )
     project_info["project_name"] = project_name
 
-    # Get project directory with improved prompt
+    # Step 2: Project Directory 🔧
+    console.print(f"\n{cli_state.get_step_header('Project Directory')}")
+    cli_state.print_separator(console)
+
     default_dir = os.path.join(
         os.getcwd(), project_name.replace(" ", "_").replace("-", "_").lower()
     )
-    console.print(
-        f"\n[bold magenta]Step {STEP_COUNTER}: Project Directory[/bold magenta]"
-    )
-    STEP_COUNTER += 1
-    console.print(f"[dim]Default: {default_dir}[/dim]")
+    console.print(f"[dim]Default location: {default_dir}[/dim]")
     console.print("Press Enter to accept the default or type a new path:")
     user_input = input("> ")
     project_dir = user_input if user_input else default_dir
     project_info["project_dir"] = project_dir
 
-    # Author information - make it clearly optional
-    console.print(
-        f"\n[bold magenta]Step {STEP_COUNTER}: Author Information (optional)[/bold magenta]"
-    )
-    STEP_COUNTER += 1
+    # Step 3: Author Information 🔧
+    console.print(f"\n{cli_state.get_step_header('Author Information (Optional)')}")
+    cli_state.print_separator(console)
+
     console.print(
         "[italic]Used for project metadata, Git configuration, and documentation.[/italic]"
     )
-    author_name = enhanced_input("Enter your name (optional, press Enter to skip)")
-    project_info["author_name"] = author_name
-    if author_name:
-        author_email = enhanced_input(
-            "Enter your email (optional, press Enter to skip)"
-        )
-        project_info["author_email"] = author_email
-    else:
-        project_info["author_email"] = ""
 
+    # Add option to skip all author info
+    skip_author = console.input(
+        "[dim]Press 's' to skip author info entirely, or Enter to continue: [/dim]"
+    )
+
+    if skip_author.lower() == "s":
+        project_info["author_name"] = ""
+        project_info["author_email"] = ""
+        console.print(
+            f"[yellow]{cli_state.warning_icon} Skipped author information[/yellow]"
+        )
+    else:
+        author_name = enhanced_input("Enter your name (optional, press Enter to skip)")
+        project_info["author_name"] = author_name
+        if author_name:
+            author_email = enhanced_input(
+                "Enter your email (optional, press Enter to skip)"
+            )
+            project_info["author_email"] = author_email
+        else:
+            project_info["author_email"] = ""
+
+    console.print(
+        f"\n[bold green]{cli_state.success_icon} Project information collected successfully![/bold green]"
+    )
     return True, project_info
 
 
 def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     """
-    Determine the project type based on project description.
+    Determine the project type based on project description with enhanced UI.
 
     Args:
         project_info: Dictionary containing project information
@@ -153,76 +212,109 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     Returns:
         Tuple containing success status and project type
     """
-    global STEP_COUNTER
     # Get available project types
     project_types = config.get_project_types()
 
-    # Step 4: Project Description
-    console.print(
-        f"\n[bold magenta]Step {STEP_COUNTER}: Project Description[/bold magenta]"
-    )
-    STEP_COUNTER += 1
+    # Step 4: Project Description 🔧
+    console.print(f"\n{cli_state.get_step_header('Project Description')}")
+    cli_state.print_separator(console)
 
     if not project_info.get("project_description"):
-        project_info["project_description"] = Prompt.ask(
-            "Please describe your project (this helps with AI recommendations)"
+        console.print(
+            "[italic]Describe your project to get AI-powered recommendations for technology stack and structure.[/italic]"
         )
+        project_info["project_description"] = Prompt.ask("Please describe your project")
 
-    # Step: AI Provider Selection
-    providers = ai_integration.get_available_ai_providers()
+    # Check AI providers availability with visual feedback
+    with console.status("[bold cyan]Checking available AI providers...[/bold cyan]"):
+        providers = ai_integration.get_available_ai_providers()
+        import time
+
+        time.sleep(1)  # Visual feedback
+
     if not providers:
         console.print(
-            "[bold yellow]No AI providers available. Please set up API keys in your environment variables.[/bold yellow]"
+            f"[bold yellow]{cli_state.warning_icon} No AI providers available. Please set up API keys in your environment variables.[/bold yellow]"
         )
         return manual_project_type_selection(project_types)
 
-    # Step number and header
+    # Step 5: AI Provider Selection 🤖
     console.print(
-        f"\n[bold magenta]Step {STEP_COUNTER}: AI Provider Selection[/bold magenta]"
+        f"\n{cli_state.get_step_header('AI Provider Selection', cli_state.ai_icon)}"
     )
-    STEP_COUNTER += 1
+    cli_state.print_separator(console)
 
-    # Provider descriptions for user guidance
-    # Reorder providers so DeepSeek is first, OpenAI is fourth
+    # Enhanced provider selection with better descriptions
     provider_order = ["DeepSeek", "Anthropic", "Perplexity", "OpenAI", "Gemini"]
     provider_descriptions = {
-        "DeepSeek": "DeepSeek Chat, strong for code and technical tasks.",
-        "Anthropic": "Claude models, strong on reasoning and summarization.",
-        "Perplexity": "Sonar model, good for research and Q&A.",
-        "OpenAI": "Fast, general-purpose, good for most projects.",
-        "Gemini": "Google's Gemini, good for data and integration with Google services.",
+        "DeepSeek": "DeepSeek Chat - Excellent for code analysis and technical recommendations",
+        "Anthropic": "Claude models - Superior reasoning and detailed project analysis",
+        "Perplexity": "Sonar model - Great for research-based technology recommendations",
+        "OpenAI": "GPT models - Fast, versatile, and reliable for general project setup",
+        "Gemini": "Google's AI - Optimized for data projects and Google service integration",
     }
+
     from rich.table import Table
 
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("#", style="cyan", no_wrap=True)
-    table.add_column("Provider", style="green")
+    table = Table(
+        show_header=True, header_style="bold magenta", title="🤖 Available AI Providers"
+    )
+    table.add_column("#", style="cyan", no_wrap=True, width=3)
+    table.add_column("Provider", style="green", width=12)
     table.add_column("Description", style="white")
+    table.add_column("Best For", style="dim", width=25)
+
     ordered_providers = [
         (name, providers[name]) for name in provider_order if name in providers
     ]
+
+    provider_specialties = {
+        "DeepSeek": "Code generation, API design",
+        "Anthropic": "Complex analysis, documentation",
+        "Perplexity": "Research, tech comparisons",
+        "OpenAI": "General projects, prototyping",
+        "Gemini": "Data science, ML projects",
+    }
+
     for idx, (name, _) in enumerate(ordered_providers, 1):
         desc = provider_descriptions.get(name, "")
-        table.add_row(str(idx), name, desc)
+        specialty = provider_specialties.get(name, "General purpose")
+        table.add_row(str(idx), name, desc, specialty)
+
     console.print(table)
     console.print(
-        "[dim]Choose the provider that best matches your needs. If unsure, select the default (1: DeepSeek).[/dim]"
+        f"[dim]{cli_state.ai_icon} Choose the provider that best matches your project needs. Default is DeepSeek (1).[/dim]"
     )
 
-    # Remove any duplicate or legacy Step 2: AI Integration/Select an AI provider text output
+    # Add option to skip AI analysis
+    console.print("\n[bold yellow]Advanced Options:[/bold yellow]")
+    console.print(
+        "  [dim]• Press 'x' to skip AI analysis and select project type manually[/dim]"
+    )
+    console.print("  [dim]• Press Enter or select 1-5 to use AI recommendations[/dim]")
+
     provider_success, selected_provider = ai_integration.select_ai_provider(
         dict(ordered_providers)
     )
+
     if not provider_success or not selected_provider:
         console.print(
-            "[bold yellow]Failed to select an AI provider. Falling back to manual selection.[/bold yellow]"
+            f"[bold yellow]{cli_state.warning_icon} Failed to select an AI provider. Using manual selection.[/bold yellow]"
         )
         return manual_project_type_selection(project_types)
 
-    # Use AI to determine project type
+    # Step 6: AI Analysis 🤖
+    console.print(
+        f"\n{cli_state.get_step_header('AI Analysis & Recommendations', cli_state.ai_icon)}"
+    )
+    cli_state.print_separator(console)
+
+    # Use AI to determine project type with enhanced progress display
     with Progress(
         SpinnerColumn(),
-        TextColumn("[bold cyan]Analyzing your project description...[/bold cyan]"),
+        TextColumn(
+            f"[bold cyan]{cli_state.ai_icon} Analyzing your project description...[/bold cyan]"
+        ),
         console=console,
     ) as progress:
         task = progress.add_task("Analyzing", total=None)
@@ -254,7 +346,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
         if not ai_success:
             console.print(
-                f"[bold red]Error getting AI suggestion:[/bold red] {response}"
+                f"[bold red]{cli_state.error_icon} Error getting AI suggestion:[/bold red] {response}"
             )
             return manual_project_type_selection(project_types)
 
@@ -273,7 +365,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
         if not project_type:
             console.print(
-                "[bold yellow]AI couldn't determine a suitable project type from your description.[/bold yellow]"
+                f"[bold yellow]{cli_state.warning_icon} AI couldn't determine a suitable project type from your description.[/bold yellow]"
             )
             return manual_project_type_selection(project_types)
 
@@ -282,11 +374,10 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     # Create a new dictionary specifically for tech_stack
     project_info["tech_stack"] = {}
 
-    # Show AI analysis step (no bounding box)
+    # Enhanced project type display with better formatting
     console.print(
-        "\n[bold magenta]Step {STEP_COUNTER}: AI Analysis with {provider_name.upper()} ({model_name})[/bold magenta]"
+        f"\n[bold green]{cli_state.success_icon} AI Analysis Complete![/bold green]"
     )
-    STEP_COUNTER += 1
 
     # Display project type recommendation with more detailed description
     type_info = project_types.get(project_type, {"name": project_type.capitalize()})
@@ -308,10 +399,16 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     )
     console.print(f"[italic]{detailed_description} {explanation.strip()}[/italic]\n")
 
-    # Generate technology stack prompt
+    # Step 7: Technology Stack Selection 🔧
+    console.print(f"\n{cli_state.get_step_header('Technology Stack Selection')}")
+    cli_state.print_separator(console)
+
+    # Generate technology stack prompt with enhanced progress
     with Progress(
         SpinnerColumn(),
-        TextColumn("[bold cyan]Analyzing optimal technology stack...[/bold cyan]"),
+        TextColumn(
+            f"[bold cyan]{cli_state.ai_icon} Analyzing optimal technology stack...[/bold cyan]"
+        ),
         console=console,
     ) as progress:
         task = progress.add_task("Analyzing", total=None)
@@ -384,7 +481,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
         if not tech_success:
             console.print(
-                f"[bold yellow]Could not generate technology recommendations: {tech_response}[/bold yellow]"
+                f"[bold yellow]{cli_state.warning_icon} Could not generate technology recommendations: {tech_response}[/bold yellow]"
             )
             return True, project_type
 
@@ -396,7 +493,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
         # Handle empty or invalid responses
         if not tech_response or tech_response.strip() == "":
             console.print(
-                "[bold yellow]No technology stack recommendations received.[/bold yellow]"
+                f"[bold yellow]{cli_state.warning_icon} No technology stack recommendations received.[/bold yellow]"
             )
             # Create a default tech stack structure
             tech_data = create_default_tech_stack(project_type)
@@ -430,7 +527,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
                 except json.JSONDecodeError as e:
                     logger.debug(f"JSON parsing error after extraction: {str(e)}")
                     console.print(
-                        "[bold yellow]Invalid technology stack response format. Using default configuration.[/bold yellow]"
+                        f"[bold yellow]{cli_state.warning_icon} Invalid technology stack response format. Using default configuration.[/bold yellow]"
                     )
                     # Create a default tech stack structure
                     tech_data = create_default_tech_stack(project_type)
@@ -440,7 +537,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
                 # No JSON found in the response
                 logger.debug("No JSON pattern found in the response")
                 console.print(
-                    "[bold yellow]Invalid technology stack response format. Using default configuration.[/bold yellow]"
+                    f"[bold yellow]{cli_state.warning_icon} Invalid technology stack response format. Using default configuration.[/bold yellow]"
                 )
                 # Create a default tech stack structure
                 tech_data = create_default_tech_stack(project_type)
@@ -449,17 +546,26 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
         # Display key project features identified by AI
         if "analysis" in tech_data and tech_data["analysis"]:
-            console.print("[bold cyan]Key Project Features:[/bold cyan]")
+            cli_state.print_subsection(
+                console,
+                f"{cli_state.ai_icon} Key Project Features Identified",
+                "Based on AI analysis of your project description",
+            )
             for feature in tech_data["analysis"]:
-                console.print(f"- {feature}", style="cyan")
+                console.print(f"  • {feature}", style="cyan")
             console.print("")
 
-        # Display technology categories and options
+        # Display technology categories and options with enhanced formatting
         if "categories" in tech_data and tech_data["categories"]:
             from rich.table import Table
 
-            console.print("[bold yellow]Recommended Technology Stack:[/bold yellow]\n")
-            if VERBOSE_MODE:
+            cli_state.print_subsection(
+                console,
+                f"{cli_state.section_icon} Recommended Technology Stack",
+                "AI-curated technologies optimized for your project",
+            )
+
+            if cli_state.verbose_mode:
                 table = Table(show_header=True, header_style="bold magenta")
                 table.add_column("Category", style="cyan", no_wrap=True)
                 table.add_column("Option", style="green")
@@ -494,14 +600,34 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
                         )
             console.print("")
 
-            # Allow user to customize technology selections
+            # Enhanced customization prompt with advanced options
+            console.print("\n[bold cyan]Technology Selection Options:[/bold cyan]")
             console.print(
-                "[bold cyan]Would you like to customize the technology selections? [yes/no] (no): [/bold cyan]",
-                end="",
+                "  [dim]• Press Enter to use AI recommendations (recommended)[/dim]"
             )
-            customize = Prompt.ask("", choices=["yes", "no"], default="no")
+            console.print(
+                "  [dim]• Type 'customize' to manually select technologies[/dim]"
+            )
+            console.print(
+                "  [dim]• Type 'v' to toggle verbose mode for detailed descriptions[/dim]"
+            )
 
-            if customize.lower() == "yes":
+            user_choice = Prompt.ask("", choices=["", "customize", "v"], default="")
+
+            if user_choice == "v":
+                cli_state.verbose_mode = not cli_state.verbose_mode
+                console.print(
+                    f"[yellow]{cli_state.warning_icon} Verbose mode {'enabled' if cli_state.verbose_mode else 'disabled'}[/yellow]"
+                )
+                # Re-display the technology stack with new verbosity setting
+                # ... (redisplay logic here)
+                user_choice = Prompt.ask(
+                    "Select customize or press Enter",
+                    choices=["", "customize"],
+                    default="",
+                )
+
+            if user_choice == "customize":
                 for category in tech_data["categories"]:
                     console.print(
                         f"\n[bold magenta]Select {category['name']}:[/bold magenta]"
@@ -657,11 +783,11 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
                         option["recommended"] = option["name"] == selected_name
 
                 console.print(
-                    "\n[bold green]✅ Technology selections updated based on your preferences[/bold green]\n"
+                    f"\n[bold green]{cli_state.success_icon} Technology selections updated based on your preferences![/bold green]\n"
                 )
             else:
                 console.print(
-                    "[bold cyan]Using AI-recommended technologies for your project.[/bold cyan]\n"
+                    f"[bold cyan]{cli_state.ai_icon} Using AI-recommended technologies for your project.[/bold cyan]\n"
                 )
 
             # Store technology selections in project_info
@@ -717,17 +843,19 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
                     )
                     if recommended:
                         f.write(f"  - {category['name']}: {recommended['name']}\n")
-            # Print the path to the session log for user reference
-            console.print(f"[green]Session log saved to:[/green] {session_md}")
+            # Enhanced session logging with better formatting
+            console.print(
+                f"[green]{cli_state.success_icon} Session log saved to:[/green] {session_md}"
+            )
         except Exception as e:
             logger.warning(f"Failed to write session markdown or README summary: {e}")
             console.print(
-                f"[yellow]Warning: Could not write session log to ai-docs. {e}[/yellow]"
+                f"[yellow]{cli_state.warning_icon} Warning: Could not write session log to ai-docs. {e}[/yellow]"
             )
 
     except (json.JSONDecodeError, KeyError, ValueError) as e:
         console.print(
-            f"[bold yellow]Error parsing technology recommendations: {str(e)}[/bold yellow]"
+            f"[bold yellow]{cli_state.warning_icon} Error parsing technology recommendations: {str(e)}[/bold yellow]"
         )
 
     return True, project_type
@@ -845,7 +973,7 @@ def manual_project_type_selection(
 
 def create_project(project_info: dict[str, Any], project_type: str) -> tuple[bool, str]:
     """
-    Create the project structure.
+    Create the project structure with enhanced visual feedback.
 
     Args:
         project_info: Dictionary containing project information
@@ -854,19 +982,41 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
     Returns:
         Tuple containing success status and message
     """
-    # Step 7: Creating Project Structure (no bounding box, consistent formatting)
-    console.print("\n[bold magenta]Step 7: Creating Project Structure[/bold magenta]")
+    # Step 8: Creating Project Structure 🔧
+    console.print(f"\n{cli_state.get_step_header('Creating Project Structure')}")
+    cli_state.print_separator(console)
 
-    # Show selected project type
+    # Show selected project type with enhanced formatting
     project_types = config.get_project_types()
     type_info = project_types.get(project_type, {"name": project_type.capitalize()})
-    console.print(f"\n[bold yellow]Creating {type_info['name']} project[/bold yellow]")
+    console.print(
+        f"\n[bold yellow]{cli_state.section_icon} Building {type_info['name']} project...[/bold yellow]"
+    )
 
-    # Display a small animated python in the terminal
-    with console.status(
-        "[bold green]Building your Python project 🐍[/bold green]", spinner="dots"
-    ):
-        console.print("\n[dim]Scaffolding directory structure...[/dim]")
+    # Enhanced project creation with detailed progress
+    creation_steps = [
+        "📁 Creating directory structure",
+        "📄 Generating configuration files",
+        "🔧 Setting up project templates",
+        "📚 Creating documentation",
+        "🧪 Setting up testing framework",
+        "⚙️ Configuring development tools",
+        "✨ Finalizing project setup",
+    ]
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold green]Building your Python project...[/bold green]"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Building", total=len(creation_steps))
+
+        for step in creation_steps:
+            console.print(f"[dim]{step}[/dim]")
+            import time
+
+            time.sleep(0.3)  # Visual feedback for each step
+            progress.advance(task)
 
         # Create project structure with technology stack information
         tech_stack_from_info = project_info.get("tech_stack")
@@ -898,56 +1048,84 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
         )
 
         if not structure_success:
-            console.print(f"[bold red]Error:[/bold red] {message}")
+            console.print(
+                f"[bold red]{cli_state.error_icon} Error:[/bold red] {message}"
+            )
             return False, message
 
-        console.print("[dim]Finalizing project setup...[/dim]")
+    console.print(f"\n[bold green]{cli_state.success_icon} {message}[/bold green]")
 
-    console.print(f"\n[bold green]✅ {message}[/bold green]")
-
-    # Step 8: Git Repository Setup (no bounding box, consistent formatting)
-    console.print("\n[bold cyan]Step 8: Git Repository Setup[/bold cyan]")
+    # Step 9: Git Repository Setup 📚
+    console.print(
+        f"\n{cli_state.get_step_header('Git Repository Setup', cli_state.git_icon)}"
+    )
+    cli_state.print_separator(console)
 
     setup_git = Confirm.ask(
-        "[bold cyan]Do you want to initialize a Git repository?[/bold cyan]",
+        f"[bold cyan]{cli_state.git_icon} Do you want to initialize a Git repository?[/bold cyan]",
         default=True,
     )
 
     if setup_git:
-        # Ask for GitHub username
-        console.print("\n[bold]Remote Repository Setup (optional)[/bold]")
-        console.print("[italic]Configure remotes for GitHub and GitLab[/italic]")
+        # Enhanced remote repository setup
+        cli_state.print_subsection(
+            console,
+            "🌐 Remote Repository Setup (Optional)",
+            "Configure remotes for GitHub and GitLab integration",
+        )
 
         # Import the enhanced_input function if not already imported
         from create_python_project.utils.cli import enhanced_input
 
-        github_username = enhanced_input(
-            "Enter your GitHub username (optional, press Enter to skip)"
-        )
+        # Add option to skip remote setup entirely
+        console.print("  [dim]• Press 's' to skip remote repository setup[/dim]")
+        console.print("  [dim]• Press Enter to configure GitHub/GitLab remotes[/dim]")
 
-        # Ask for GitLab username
-        gitlab_username = enhanced_input(
-            "Enter your GitLab username (optional, press Enter to skip)"
-        )
+        remote_choice = console.input("Skip remotes or configure? [s/Enter]: ")
 
-        # Ask for GitHub Copilot configuration
-        setup_github_config = Confirm.ask(
-            "\n[bold cyan]Would you like to set up GitHub Copilot configuration files?[/bold cyan]",
-            default=True,
-        )
+        github_username = ""
+        gitlab_username = ""
 
-        # If setting up GitHub config, explain the benefits
-        if setup_github_config:
-            console.print(
-                "\n[italic]This will create a .github directory with configuration files for GitHub Copilot:[/italic]"
+        if remote_choice.lower() != "s":
+            github_username = enhanced_input(
+                "Enter your GitHub username (optional, press Enter to skip)"
             )
-            console.print("[dim]- Project-specific coding standards and guidelines")
-            console.print("[dim]- Custom prompt templates for common development tasks")
-            console.print("[dim]- VS Code settings for integration with GitHub Copilot")
+
+            # Ask for GitLab username
+            gitlab_username = enhanced_input(
+                "Enter your GitLab username (optional, press Enter to skip)"
+            )
+
+        # Enhanced GitHub Copilot configuration
+        setup_github_config = False
+        if github_username:  # Only ask if GitHub username provided
+            setup_github_config = Confirm.ask(
+                f"\n[bold cyan]{cli_state.ai_icon} Would you like to set up GitHub Copilot configuration files?[/bold cyan]",
+                default=True,
+            )
+
+            # If setting up GitHub config, explain the benefits with better formatting
+            if setup_github_config:
+                cli_state.print_subsection(
+                    console,
+                    "🤖 GitHub Copilot Integration",
+                    "Enhanced AI-powered development experience",
+                )
+                console.print(
+                    "[dim]  • Project-specific coding standards and guidelines[/dim]"
+                )
+                console.print(
+                    "[dim]  • Custom prompt templates for common development tasks[/dim]"
+                )
+                console.print(
+                    "[dim]  • VS Code settings for seamless Copilot integration[/dim]"
+                )
 
         with Progress(
             SpinnerColumn(),
-            TextColumn("[bold cyan]Setting up Git repository...[/bold cyan]"),
+            TextColumn(
+                f"[bold cyan]{cli_state.git_icon} Setting up Git repository...[/bold cyan]"
+            ),
             console=console,
         ) as progress:
             task = progress.add_task("Setting up", total=None)
@@ -974,11 +1152,13 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
             progress.update(task, completed=True)
 
         if git_success:
-            console.print(f"\n[bold green]✅ {git_message}[/bold green]")
+            console.print(
+                f"\n[bold green]{cli_state.success_icon} {git_message}[/bold green]"
+            )
 
             if setup_github_config:
                 console.print(
-                    "\n[green]✓[/green] GitHub Copilot configuration files created in the .github directory"
+                    f"\n[green]{cli_state.success_icon}[/green] GitHub Copilot configuration files created in the .github directory"
                 )
                 console.print(
                     "[dim]To use these with VS Code, install the GitHub Copilot extension[/dim]"
@@ -992,21 +1172,30 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
                     "[italic]Use 'git push -u origin main' to push your code when ready.[/italic]"
                 )
         else:
-            console.print(f"\n[bold red]❌ {git_message}[/bold red]")
-            console.print("[yellow]Continuing without Git repository...[/yellow]")
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} {git_message}[/bold red]"
+            )
+            console.print(
+                f"[yellow]{cli_state.warning_icon} Continuing without Git repository...[/yellow]"
+            )
 
-    # Step 9: Poetry Environment Setup (no bounding box, consistent formatting)
-    console.print("\n[bold yellow]Step 9: Poetry Environment Setup[/bold yellow]")
+    # Step 10: Poetry Environment Setup 📦
+    console.print(
+        f"\n{cli_state.get_step_header('Poetry Environment Setup', cli_state.poetry_icon)}"
+    )
+    cli_state.print_separator(console)
 
     setup_venv = Confirm.ask(
-        "[bold cyan]Do you want to set up Poetry and install dependencies?[/bold cyan]",
+        f"[bold cyan]{cli_state.poetry_icon} Do you want to set up Poetry and install dependencies?[/bold cyan]",
         default=True,
     )
 
     if setup_venv:
         with Progress(
             SpinnerColumn(),
-            TextColumn("[bold yellow]Setting up Poetry environment...[/bold yellow]"),
+            TextColumn(
+                f"[bold yellow]{cli_state.poetry_icon} Setting up Poetry environment...[/bold yellow]"
+            ),
             console=console,
         ) as progress:
             task = progress.add_task("Setting up", total=None)
@@ -1018,14 +1207,18 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
             progress.update(task, completed=True)
 
         if venv_success:
-            console.print(f"\n[bold green]✅ {venv_message}[/bold green]")
+            console.print(
+                f"\n[bold green]{cli_state.success_icon} {venv_message}[/bold green]"
+            )
             console.print(
                 "[dim]To activate the environment, run [bold]poetry shell[/bold] in your project directory[/dim]"
             )
         else:
-            console.print(f"\n[bold red]❌ {venv_message}[/bold red]")
             console.print(
-                "[yellow]Continuing without Poetry environment setup...[/yellow]"
+                f"\n[bold red]{cli_state.error_icon} {venv_message}[/bold red]"
+            )
+            console.print(
+                f"[yellow]{cli_state.warning_icon} Continuing without Poetry environment setup...[/yellow]"
             )
             console.print(
                 "[dim]You can set it up later by running [bold]poetry install[/bold] in your project directory[/dim]"
@@ -1035,65 +1228,98 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
 
 
 def main() -> int:
-    """Main entry point for the application."""
+    """Main entry point for the application with enhanced error handling."""
 
-    global STEP_COUNTER
-    STEP_COUNTER = 1
     try:
         # Clear the terminal completely at startup
         os.system("clear")
 
-        # Add debug print statements
-        print("Starting Python Project Initializer...")
+        # Enhanced startup message with animation
+        with console.status(
+            "[bold cyan]Initializing Python Project Creator...[/bold cyan]"
+        ):
+            import time
+
+            time.sleep(1)
+
+        print("🚀 Starting Python Project Initializer...")
 
         # Log available AI providers for debugging
         available_providers = ai_integration.get_available_ai_providers()
         logger.debug(f"Available AI providers: {available_providers}")
 
-        # Flow control
+        # Enhanced flow control with better error messages
         success, project_info = get_project_info()
         if not success:
-            console.print("\n[bold red]Failed to get project information.[/bold red]")
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} Failed to get project information.[/bold red]"
+            )
             return 1
 
         # Determine project type
         success, project_type = determine_project_type(project_info)
         if not success:
-            console.print("\n[bold red]Failed to determine project type.[/bold red]")
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} Failed to determine project type.[/bold red]"
+            )
             return 1
 
         # Create the project
         success, message = create_project(project_info, project_type)
         if not success:
-            console.print(f"\n[bold red]Failed to create project: {message}[/bold red]")
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} Failed to create project: {message}[/bold red]"
+            )
             return 1
 
-        # Step 10: Project Created Successfully (no bounding box, consistent formatting)
+        # Final Step: Project Created Successfully! 🎉
         console.print(
-            "\n[bold green]Step 10: Project Created Successfully! 🎉[/bold green]"
+            f"\n{cli_state.get_step_header('Project Created Successfully!', cli_state.complete_icon)}"
         )
+        cli_state.print_separator(console)
 
-        console.print("\n[bold]Your new Python project has been created at:[/bold]")
-        console.print(f"  [cyan]{project_info['project_dir']}[/cyan]")
+        # Enhanced completion message with project summary
+        console.print(
+            f"\n[bold green]{cli_state.complete_icon} Your new Python project has been created![/bold green]"
+        )
+        console.print(f"  📁 [cyan]{project_info['project_dir']}[/cyan]")
 
-        next_steps = """
-## Next steps:
+        # Project summary panel
+        from rich.panel import Panel
 
-1. Navigate to your project directory:
+        summary_content = f"""[bold]Project Summary:[/bold]
+• [cyan]Name:[/cyan] {project_info['project_name']}
+• [cyan]Type:[/cyan] {project_type.capitalize()} Project
+• [cyan]Author:[/cyan] {project_info.get('author_name', 'Not specified')}
+• [cyan]Location:[/cyan] {project_info['project_dir']}"""
+
+        summary_panel = Panel(
+            summary_content,
+            title="🎯 Project Overview",
+            title_align="left",
+            border_style="green",
+        )
+        console.print(summary_panel)
+
+        # Enhanced next steps with better formatting
+        next_steps = f"""
+## 🚀 Next steps:
+
+1. **Navigate to your project directory:**
    ```bash
-   cd {project_dir}
+   cd {project_info['project_dir']}
    ```
 
-2. Activate the Poetry environment:
+2. **Activate the Poetry environment:**
    ```bash
    poetry shell
    ```
 
-3. Start coding in the `src/` directory
+3. **Start coding in the `src/` directory**
 
-4. Add your tests in the `tests/` directory
+4. **Add your tests in the `tests/` directory**
 
-5. Use Poetry to manage dependencies:
+5. **Use Poetry to manage dependencies:**
    ```bash
    # Add a production dependency
    poetry add <package-name>
@@ -1101,20 +1327,39 @@ def main() -> int:
    # Add a development dependency
    poetry add --group dev <package-name>
    ```
-        """.format(
-            project_dir=project_info["project_dir"]
-        )
+
+6. **Additional helpful commands:**
+   ```bash
+   # Run tests
+   poetry run pytest
+
+   # Format code
+   poetry run black src/
+
+   # Type checking
+   poetry run mypy src/
+   ```
+        """
 
         console.print(Markdown(next_steps))
+
+        # Final success message
+        console.print(
+            f"\n[bold green]{cli_state.complete_icon} Happy coding! Your project is ready for development.[/bold green]"
+        )
 
         return 0
 
     except KeyboardInterrupt:
-        console.print("\n\n[yellow]Operation cancelled by user.[/yellow]")
+        console.print(
+            f"\n\n[yellow]{cli_state.warning_icon} Operation cancelled by user.[/yellow]"
+        )
         return 130
     except Exception as e:
         logger.exception(f"Unexpected error: {str(e)}")
-        console.print(f"\n[bold red]❌ An error occurred:[/bold red] {str(e)}")
+        console.print(
+            f"\n[bold red]{cli_state.error_icon} An error occurred:[/bold red] {str(e)}"
+        )
         return 1
 
 

@@ -45,33 +45,15 @@
         {
             "label": "Format Code",
             "type": "shell",
-            "command": "poetry run black ${workspaceFolder}/src/create_python_project && poetry run isort ${workspaceFolder}/src/create_python_project && poetry run ruff check --fix ${workspaceFolder}/src/create_python_project",
-            "problemMatcher": []
-        },
-        {
-            "label": "Check Types",
-            "type": "shell",
-            "command": "${workspaceFolder}/scripts/run_mypy.sh",
-            "problemMatcher": []
-        },
-        {
-            "label": "Start Mypy Daemon",
-            "type": "shell",
-            "command": "cd ${workspaceFolder} && poetry run python -m mypy.dmypy start",
+            "command": "poetry run black ${workspaceFolder}/src/create_python_project && poetry run ruff check --fix ${workspaceFolder}/src/create_python_project",
             "problemMatcher": []
         },
         {
             "label": "Run Mypy (Daemon Mode)",
             "type": "shell",
-            "command": "cd ${workspaceFolder} && poetry run python -m mypy.dmypy run --config-file=.config/mypy.ini src/create_python_project",
+            "command": "poetry run mypy --config-file=.config/mypy.ini src/create_python_project",
             "problemMatcher": [],
             "group": "test"
-        },
-        {
-            "label": "Stop Mypy Daemon",
-            "type": "shell",
-            "command": "cd ${workspaceFolder} && poetry run python -m mypy.dmypy stop",
-            "problemMatcher": []
         },
         {
             "label": "Find Secrets",

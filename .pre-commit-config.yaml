@@ -21,32 +21,6 @@ repos:
         args: [--ignore-missing-imports, --config-file=.config/mypy.ini]
         stages: [pre-commit]
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        stages: [pre-commit]
-
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-        stages: [pre-commit]
-
-  - repo: https://github.com/pycqa/pylint
-    rev: v3.3.6
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: poetry run pylint
-        language: system
-        types: [python]
-        args: [
-          "--rcfile=.config/pylintrc",
-          "--ignore=.venv,venv,build,dist"
-        ]
-        stages: [pre-commit]
-
   # Stage 2: Documentation generation - runs only after all other hooks pass
   - repo: local
     hooks:

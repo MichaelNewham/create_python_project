@@ -39,11 +39,11 @@ poetry run mypy --config-file=.config/mypy.ini src/create_python_project
 # Format code with Black
 poetry run black src/create_python_project
 
-# Linting with pylint
-poetry run pylint src/create_python_project
+# Linting and auto-fixing with Ruff (replaces isort, flake8, autopep8, pyupgrade, autoflake)
+poetry run ruff src/create_python_project --fix
 
-# Using ruff (fast linter)
-poetry run ruff src/create_python_project
+# Security scanning
+poetry run detect-secrets scan --all-files
 ```
 
 ### Testing

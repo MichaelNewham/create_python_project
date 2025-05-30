@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to commit changes with documentation updates while temporarily disabling pylint
+# Script to commit changes with documentation updates
 
 set -e
 
@@ -23,30 +23,26 @@ git add .
 echo "2. Creating a backup of pre-commit config"
 cp .pre-commit-config.yaml .pre-commit-config.yaml.bak
 
-echo "3. Creating a temporary pre-commit config without pylint"
-grep -v "pylint" .pre-commit-config.yaml > .pre-commit-config.temp.yaml
-mv .pre-commit-config.temp.yaml .pre-commit-config.yaml
-
-echo "4. Updating documentation"
+echo "3. Updating documentation"
 ./scripts/update_documentation.sh
 
-echo "5. Adding documentation changes"
+echo "4. Adding documentation changes"
 git add .
 
-echo "6. Running pre-commit hooks (without pylint)"
+echo "5. Running pre-commit hooks"
 pre-commit run --all-files || {
     echo "Pre-commit hooks failed. Restoring original pre-commit config."
     mv .pre-commit-config.yaml.bak .pre-commit-config.yaml
     exit 1
 }
 
-echo "7. Committing changes"
+echo "6. Committing changes"
 git commit -m "$COMMIT_MESSAGE"
 
-echo "8. Restoring original pre-commit config"
+echo "7. Restoring original pre-commit config"
 mv .pre-commit-config.yaml.bak .pre-commit-config.yaml
 
-echo "9. Pushing changes"
+echo "8. Pushing changes"
 ./scripts/post_commit_push.sh
 
 echo "=== Commit completed successfully ==="

@@ -46,19 +46,19 @@ This document describes the logging system used in the project.
 
 ## Log Directory Structure
 
-\`\`\`
+```
 logs/
 ├── archive/          # Archived log files
 └── current/          # Current log files
-\`\`\`
+```
 
 ## Log Types
 
 The following log files are maintained:
 
-$(for linter in black isort ruff flake8 mypy pylint; do
-    echo "- linter_${linter}_YYYYMMDD.log - ${linter^} linting results"
-done)
+- linter_black_YYYYMMDD.log - Black linting results
+- linter_ruff_YYYYMMDD.log - Ruff linting results
+- linter_mypy_YYYYMMDD.log - Mypy type checking results
 
 ## Retention Policy
 
@@ -72,7 +72,7 @@ EOF
 }
 
 # Create log files with proper permissions
-for linter in black isort ruff flake8 mypy pylint; do
+for linter in black ruff mypy; do
     create_log_file "${LOG_DIR}/linter_${linter}_$(date +%Y%m%d).log"
 done
 
@@ -83,7 +83,7 @@ archive_old_logs
 update_log_documentation
 
 # Create symlinks for latest logs
-for linter in black isort ruff flake8 mypy pylint; do
+for linter in black ruff mypy; do
     latest_log=$(ls -t "${LOG_DIR}/linter_${linter}_"*.log 2>/dev/null | head -n1)
     if [ -n "$latest_log" ]; then
         ln -sf "$latest_log" "${LOG_DIR}/linter_${linter}_latest.log"

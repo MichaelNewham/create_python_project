@@ -1,18 +1,29 @@
-Documentation update on 2025-05-27 02:16:16
+Documentation update on 2025-05-31 00:46:12
 ----------------------------------------
 Files modified during this documentation update:
+/home/michaelnewham/Projects/create_python_project/ai-docs/.doc_history
 /home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
-/home/michaelnewham/Projects/create_python_project/ai-docs/api_documentation.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/project_structure.md
-/home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
-/home/michaelnewham/Projects/create_python_project/.config/aboutthisfolder.md
-/home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/api_documentation.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/Projects/create_python_project/docs/.doc_history
+/home/michaelnewham/Projects/create_python_project/docs/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/scripts/.doc_history
+/home/michaelnewham/Projects/create_python_project/scripts/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh
+/home/michaelnewham/Projects/create_python_project/ai-docs/.doc_history
+/home/michaelnewham/Projects/create_python_project/ai-docs/aboutthisfolder.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/doc_updates.log
 /home/michaelnewham/Projects/create_python_project/ai-docs/api/project_structure.md
+/home/michaelnewham/Projects/create_python_project/ai-docs/api_documentation.md
 /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
+/home/michaelnewham/Projects/create_python_project/tests/.doc_history
+/home/michaelnewham/Projects/create_python_project/tests/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/src/.doc_history
+/home/michaelnewham/Projects/create_python_project/src/aboutthisfolder.md
+/home/michaelnewham/Projects/create_python_project/test_docs/.doc_history
 /home/michaelnewham/Projects/create_python_project/test_docs/aboutthisfolder.md
 /home/michaelnewham/Projects/create_python_project/README.md
 ----------------------------------------
-Total files updated: 13
+Total files updated: 24

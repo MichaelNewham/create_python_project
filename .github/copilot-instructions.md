@@ -8,7 +8,6 @@ This project provides a CLI tool for creating standardized Python project scaffo
 - **Poetry**: Package and dependency management
 - **pytest**: Testing framework
 - **Black**: Code formatting
-- **pylint**: Code linting
 - **mypy**: Type checking
 - **detect-secrets**: Security scanning
 

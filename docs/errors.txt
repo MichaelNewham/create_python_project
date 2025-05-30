@@ -9,128 +9,164 @@ Loaded environment variables from .env file.
 Cleaning up problematic files...
 Adding workflow files...
 Files added successfully
-📚 Step 2: Running focused documentation update
-Updating git_workflow.md...
-Updating scripts/aboutthisfolder.md...
-Documentation checks passed
+📚 Step 2: Running documentation update
+Running documentation update...
+[2025-05-30 02:03:54] [INFO] Starting documentation management script
+[2025-05-30 02:03:55] [INFO] Updated documentation for: /home/michaelnewham/Projects/create_python_project
+[2025-05-30 02:03:55] [INFO] Updated documentation for: /home/michaelnewham/Projects/create_python_project/src
+[2025-05-30 02:03:55] [INFO] Updated documentation for: /home/michaelnewham/Projects/create_python_project/tests
+[2025-05-30 02:03:55] [INFO] Updated documentation for: /home/michaelnewham/Projects/create_python_project/scripts
+[2025-05-30 02:03:56] [INFO] Updated documentation for: /home/michaelnewham/Projects/create_python_project/docs
+[2025-05-30 02:03:56] [INFO] Updated documentation for: /home/michaelnewham/Projects/create_python_project/ai-docs
 📎 Adding documentation changes to git
+✅ Documentation updated and staged successfully
 🔍 Step 3: Running full linting and code quality checks
-Removing backup and temporary files...
 Running Black code formatting (attempt 1/3)...
 black....................................................................Failed
 - hook id: black
 - files were modified by this hook
 
-reformatted src/create_python_project/utils/core_project_builder.py
+reformatted src/create_python_project/create_python_project.py
 
 All done! ✨ 🍰 ✨
-1 file reformatted, 24 files left unchanged.
+1 file reformatted, 23 files left unchanged.
 
 ✅ Black code formatting passed!
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 43: logs/: Is a directory
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 44: ├──: command not found
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 45: └──: command not found
 Running isort import sorting (attempt 1/3)...
 isort....................................................................Passed
 ✅ isort import sorting passed!
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 43: logs/: Is a directory
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 44: ├──: command not found
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 45: └──: command not found
 Running Ruff linting (attempt 1/3)...
 ruff.....................................................................Failed
 - hook id: ruff
+- exit code: 1
 - files were modified by this hook
 
-Found 6 errors (6 fixed, 0 remaining).
+src/create_python_project/create_python_project.py:1335:1: W293 Blank line contains whitespace
+     |
+1333 |    # Run tests
+1334 |    poetry run pytest
+1335 |    
+     | ^^^ W293
+1336 |    # Format code
+1337 |    poetry run black src/
+     |
+     = help: Remove whitespace from blank line
+
+src/create_python_project/create_python_project.py:1338:1: W293 Blank line contains whitespace
+     |
+1336 |    # Format code
+1337 |    poetry run black src/
+1338 |    
+     | ^^^ W293
+1339 |    # Type checking
+1340 |    poetry run mypy src/
+     |
+     = help: Remove whitespace from blank line
+
+Found 3 errors (1 fixed, 2 remaining).
+No fixes available (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
 
 ✅ Ruff linting passed!
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 43: logs/: Is a directory
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 44: ├──: command not found
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 45: └──: command not found
 Running Flake8 linting (attempt 1/3)...
 flake8...................................................................Passed
 ✅ Flake8 linting passed!
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 43: logs/: Is a directory
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 44: ├──: command not found
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 45: └──: command not found
 Running mypy type checking (attempt 1/3)...
-mypy.....................................................................Passed
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+src/create_python_project/create_python_project.py:60: error: Incompatible default for argument "icon" (default has type "None", argument has type "str")  [assignment]
+src/create_python_project/create_python_project.py:60: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+src/create_python_project/create_python_project.py:60: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+Found 1 error in 1 file (checked 24 source files)
+
 ✅ mypy type checking passed!
-Running Pylint comprehensive linting...
-Pylint score: 9.91/10.0
-✅ Pylint check passed (score >= 9.0)!
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 43: logs/: Is a directory
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 44: ├──: command not found
+/home/michaelnewham/Projects/create_python_project/scripts/manage_logs.sh: line 45: └──: command not found
 ✅ All linting and code quality checks passed!
 💭 Step 4: Generating commit message
-Generated commit message: 
 
-    Refactor project structure and update configuration files
-    Restructure project directories and update configuration files to improve maintainability. Update flake8 rules to handle template strings better. Add new dmypy.json config for mypy daemon. Remove outdated docs and add new project setup documentation. Refactor core project builder and AI integration components.
-
-Do you want to edit this commit message? (y/n): 
-n
-Using AI-generated commit message.
-✅ Step 5: Committing changes (bypassing hooks)
-Running documentation update before commit...
-=== Create Python Project Documentation Generator ===
-Started: 2025-05-27 01:21:48
-==========================================
-================================================================
-Starting documentation update process - 2025-05-27 01:21:48
-================================================================
-Generating API documentation...
-File '/home/michaelnewham/Projects/create_python_project/ai-docs/api/create_python_project/index.html' already exists. Delete it, or run with --force
-API documentation generated successfully in ai-docs/api/
-Updating folder documentation files...
-Created/updated documentation for docs folder
-Created/updated documentation for ai-docs folder
-Created/updated documentation for src folder
-Created/updated documentation for .config folder
-Created/updated documentation for .git folder
-Updating README.md with project overview...
-README.md updated successfully
-Updating convo.md with documentation changes...
-mv: cannot stat '/home/michaelnewham/Projects/create_python_project/ai-docs/convo.md.tmp': No such file or directory
-convo.md updated successfully
-Checking for sensitive information in ai-docs...
-✅ No sensitive information detected in ai-docs folder.
-✅ The ai-docs folder is not in .gitignore. Documentation changes will be tracked by Git.
-Limiting all markdown files to 500 lines maximum...
-Truncated /home/michaelnewham/Projects/create_python_project/Proj_Setup.md from 503 lines to 500 lines
-All markdown files limited to 500 lines maximum
-Tracking all updated files...
-
-📋 Update Summary:
-----------------------------------------
-Documentation updated on: 2025-05-27 01:21:48
-Total files updated: 18
-
-Full list saved to: /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
-
-To see all updated files, run:
-cat /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
-
-Or run with --verbose next time:
-./scripts/update_documentation.sh --verbose
-================================================================
-Documentation process completed - 2025-05-27 01:22:01
-================================================================
-Committing with --no-verify to avoid documentation hook loop...
-[main cd54341] Refactor project structure and update configuration files Restructure project directories and update configuration files to improve maintainability. Update flake8 rules to handle template strings better. Add new dmypy.json config for mypy daemon. Remove outdated docs and add new project setup documentation. Refactor core project builder and AI integration components.
- 32 files changed, 1461 insertions(+), 2773 deletions(-)
- create mode 100644 .dmypy.json
- create mode 100644 Proj_Setup.md
- delete mode 100644 docs/Some text.md
- create mode 100644 docs/errors.txt
- delete mode 100644 scripts/errors.txt
- mode change 100644 => 100755 scripts/fix_lint_issues.py
- create mode 100755 scripts/manage_logs.sh
- create mode 100644 src/test_cursor_rules.py
-🚀 Step 6: Pushing changes
-Do you need to force push? (Only use if you've rewritten git history)
-Force push? (y/n): n
-Pushing to github...
-Enumerating objects: 75, done.
-Counting objects: 100% (75/75), done.
-Delta compression using up to 4 threads
-Compressing objects: 100% (43/43), done.
-Writing objects: 100% (45/45), 25.79 KiB | 1.61 MiB/s, done.
-Total 45 (delta 23), reused 0 (delta 0), pack-reused 0 (from 0)
-remote: Resolving deltas: 100% (23/23), completed with 23 local objects.
-To https://github.com/MichaelNewham/create_python_project.git
-   fc83618..cd54341  main -> main
-Pushing to gitlab...
-fatal: unable to access 'https://gitlab.michaelnewham.me/python_projects/create_python_project.git/': The requested URL returned error: 530
-⚠️ Push to gitlab failed, continuing anyway...
-✨ Push completed (any errors are shown above)
-================================================================
-✨ AI-assisted commit workflow completed successfully!
-================================================================
- *  Terminal will be reused by tasks, press any key to close it. 
+^CTraceback (most recent call last):
+  File "/home/michaelnewham/Projects/create_python_project/scripts/deepseek_commit_message.py", line 78, in <module>
+    main()
+    ~~~~^^
+  File "/home/michaelnewham/Projects/create_python_project/scripts/deepseek_commit_message.py", line 58, in main
+    response = requests.post(
+        "https://api.deepseek.com/v1/chat/completions",
+        headers=headers,
+        data=json.dumps(data),
+    )
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 741, in connect
+    sock_and_verified = _ssl_wrap_socket_and_match_hostname(
+        sock=sock,
+    ...<14 lines>...
+        assert_fingerprint=self.assert_fingerprint,
+    )
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 920, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+        sock=sock,
+    ...<8 lines>...
+        tls_in_tls=tls_in_tls,
+    )
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/util/ssl_.py", line 480, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+  File "/home/michaelnewham/Projects/create_python_project/.venv/lib/python3.13/site-packages/urllib3/util/ssl_.py", line 524, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<5 lines>...
+        session=session
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/ssl.py", line 1076, in _create
+    self.do_handshake()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/ssl.py", line 1372, in do_handshake
+    self._sslobj.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+KeyboardInterrupt
