@@ -64,13 +64,11 @@ is_git_ignored() {
     return 1  # Path is not ignored
 }
 
-echo "=== Create Python Project Documentation Generator ==="
-echo "Started: $TIMESTAMP"
-echo "=========================================="
+echo "📚 Updating project documentation..."
 
 # Function to dynamically scan and document the project structure
 generate_api_documentation() {
-    echo "Generating API documentation..."
+    echo "  • API documentation..."
 
     # Create a summary of the project structure to help with documentation
     SRC_DIR="${PROJECT_DIR}/src/create_python_project"
@@ -161,7 +159,7 @@ EOL
     # Replace the original file with the updated one
     mv "${README_FILE}.tmp" "$README_FILE"
 
-    echo "API documentation generated successfully in ai-docs/api/"
+    echo "   ✅"
 
     # Append timestamp to a record file to track documentation updates
     echo "Documentation updated on $TIMESTAMP" >> "${PROJECT_DIR}/ai-docs/api/doc_updates.log"
@@ -844,9 +842,7 @@ track_updated_files() {
 }
 
 # Main execution
-echo "================================================================"
 echo "Starting documentation update process - $(date '+%Y-%m-%d %H:%M:%S')"
-echo "================================================================"
 
 if [[ "$LIST_ONLY" == "true" ]]; then
     echo "Running in list-only mode (no changes will be made)"
@@ -904,6 +900,4 @@ else
     track_updated_files
 fi
 
-echo "================================================================"
 echo "Documentation process completed - $(date '+%Y-%m-%d %H:%M:%S')"
-echo "================================================================"

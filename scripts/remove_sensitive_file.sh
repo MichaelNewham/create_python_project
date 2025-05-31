@@ -36,6 +36,11 @@ fi
 # Get the sensitive file path from command line argument or prompt the user
 SENSITIVE_FILE="${1}"
 if [ -z "$SENSITIVE_FILE" ]; then
+# Skip interactive prompts in VS Code/Cursor tasks
+if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+    echo "Skipping interactive prompt (IDE task)"
+    continue
+fi
     read -p "Enter the path of the sensitive file to remove (e.g., .vscode/mcp.json): " SENSITIVE_FILE
 fi
 
@@ -44,6 +49,11 @@ echo -e "${YELLOW}You are about to remove ${SENSITIVE_FILE} from the entire git 
 if [[ $DRY_RUN -eq 1 ]]; then
     echo -e "${GREEN}DRY RUN: No changes will be made.${NC}"
 else
+# Skip interactive prompts in VS Code/Cursor tasks
+if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+    echo "Skipping interactive prompt (IDE task)"
+    continue
+fi
     read -p "Are you sure you want to proceed? (y/N): " CONFIRM
     if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}Operation cancelled.${NC}"

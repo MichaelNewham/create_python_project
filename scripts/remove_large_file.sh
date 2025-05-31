@@ -33,6 +33,11 @@ print_message "$YELLOW" "This is a destructive operation that rewrites git histo
 print_message "$YELLOW" "Make sure you have a backup of your repository before proceeding."
 print_message "$YELLOW" "After running this script, all collaborators will need to re-clone the repository."
 echo ""
+# Skip interactive prompts in VS Code/Cursor tasks
+if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+    echo "Skipping interactive prompt (IDE task)"
+    continue
+fi
 read -p "Do you want to proceed? (y/n): " proceed
 
 if [[ "$proceed" != "y" && "$proceed" != "Y" ]]; then

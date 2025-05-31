@@ -8,30 +8,30 @@ Documentation for the docs directory.
 ```
 docs/
 ├── .doc_history
-├── MCP_SETUP.md
-├── VSCODE_SECURITY.md
 ├── errors.txt
 ├── logs.md
+├── MCP_SETUP.md
 ├── package-lock.json
+├── VSCODE_SECURITY.md
 ```
 
 ## Contents Description
 
-- `.doc_history`: ASCII text
-- `MCP_SETUP.md`: MCP Configuration Setup Guide
-- `VSCODE_SECURITY.md`: VS Code Settings Security Guide
+- `.doc_history`: ASCII text, with very long lines (309)
 - `errors.txt`: Unicode text, UTF-8 text
 - `logs.md`: Log Management Documentation
+- `MCP_SETUP.md`: MCP Configuration Setup Guide
 - `package-lock.json`: JSON text data
+- `VSCODE_SECURITY.md`: VS Code Settings Security Guide
 
 ## Change History
 
-errors.txt
-logs.md
+MCP_SETUP.md
 package-lock.json
-Sat May 31 00:43:09 IST 2025: ADDED: MCP_SETUP.md VSCODE_SECURITY.md errors.txt logs.md package-lock.json 
-Sat May 31 00:43:09 IST 2025: REMOVED:      2025: 2025: 2025: 20:32 20:42 21:56 25:14 26:35 39:58 FILES:MCP_SETUP.md IST IST IST IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
+VSCODE_SECURITY.md
+Sat 31 May 2025 01:12:46 IST: ADDED: errors.txt logs.md MCP_SETUP.md package-lock.json VSCODE_SECURITY.md 
+Sat 31 May 2025 01:12:46 IST: REMOVED:           01:02 10:03 2025: 2025: 2025: 2025: 2025: 2025: 20:32 20:42 21:56 25:14 26:35 39:58 43:09 49:47 53:12 FILES:MCP_SETUP.md IST IST IST IST IST IST IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-31 00:43:08
+This documentation was automatically generated on: 2025-05-31 01:12:45

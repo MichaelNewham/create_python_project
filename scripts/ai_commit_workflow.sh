@@ -127,7 +127,7 @@ log_step "COMMIT: Generated: $COMMIT_MESSAGE"
 print_message "$GREEN" "Generated: \"$COMMIT_MESSAGE\""
 
 # Skip interactive editing in VS Code tasks
-if [ -n "$TERM_PROGRAM" ] || [ "$TERM" = "xterm-256color" ]; then
+if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
     log_step "COMMIT: Skipping edit (VS Code task)"
 else
     read -p "Edit this message? (y/n): " edit_message
@@ -148,7 +148,7 @@ log_step "COMMIT: Starting git commit"
 git rm --cached .config/.flake8 .config/.isort.cfg .config/pylintrc 2>/dev/null || true
 git add -A 2>/dev/null || true
 
-git commit -m "$COMMIT_MESSAGE" 2>/dev/null
+git commit -m "$COMMIT_MESSAGE"
 
 if [ $? -eq 0 ]; then
     log_step "COMMIT: Successfully committed"

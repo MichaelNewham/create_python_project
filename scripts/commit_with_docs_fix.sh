@@ -21,6 +21,11 @@ echo "2. Running documentation update"
 ./scripts/update_documentation.sh --list-only
 
 # Ask user if they want to proceed with documentation update
+# Skip interactive prompts in VS Code/Cursor tasks
+if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+    echo "Skipping interactive prompt (IDE task)"
+    continue
+fi
 read -p "Do you want to proceed with documentation update? (y/n): " proceed
 if [[ "$proceed" != "y" && "$proceed" != "Y" ]]; then
     echo "Documentation update skipped."

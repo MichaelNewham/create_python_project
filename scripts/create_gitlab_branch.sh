@@ -30,6 +30,11 @@ CURRENT_BRANCH=$(git branch --show-current)
 
 # Ask for the new branch name
 print_message "$YELLOW" "Enter a name for the new branch (e.g., update-history):"
+# Skip interactive prompts in VS Code/Cursor tasks
+if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+    echo "Skipping interactive prompt (IDE task)"
+    continue
+fi
 read -p "Branch name: " NEW_BRANCH
 
 if [[ -z "$NEW_BRANCH" ]]; then
