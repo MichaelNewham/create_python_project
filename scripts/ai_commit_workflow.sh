@@ -126,18 +126,13 @@ fi
 log_step "COMMIT: Generated: $COMMIT_MESSAGE"
 print_message "$GREEN" "Generated: \"$COMMIT_MESSAGE\""
 
-# Skip interactive editing in VS Code tasks
-if [ -n "$VSCODE_GIT_ASKPASS_NODE" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
-    log_step "COMMIT: Skipping edit (VS Code task)"
-else
-    read -p "Edit this message? (y/n): " edit_message
-    if [[ "$edit_message" == "y" || "$edit_message" == "Y" ]]; then
-        TEMP_FILE=$(mktemp)
-        echo "$COMMIT_MESSAGE" > "$TEMP_FILE"
-        ${EDITOR:-nano} "$TEMP_FILE"
-        COMMIT_MESSAGE=$(cat "$TEMP_FILE")
-        rm "$TEMP_FILE"
-    fi
+read -p "Edit this message? (y/n): " edit_message
+if [[ "$edit_message" == "y" || "$edit_message" == "Y" ]]; then
+    TEMP_FILE=$(mktemp)
+    echo "$COMMIT_MESSAGE" > "$TEMP_FILE"
+    ${EDITOR:-nano} "$TEMP_FILE"
+    COMMIT_MESSAGE=$(cat "$TEMP_FILE")
+    rm "$TEMP_FILE"
 fi
 
 # Step 5: Commit
