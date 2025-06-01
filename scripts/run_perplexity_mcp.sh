@@ -11,7 +11,7 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}===== Perplexity MCP Server Launcher =====${NC}"
 
 # Load environment variables
-if [ -f ".env" ]; then
+if [ -f "/home/michaelnewham/Projects/.env" ]; then
     echo -e "${BLUE}Loading environment variables from .env file...${NC}"
     export $(grep -v '^#' .env | xargs)
     
@@ -24,7 +24,7 @@ if [ -f ".env" ]; then
         echo -e "${GREEN}✅ Using model: ${PERPLEXITY_MODEL:-sonar}${NC}"
     fi
 else
-    echo -e "${RED}❌ Error: .env file not found.${NC}"
+    echo -e "${RED}❌ Error: Global .env file not found at /home/michaelnewham/Projects/.env${NC}"
     exit 1
 fi
 

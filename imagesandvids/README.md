@@ -11,7 +11,8 @@ The Pexels MCP server is configured in your `.vscode/mcp.json` file and provides
 When using GitHub Copilot or Claude with MCP support, you can use these tools:
 
 1. **Search Photos**: `f1e_searchPhotos`
-   - Example: `f1e_searchPhotos` with parameters: 
+   - Example: `f1e_searchPhotos` with parameters:
+
      ```json
      {
        "query": "lions on savannah africa",
@@ -21,16 +22,19 @@ When using GitHub Copilot or Claude with MCP support, you can use these tools:
 
 2. **Download Photo**: `f1e_downloadPhoto`
    - Example: `f1e_downloadPhoto` with parameters:
+
      ```json
      {
        "id": 32151901,
        "size": "large"
      }
      ```
+
    - Available sizes: 'original', 'large2x', 'large', 'medium', 'small', 'portrait', 'landscape', 'tiny'
 
 3. **Get Photo Info**: `f1e_getPhoto`
    - Example: `f1e_getPhoto` with parameters:
+
      ```json
      {
        "id": 32151901
@@ -39,6 +43,7 @@ When using GitHub Copilot or Claude with MCP support, you can use these tools:
 
 4. **Search Videos**: `f1e_searchVideos`
    - Example: `f1e_searchVideos` with parameters:
+
      ```json
      {
        "query": "lions on savannah",
@@ -48,6 +53,7 @@ When using GitHub Copilot or Claude with MCP support, you can use these tools:
 
 5. **Download Video**: `f1e_downloadVideo`
    - Example: `f1e_downloadVideo` with parameters:
+
      ```json
      {
        "id": 1234567,
@@ -58,6 +64,7 @@ When using GitHub Copilot or Claude with MCP support, you can use these tools:
 ### Image Attribution
 
 Always remember to properly attribute Pexels and the photographers:
+
 - Always show a prominent link to Pexels (e.g., "Photos provided by Pexels")
 - Always credit photographers (e.g., "Photo by [Photographer] on Pexels")
 

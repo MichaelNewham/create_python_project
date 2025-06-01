@@ -5,36 +5,44 @@ This document provides an overview of the Pexels MCP Server's capabilities throu
 ## Photo Tools
 
 ### 1. Search for Photos
+
 **Question:** "Find me some photos of lions on the African savannah."  
 **Tool:** `f1e_searchPhotos`  
 **Description:** Searches the Pexels library for photos matching your query, with optional filters for orientation, size, and color. Returns metadata including photo IDs, URLs, and attribution information.
+
 ```
 Natural language: "Find high-quality photos of mountains at sunset"
 Tool call: f1e_searchPhotos({"query": "mountains at sunset", "orientation": "landscape", "perPage": 5})
 ```
 
 ### 2. Download a Photo
+
 **Question:** "I'd like to download this lion photo in large size."  
 **Tool:** `f1e_downloadPhoto`  
 **Description:** Provides a direct download link for a specific photo by ID, with options to choose size. Returns the download URL, suggested filename, and required attribution information.
+
 ```
 Natural language: "Download this photo with ID 32151901 in large size"
 Tool call: f1e_downloadPhoto({"id": 32151901, "size": "large"})
 ```
 
 ### 3. Get Curated Photos
+
 **Question:** "Show me the current curated collection of photos from Pexels."  
 **Tool:** `f1e_getCuratedPhotos`  
 **Description:** Retrieves Pexels' current curated collection of high-quality photos selected by their team. Results can be paginated for browsing through multiple sets.
+
 ```
 Natural language: "Show me the latest curated photos from Pexels"
 Tool call: f1e_getCuratedPhotos({"perPage": 10})
 ```
 
 ### 4. Get Photo Details
+
 **Question:** "Can you show me all the available information about this specific photo?"  
 **Tool:** `f1e_getPhoto`  
 **Description:** Retrieves comprehensive metadata about a specific photo, including all available sizes, photographer information, and full attribution details.
+
 ```
 Natural language: "Get all the details for photo with ID 32151901"
 Tool call: f1e_getPhoto({"id": 32151901})
@@ -43,36 +51,44 @@ Tool call: f1e_getPhoto({"id": 32151901})
 ## Video Tools
 
 ### 1. Search for Videos
+
 **Question:** "Find me some videos of waves crashing on a beach."  
 **Tool:** `f1e_searchVideos`  
 **Description:** Searches the Pexels library for videos matching your query, with optional filters. Returns metadata including video IDs, URLs, preview images, and attribution information.
+
 ```
 Natural language: "Find videos of city traffic time lapse"
 Tool call: f1e_searchVideos({"query": "city traffic time lapse", "orientation": "landscape", "perPage": 5})
 ```
 
 ### 2. Get Popular Videos
+
 **Question:** "What are the current popular videos on Pexels?"  
 **Tool:** `f1e_getPopularVideos`  
 **Description:** Retrieves a collection of currently popular videos from Pexels, with optional filters for duration and dimensions. Results can be paginated.
+
 ```
 Natural language: "Show me popular short videos under 30 seconds"
 Tool call: f1e_getPopularVideos({"maxDuration": 30, "perPage": 5})
 ```
 
 ### 3. Get Video Details
+
 **Question:** "Can you show me all the available information about this specific video?"  
 **Tool:** `f1e_getVideo`  
 **Description:** Retrieves comprehensive metadata about a specific video, including all available quality options, file sizes, duration, and attribution details.
+
 ```
 Natural language: "Get all details for video with ID 1409899"
 Tool call: f1e_getVideo({"id": 1409899})
 ```
 
 ### 4. Download a Video
+
 **Question:** "I'd like to download this ocean wave video in HD quality."  
 **Tool:** `f1e_downloadVideo`  
 **Description:** Provides a direct download link for a specific video by ID, with options to choose quality (HD or SD). Returns the download URL, suggested filename, and required attribution information.
+
 ```
 Natural language: "Download video 1409899 in HD quality"
 Tool call: f1e_downloadVideo({"id": 1409899, "quality": "hd"})
@@ -81,27 +97,33 @@ Tool call: f1e_downloadVideo({"id": 1409899, "quality": "hd"})
 ## Collection Tools
 
 ### 1. Get Featured Collections
+
 **Question:** "What are the current featured collections on Pexels?"  
 **Tool:** `f1e_getFeaturedCollections`  
 **Description:** Retrieves Pexels' current featured collections, which are curated sets of photos and videos organized by themes. Results can be paginated.
+
 ```
 Natural language: "Show me the featured collections on Pexels"
 Tool call: f1e_getFeaturedCollections({"perPage": 10})
 ```
 
 ### 2. Get Collection Media
+
 **Question:** "Show me all the photos in the 'Wild Animals' collection."  
 **Tool:** `f1e_getCollectionMedia`  
 **Description:** Retrieves all media items (photos and/or videos) from a specific collection. Options to filter by media type, sort order, and paginate results.
+
 ```
 Natural language: "Get all photos from collection with ID 'ftw9l9'"
 Tool call: f1e_getCollectionMedia({"id": "ftw9l9", "type": "photos", "perPage": 15})
 ```
 
 ### 3. Set API Key
+
 **Question:** "I need to update my Pexels API key."  
 **Tool:** `f1e_setApiKey`  
 **Description:** Dynamically updates the Pexels API key used for subsequent requests. Useful if you need to switch between different API keys during a session.
+
 ```
 Natural language: "Set my Pexels API key to this new value"
 Tool call: f1e_setApiKey({"apiKey": "your-api-key-here"})
@@ -112,21 +134,25 @@ Tool call: f1e_setApiKey({"apiKey": "your-api-key-here"})
 ### Workflow Example: Finding and Downloading Wildlife Images
 
 1. **Search for specific wildlife photos:**
+
 ```
 f1e_searchPhotos({"query": "lions hunting savannah", "orientation": "landscape", "perPage": 10})
 ```
 
 2. **Get details about a specific photo:**
+
 ```
 f1e_getPhoto({"id": 12345678})
 ```
 
 3. **Download the selected photo in high resolution:**
+
 ```
 f1e_downloadPhoto({"id": 12345678, "size": "original"})
 ```
 
 4. **Browse a related wildlife collection:**
+
 ```
 f1e_getCollectionMedia({"id": "wildlife-collection-id", "type": "photos", "perPage": 20})
 ```
@@ -140,6 +166,7 @@ For maximum efficiency, AI agents can combine Pexels tool calls with a single te
 #### Complete Photo Workflow (3 Steps)
 
 1. **Search and identify photos:**
+
 ```
 # First find suitable photos
 result = f1e_searchPhotos({"query": "specific subject keywords", "perPage": 5})
@@ -148,12 +175,14 @@ photo_id = result.photos[0].id  # Choose the first or most relevant photo
 ```
 
 2. **Get download link and attribution info:**
+
 ```
 # Get download link and attribution
 download_info = f1e_downloadPhoto({"id": photo_id, "size": "medium"})
 ```
 
 3. **Download image and create attribution in one terminal command:**
+
 ```
 # Execute a single terminal command to download and create attribution
 cmd = f"""
@@ -185,11 +214,13 @@ run_in_terminal({"command": cmd, "explanation": "Downloading photo and creating 
 #### Multiple Photos with Single Attribution (4 Steps)
 
 1. **Search for photos:**
+
 ```
 results = f1e_searchPhotos({"query": "search terms", "perPage": 3})
 ```
 
 2. **Get download links for each photo:**
+
 ```
 download_links = []
 attribution_info = []
@@ -204,11 +235,13 @@ for i, photo in enumerate(results.photos):
 ```
 
 3. **Construct filenames:**
+
 ```
 filenames = [f"{i+1}_subject.jpeg" for i in range(len(download_links))]
 ```
 
 4. **Download all photos and create a single attribution file:**
+
 ```
 cmd = f"""
 cd /path/to/project/imagesandvids && \\

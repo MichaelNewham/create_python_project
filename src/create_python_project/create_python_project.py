@@ -157,13 +157,42 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     console.print(f"\n{cli_state.get_step_header('Project Directory')}")
     cli_state.print_separator(console)
 
+    # Default to ~/Projects directory for better organization
+    projects_dir = os.path.expanduser("~/Projects")
+    os.makedirs(projects_dir, exist_ok=True)
     default_dir = os.path.join(
-        os.getcwd(), project_name.replace(" ", "_").replace("-", "_").lower()
+        projects_dir, project_name.replace(" ", "_").replace("-", "_").lower()
     )
     console.print(f"[dim]Default location: {default_dir}[/dim]")
-    console.print("Press Enter to accept the default or type a new path:")
-    user_input = input("> ")
-    project_dir = user_input if user_input else default_dir
+
+    # Check if directory already exists
+    if os.path.exists(default_dir):
+        console.print(
+            f"[yellow]{cli_state.warning_icon} Warning: Directory already exists![/yellow]"
+        )
+        if not Confirm.ask(
+            "Do you want to overwrite the existing directory?", default=False
+        ):
+            console.print("[dim]Enter a different path:[/dim]")
+            while True:
+                user_input = input("> ")
+                if user_input and not os.path.exists(user_input):
+                    project_dir = user_input
+                    break
+                elif user_input and os.path.exists(user_input):
+                    console.print(
+                        f"[red]{cli_state.error_icon} That directory also exists. Try another:[/red]"
+                    )
+                else:
+                    console.print(
+                        f"[red]{cli_state.error_icon} Please enter a valid path:[/red]"
+                    )
+        else:
+            project_dir = default_dir
+    else:
+        console.print("Press Enter to accept the default or type a new path:")
+        user_input = input("> ")
+        project_dir = user_input if user_input else default_dir
     project_info["project_dir"] = project_dir
 
     # Step 3: Author Information 🔧

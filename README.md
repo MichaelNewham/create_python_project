@@ -278,23 +278,9 @@ Run `./scripts/update_documentation.sh` to update documentation.
 ---
 
 **Note:** This file has been automatically truncated to 150 lines maximum.
-Full content was 154 lines. Last updated: 2025-05-17 01:23:47
 
-## Project Structure
+---
 
-The project is organized as follows:
+**Note:** This file has been automatically truncated to 280 lines maximum.
 
-- **ai-docs/**: AI-related documentation and conversation logs
-- **imagesandvids/**: Project files
-- **logs/**: Log output files
-- **scripts/**: Automation scripts for development workflow
-- **src/**: Main implementation code
-- **tests/**: Test files for the project
-
-### Configuration Directories
-
-- **.claude/**: Configuration files
-- **.config/**: Configuration files for linters and tools
-- **.git/**: Configuration files
-- **.github/**: GitHub workflows and configuration
-
+Run `./scripts/update_documentation.sh` to update documentation.

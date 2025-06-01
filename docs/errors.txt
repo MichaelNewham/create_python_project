@@ -1,86 +1,59 @@
-================================================================
-                AI-ASSISTED COMMIT WORKFLOW                   
-================================================================
-🧹 Cleaning workspace and staging files...
-✅ Files staged successfully
-📚 Updating project documentation...
-✅ Documentation updated and staged
-🔍 Running code quality checks...
-  • Black (formatting)...
- ✅
-  • Ruff (linting & imports)...
- 🔧
-  • MyPy (type checking)...
- ❌
-MyPy errors found - continuing anyway
-✅ All quality checks passed
-🤖 Generating AI commit message...
-Generated: "Update documentation and script files"
-💾 Committing changes...
-black....................................................................Passed
-ruff.....................................................................Failed
-- hook id: ruff
-- exit code: 1
-
-src/create_python_project/utils/config.py:153:5: F841 Local variable `error_icon` is assigned to but never used
-    |
-151 |     }
-152 |     # Add error icon for better UX
-153 |     error_icon = "❌"
-    |     ^^^^^^^^^^ F841
-    |
-    = help: Remove assignment to unused variable `error_icon`
-
-Found 1 error.
-No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).
-
-mypy.....................................................................Failed
-- hook id: mypy
-- exit code: 1
-
-src/create_python_project/utils/config.py:153: error: Statement is unreachable  [unreachable]
-Found 1 error in 1 file (checked 1 source file)
-
-Update Project Documentation.............................................Failed
-- hook id: update-documentation
-- duration: 14.11s
-- files were modified by this hook
-
-📚 Updating project documentation...
-Starting documentation update process - 2025-05-31 01:13:12
-  • API documentation...
-File '/home/michaelnewham/Projects/create_python_project/ai-docs/api/create_python_project/index.html' already exists. Delete it, or run with --force
-   ✅
-Updating folder documentation files...
-Created/updated documentation for ai-docs folder
-Created/updated documentation for src folder
-Created/updated documentation for .git folder
-Updating README.md with project overview...
-README.md updated successfully
-Updating convo.md with documentation changes...
-mv: cannot stat '/home/michaelnewham/Projects/create_python_project/ai-docs/convo.md.tmp': No such file or directory
-convo.md updated successfully
-Checking for sensitive information in ai-docs...
-✅ No sensitive information detected in ai-docs folder.
-✅ The ai-docs folder is not in .gitignore. Documentation changes will be tracked by Git.
-Limiting all markdown files to 500 lines maximum...
-Truncated /home/michaelnewham/Projects/create_python_project/Proj_Setup.md from 503 lines to 500 lines
-All markdown files limited to 500 lines maximum
-Tracking all updated files...
-
-📋 Update Summary:
-----------------------------------------
-Documentation updated on: 2025-05-31 01:13:12
-Total files updated: 26
-
-Full list saved to: /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
-
-To see all updated files, run:
-cat /home/michaelnewham/Projects/create_python_project/ai-docs/updated_files.txt
-
-Or run with --verbose next time:
-./scripts/update_documentation.sh --verbose
-Documentation process completed - 2025-05-31 01:13:26
-
-
- *  The terminal process "/usr/bin/zsh '-c', '/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh'" terminated with exit code: 1. 
+2025-05-31 15:26:18.197 [info] Starting server github
+2025-05-31 15:26:18.201 [info] Connection state: Starting
+2025-05-31 15:26:18.270 [info] Starting server from LocalProcess extension host
+2025-05-31 15:26:18.476 [info] Connection state: Starting
+2025-05-31 15:26:18.477 [info] Connection state: Running
+2025-05-31 15:26:18.982 [warning] [server stderr] time="2025-05-31T14:26:18Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 15:26:18.988 [info] Connection state: Error Process exited with code 1
+2025-05-31 15:26:18.989 [error] Server exited before responding to `initialize` request.
+2025-05-31 15:56:17.194 [info] Starting server github
+2025-05-31 15:56:17.198 [info] Connection state: Starting
+2025-05-31 15:56:17.223 [info] Starting server from LocalProcess extension host
+2025-05-31 15:56:18.305 [info] Connection state: Starting
+2025-05-31 15:56:18.306 [info] Connection state: Running
+2025-05-31 15:56:18.824 [warning] [server stderr] time="2025-05-31T14:56:18Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 15:56:18.854 [info] Connection state: Error write EPIPE
+2025-05-31 15:56:18.867 [error] Server exited before responding to `initialize` request.
+2025-05-31 16:20:54.137 [info] Stopping server github
+2025-05-31 16:33:10.056 [info] Stopping server github
+2025-05-31 16:35:07.480 [info] Starting server github
+2025-05-31 16:35:07.485 [info] Connection state: Starting
+2025-05-31 16:35:07.507 [info] Starting server from LocalProcess extension host
+2025-05-31 16:35:07.553 [info] Connection state: Starting
+2025-05-31 16:35:07.556 [info] Connection state: Running
+2025-05-31 16:35:07.896 [warning] [server stderr] time="2025-05-31T15:35:07Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 16:35:08.082 [info] Connection state: Error Process exited with code 1
+2025-05-31 16:35:08.090 [error] Server exited before responding to `initialize` request.
+2025-05-31 16:35:14.262 [info] Starting server github
+2025-05-31 16:35:14.270 [info] Connection state: Starting
+2025-05-31 16:35:14.280 [info] Starting server from LocalProcess extension host
+2025-05-31 16:35:14.323 [info] Connection state: Starting
+2025-05-31 16:35:14.323 [info] Connection state: Running
+2025-05-31 16:35:14.934 [warning] [server stderr] time="2025-05-31T15:35:14Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 16:35:14.965 [info] Connection state: Error Process exited with code 1
+2025-05-31 16:35:14.965 [error] Server exited before responding to `initialize` request.
+2025-05-31 16:40:22.388 [info] Stopping server github
+2025-05-31 22:51:20.782 [info] Starting server github
+2025-05-31 22:51:20.785 [info] Connection state: Starting
+2025-05-31 22:51:20.809 [info] Starting server from LocalProcess extension host
+2025-05-31 22:51:25.296 [info] Connection state: Starting
+2025-05-31 22:51:25.297 [info] Connection state: Running
+2025-05-31 22:51:25.861 [warning] [server stderr] time="2025-05-31T21:51:25Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 22:51:25.877 [info] Connection state: Error Process exited with code 1
+2025-05-31 22:51:25.880 [error] Server exited before responding to `initialize` request.
+2025-05-31 23:13:23.982 [info] Starting server github
+2025-05-31 23:13:23.992 [info] Connection state: Starting
+2025-05-31 23:13:24.006 [info] Starting server from LocalProcess extension host
+2025-05-31 23:13:24.044 [info] Connection state: Starting
+2025-05-31 23:13:24.054 [info] Connection state: Running
+2025-05-31 23:13:24.303 [warning] [server stderr] time="2025-05-31T22:13:24Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 23:13:24.440 [info] Connection state: Error Process exited with code 1
+2025-05-31 23:13:24.441 [error] Server exited before responding to `initialize` request.
+2025-05-31 23:13:30.093 [info] Starting server github
+2025-05-31 23:13:30.096 [info] Connection state: Starting
+2025-05-31 23:13:30.106 [info] Starting server from LocalProcess extension host
+2025-05-31 23:13:30.156 [info] Connection state: Starting
+2025-05-31 23:13:30.168 [info] Connection state: Running
+2025-05-31 23:13:30.559 [warning] [server stderr] time="2025-05-31T22:13:30Z" level=fatal msg="GITHUB_PERSONAL_ACCESS_TOKEN not set"
+2025-05-31 23:13:30.711 [info] Connection state: Error Process exited with code 1
+2025-05-31 23:13:30.712 [error] Server exited before responding to `initialize` request.

@@ -1,0 +1,23 @@
+#!/bin/bash
+# GitHub MCP Server Configuration Fix Summary
+
+echo "GitHub MCP Server Fix Applied"
+echo "============================="
+echo ""
+echo "Issue: GITHUB_PERSONAL_ACCESS_TOKEN environment variable not being loaded"
+echo ""
+echo "Solution: Hardcoded the GitHub PAT in both configuration files:"
+echo "- Updated .vscode/mcp.json"
+echo "- Updated .cursor/mcp.json"
+echo ""
+echo "All problematic MCP servers now have hardcoded credentials:"
+echo "✓ BrightData - API_TOKEN"
+echo "✓ Perplexity - PERPLEXITY_API_KEY"
+echo "✓ Pexels - All Smithery and Pexels keys"
+echo "✓ GitHub - GITHUB_PERSONAL_ACCESS_TOKEN"
+echo ""
+echo "To apply changes:"
+echo "1. Reload VS Code/Cursor window (Ctrl+Shift+P → 'Developer: Reload Window')"
+echo "2. Or restart the IDE"
+echo ""
+echo "The GitHub MCP server should now start successfully with Docker."

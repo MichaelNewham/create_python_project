@@ -454,6 +454,12 @@ update_readme() {
 
     local readme_file="${PROJECT_DIR}/README.md"
 
+    # Auto-detect recent changes for changelog
+    local recent_changes=""
+    if git log --oneline --since="7 days ago" | head -5 | grep -qE "(add|feat|fix|update)"; then
+        recent_changes="$(git log --oneline --since="7 days ago" --pretty=format:"- %s" | head -3)"
+    fi
+
     # Get the list of all tracked directories
     local all_dirs=()
     local tracked_hidden_dirs=()
