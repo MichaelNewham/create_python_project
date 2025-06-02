@@ -56,7 +56,7 @@ fi
 
 # Check 5: Documentation exists
 echo -n "Checking security documentation: "
-if [ -f "docs/MCP_SETUP.md" ]; then
+if [ -f "ai-docs/setup/MCP_SETUP.md" ]; then
     echo -e "${GREEN}PASSED${NC} - Security documentation exists"
 else
     echo -e "${RED}FAILED${NC} - Security documentation missing"

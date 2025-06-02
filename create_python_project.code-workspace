@@ -20,7 +20,18 @@
         "mcp.secretsFile": "${workspaceFolder}/.vscode/mcp-secrets.json",
         "cursorpyright.analysis.extraPaths": [
             "${workspaceFolder}"
-        ]
+        ],
+        "files.exclude": {
+            "package.json": true,
+            "package-lock.json": true,
+            "node_modules": true,
+            ".dmypy.json": true,
+            ".venv": true,
+            ".ruff_cache": true,
+            ".pytest_cache": true,
+            ".mypy_cache": true,
+            ".claude": true
+        }
     },
     "extensions": {
         "recommendations": [

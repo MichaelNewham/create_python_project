@@ -11,12 +11,14 @@ ai-docs/
 ├── api_documentation.md
 ├── convo.md
 ├── .doc_history
-├── git_workflow.md
 ├── LICENSE
 ├── mcp-explainers
-├── mcp-setup-guide.md
 ├── openaianalysis.md
+├── README.md
+├── security
+├── setup
 ├── updated_files.txt
+├── workflows
 ```
 
 ## Contents Description
@@ -24,22 +26,24 @@ ai-docs/
 - `api/`: Directory containing 3 items
 - `api_documentation.md`: API Documentation
 - `convo.md`: Engineering Assessment for Create Python Project
-- `.doc_history`: ASCII text, with very long lines (503)
-- `git_workflow.md`: Advanced Git Workflow
+- `.doc_history`: ASCII text, with very long lines (524)
 - `LICENSE`: ASCII text
 - `mcp-explainers/`: Directory containing 9 items
-- `mcp-setup-guide.md`: MCP Setup Guide
 - `openaianalysis.md`: # OpenAI Analysis of Create Python Project Codebase
+- `README.md`: AI Documentation Hub
+- `security/`: Directory containing 2 items
+- `setup/`: Directory containing 4 items
 - `updated_files.txt`: ASCII text
+- `workflows/`: Directory containing 2 items
 
 ## Change History
 
-mcp-setup-guide.md
-openaianalysis.md
+setup
 updated_files.txt
-Mon 02 Jun 2025 01:45:03 IST: ADDED: api api_documentation.md convo.md git_workflow.md LICENSE mcp-explainers mcp-setup-guide.md openaianalysis.md updated_files.txt 
-Mon 02 Jun 2025 01:45:03 IST: REMOVED:                    01:01 03:58 07:48 10:03 12:45 16:42 2025: 2025: 2025: 2025: 2025: 2025: 2025: 2025: 20:32 20:42 21:56 25:13 25:17 26:35 27:12 28:57 28:59 32:42 39:57 43:09 49:47 53:12 FILES:LICENSE IST IST IST IST IST IST IST IST IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
+workflows
+Mon 02 Jun 2025 21:40:37 IST: ADDED: api api_documentation.md convo.md LICENSE mcp-explainers openaianalysis.md README.md security setup updated_files.txt workflows 
+Mon 02 Jun 2025 21:40:37 IST: REMOVED:                     01:01 03:58 07:48 10:03 12:45 16:42 2025: 2025: 2025: 2025: 2025: 2025: 2025: 2025: 20:32 20:42 21:56 25:13 25:17 26:35 27:12 28:57 28:59 32:42 39:57 43:09 45:03 49:47 53:12 FILES:LICENSE IST IST IST IST IST IST IST IST IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-06-02 01:45:03
+This documentation was automatically generated on: 2025-06-02 21:40:36
