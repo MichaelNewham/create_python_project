@@ -38,18 +38,21 @@ pip install -e .
 This project requires some configuration for MCP and VS Code integration:
 
 1. **Environment Variables**: Copy the example .env file and fill in your API keys
+
    ```bash
    cp .env.example .env
    # Edit .env with your API keys
    ```
 
 2. **VS Code Settings**:
+
    ```bash
    cp .vscode/settings.json.template .vscode/settings.json
    cp .vscode/mcp.json.template .vscode/mcp.json
    ```
 
 For more information on security best practices:
+
 - [MCP Setup Guide](docs/MCP_SETUP.md)
 - [VS Code Security Guide](docs/VSCODE_SECURITY.md)
 
@@ -64,6 +67,7 @@ create-python-project
 ```
 
 The interactive process will guide you through:
+
 1. Setting up your project name and location
 2. Selecting an AI provider for recommendations
 3. Describing your project for AI analysis
@@ -96,7 +100,6 @@ The project follows a clean organization structure:
 
 ... (truncated for brevity) ...
 
-
 1. **OpenAI**: GPT-4o-mini and other OpenAI models
 2. **Anthropic**: Claude 3.7 Sonnet and other Claude models
 3. **Perplexity**: Sonar model for project analysis
@@ -104,6 +107,7 @@ The project follows a clean organization structure:
 5. **Gemini**: Gemini 2.5 Pro and other Gemini models
 
 Each provider helps with:
+
 - Project type detection based on your description
 - Recommending appropriate technologies and libraries
 - Suggesting optimal project structure
@@ -116,171 +120,5 @@ MIT
 ## Last Updated
 
 This project was last updated on: 2025-05-31 01:17:21
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-31 01:13:12
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-31 01:01:17
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-31 00:50:23
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-31 00:46:12
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-31 00:40:42
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-31 00:27:38
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-29 22:48:50
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-29 22:48:26
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 02:16:16
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 02:15:32
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 01:21:48
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 01:00:23
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 00:57:00
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 00:52:50
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 00:51:32
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-27 00:50:10
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-26 01:21:17
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-26 00:26:28
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-22 01:07:57
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-22 01:05:10
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-21 00:55:41
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-20 01:22:28
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-20 00:52:06
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-20 00:19:41
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-19 23:38:59
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-19 23:06:30
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-18 00:26:21
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-18 00:25:48
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-18 00:25:41
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-18 00:25:24
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-18 00:25:07
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-18 00:17:52
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 02:05:26
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 02:03:17
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 01:59:20
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 01:56:52
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 01:54:30
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 01:53:55
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
-This project was last updated on: 2025-05-17 01:51:53
-
-Run `./scripts/update_documentation.sh` to update documentation.
-
----
-
-**Note:** This file has been automatically truncated to 150 lines maximum.
-
----
-
-**Note:** This file has been automatically truncated to 280 lines maximum.
 
 Run `./scripts/update_documentation.sh` to update documentation.
