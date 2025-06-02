@@ -1,0 +1,57 @@
+Executing task in folder create_python_project: /home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh 
+
+================================================================
+                AI-ASSISTED COMMIT WORKFLOW                   
+================================================================
+🧹 Cleaning workspace and staging files...
+✅ Files staged successfully
+📚 Updating project documentation...
+✅ Documentation updated and staged
+🔍 Running code quality checks...
+  • Black (formatting)...
+ ✅
+  • Ruff (linting & imports)...
+ ✅
+  • MyPy (type checking)...
+ ✅
+✅ All quality checks passed
+🤖 Generating AI commit message...
+Generated: "Add aboutthisfolder.md files and verify_security.sh"
+Edit this message? (y/n): n
+💾 Committing changes...
+black................................................(no files to check)Skipped
+ruff.................................................(no files to check)Skipped
+mypy.................................................(no files to check)Skipped
+[main b1d40e9] Add aboutthisfolder.md files and verify_security.sh
+ 35 files changed, 304 insertions(+), 954 deletions(-)
+ delete mode 120000 .flake8
+ delete mode 120000 .isort.cfg
+ delete mode 100644 .post-commit-config.yaml
+ delete mode 100644 Proj_Setup.md
+ delete mode 100644 Updated Project Chat Log - Create Python Project
+ create mode 100644 ai-docs/README.md
+ create mode 100644 ai-docs/security/README.md
+ rename {docs => ai-docs/security}/VSCODE_SECURITY.md (100%)
+ rename {docs => ai-docs/setup}/MCP_ENV_SETUP.md (100%)
+ rename {docs => ai-docs/setup}/MCP_SETUP.md (100%)
+ create mode 100644 ai-docs/setup/README.md
+ rename ai-docs/{ => setup}/mcp-setup-guide.md (100%)
+ create mode 100644 ai-docs/workflows/README.md
+ rename ai-docs/{ => workflows}/git_workflow.md (100%)
+ delete mode 100644 docs/.doc_history
+ delete mode 100644 docs/aboutthisfolder.md
+ delete mode 100644 docs/errors.txt
+ delete mode 100644 docs/logs.md
+ delete mode 100644 test_docs/.doc_history
+ delete mode 100644 test_docs/aboutthisfolder.md
+ delete mode 100644 test_docs/dir1/test.txt
+✅ Committed successfully
+🚀 Pushing to remotes...
+  • GitHub...
+ ✅
+  • GitLab...
+ ❌ (server down)
+================================================================
+✨ AI-assisted commit workflow completed successfully!
+================================================================
+ *  Terminal will be reused by tasks, press any key to close it.

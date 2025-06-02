@@ -35,7 +35,14 @@ command_exists() {
 
 generate_ai_commit_message() {
     local changed_files=$(git diff --cached --name-only)
-    local prompt="Generate concise git commit message for: $changed_files"
+    local commit_stats=$(git diff --cached --stat)
+    local prompt="Generate concise git commit message for these changes:
+
+Files: $changed_files
+
+Stats: $commit_stats
+
+Focus on the main operation (add/update/delete/refactor)"
     
     if [ -f "${PROJECT_DIR}/scripts/deepseek_commit_message.py" ]; then
         poetry run python "${PROJECT_DIR}/scripts/deepseek_commit_message.py" "$prompt" 2>/dev/null || echo "Update project files"
