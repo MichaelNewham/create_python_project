@@ -1253,6 +1253,28 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
                 "[dim]You can set it up later by running [bold]poetry install[/bold] in your project directory[/dim]"
             )
 
+    # Step 11: MCP Configuration Setup 🤖
+    console.print(
+        f"\n{cli_state.get_step_header('MCP Configuration Setup', cli_state.ai_icon)}"
+    )
+    cli_state.print_separator(console)
+
+    setup_mcp = Confirm.ask(
+        f"[bold cyan]{cli_state.ai_icon} Do you want to configure MCP servers for your IDE?[/bold cyan]",
+        default=True,
+    )
+
+    if setup_mcp:
+        console.print(
+            "[dim]MCP configuration templates have been created in .vscode/ and .cursor/ directories[/dim]"
+        )
+        console.print(
+            "[dim]Edit the mcp.json files and add your API keys to the .env file[/dim]"
+        )
+        console.print(
+            f"[green]{cli_state.success_icon} MCP configuration ready for customization[/green]"
+        )
+
     return True, "Project created successfully"
 
 

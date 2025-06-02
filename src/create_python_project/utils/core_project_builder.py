@@ -22,7 +22,7 @@ def create_project_structure(
     **kwargs: Any,
 ) -> tuple[bool, str]:
     """
-    Create the base project structure.
+    Create the complete project structure with IDE configurations.
 
     Args:
         project_name: Name of the project
@@ -42,9 +42,34 @@ def create_project_structure(
         # Create project directory if it doesn't exist
         os.makedirs(project_dir, exist_ok=True)
 
-        # Create package directory
+        # Create basic package directory
         package_dir = os.path.join(project_dir, "src", package_name)
         os.makedirs(package_dir, exist_ok=True)
+
+        # Create __init__.py
+        with open(os.path.join(package_dir, "__init__.py"), "w", encoding="utf-8") as f:
+            f.write(f'"""Package {package_name}."""\n__version__ = "0.1.0"\n')
+
+        # Use new template manager for project-specific structure
+        from .project_templates import ProjectTemplateManager
+
+        template_manager = ProjectTemplateManager(project_dir, project_name, tech_stack)
+        template_manager.create_project_structure(project_type)
+
+        # Create IDE configurations for both VS Code and Cursor
+        from .ide_config import IDEConfigManager
+
+        ide_manager = IDEConfigManager(
+            project_dir, project_name, project_type, tech_stack
+        )
+        ide_manager.create_vscode_config()
+        ide_manager.create_cursor_config()
+
+        # Create Poetry configuration
+        _create_pyproject_toml(project_dir, project_name, project_type, tech_stack)
+
+        # Create enhanced .env files
+        _create_environment_files(project_dir, project_type, tech_stack)
 
         # Create data analysis module for data projects
         if project_type == "data":
@@ -226,18 +251,128 @@ def visualize_data(df: pd.DataFrame, column: str, output_path: str = None) -> No
         ) as file:
             file.write('"""Utility functions for the project."""\n')
 
-        return True, f"Project structure created at {project_dir}"
+        return True, f"Complete project structure created at {project_dir}"
 
     except Exception as e:
         return False, f"Failed to create project structure: {str(e)}"
 
 
+def _create_pyproject_toml(
+    project_dir: str, project_name: str, project_type: str, tech_stack: dict[Any, Any]
+):
+    """Create Poetry configuration with appropriate dependencies."""
+    package_name = project_name.replace("-", "_").replace(" ", "_").lower()
+
+    content = f"""[tool.poetry]
+name = "{project_name}"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{{include = "{package_name}", from = "src"}}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+{_get_project_dependencies(project_type, tech_stack)}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+black = "^24.0.0"
+ruff = "^0.5.0"
+mypy = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+"""
+
+    with open(os.path.join(project_dir, "pyproject.toml"), "w", encoding="utf-8") as f:
+        f.write(content)
+
+
+def _get_project_dependencies(project_type: str, tech_stack: dict[Any, Any]) -> str:
+    """Get project-specific dependencies."""
+    deps = []
+
+    if project_type == "web":
+        deps.extend(['django = "^5.0.0"', 'djangorestframework = "^3.15.0"'])
+    elif project_type == "api":
+        deps.extend(['fastapi = "^0.110.0"', 'uvicorn = "^0.29.0"'])
+    elif project_type == "cli":
+        deps.append('click = "^8.1.0"')
+    elif project_type == "data":
+        deps.extend(
+            ['pandas = "^2.2.0"', 'matplotlib = "^3.8.0"', 'jupyter = "^1.0.0"']
+        )
+
+    return "\n".join(deps)
+
+
+def _create_environment_files(
+    project_dir: str, project_type: str, tech_stack: dict[Any, Any]
+):
+    """Create .env template and .gitignore."""
+    env_content = "# Environment variables\nDEBUG=True\n"
+
+    if project_type == "web":
+        env_content += (
+            "SECRET_KEY=your-secret-key-here\nDATABASE_URL=sqlite:///db.sqlite3\n"
+        )
+
+    with open(os.path.join(project_dir, ".env.example"), "w", encoding="utf-8") as f:
+        f.write(env_content)
+
+    # Enhanced .gitignore
+    gitignore_content = """# Python
+__pycache__/
+*.py[cod]
+.Python
+*.so
+.venv/
+.env
+
+# IDE
+.vscode/mcp.json
+.cursor/mcp.json
+*.swp
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Node modules (for React projects)
+node_modules/
+dist/
+build/
+
+# Coverage and testing
+.coverage
+htmlcov/
+.pytest_cache/
+"""
+
+    with open(os.path.join(project_dir, ".gitignore"), "w", encoding="utf-8") as f:
+        f.write(gitignore_content)
+
+
 def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
     """
-    Set up a virtual environment using Poetry.
+    Set up Poetry environment and install dependencies.
 
     Args:
-        project_dir: The project directory where the dependencies should be installed
+        project_dir: The project directory where dependencies should be installed
 
     Returns:
         Tuple containing success status and message
@@ -247,12 +382,43 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
         if not shutil.which("poetry"):
             return False, "Poetry is not installed. Please install Poetry first."
 
-        # Initialize Poetry project
+        # Configure Poetry to create venv in project
         subprocess.run(
-            ["poetry", "init", "--no-interaction"], cwd=project_dir, check=True
+            ["poetry", "config", "virtualenvs.in-project", "true"],
+            cwd=project_dir,
+            check=True,
+            capture_output=True,
         )
 
-        return True, "Virtual environment created successfully"
+        # Install dependencies
+        result = subprocess.run(
+            ["poetry", "install"],
+            cwd=project_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        if result.returncode == 0:
+            # Generate requirements.txt for compatibility
+            subprocess.run(
+                [
+                    "poetry",
+                    "export",
+                    "-f",
+                    "requirements.txt",
+                    "--output",
+                    "requirements.txt",
+                ],
+                cwd=project_dir,
+                capture_output=True,
+            )
+            return (
+                True,
+                "Poetry environment created and dependencies installed successfully",
+            )
+        else:
+            return False, f"Failed to install dependencies: {result.stderr}"
 
     except subprocess.CalledProcessError as e:
         return False, f"Failed to create virtual environment: {str(e)}"
