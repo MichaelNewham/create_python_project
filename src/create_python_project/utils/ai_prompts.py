@@ -6,31 +6,57 @@ This module contains prompt templates for interacting with AI providers.
 """
 
 
-def get_project_type_prompt(project_name: str, project_description: str) -> str:
+def get_project_type_prompt(
+    project_name: str, project_description: str, context: dict | None = None
+) -> str:
     """
-    Get a prompt for determining the project type.
+    Get a prompt for determining the project type with rich context.
 
     Args:
         project_name: Name of the project
         project_description: Description of the project
+        context: Dictionary with problem, users, inspiration
 
     Returns:
         Formatted prompt for AI
     """
+    context = context or {}
+
+    context_section = ""
+    if context:
+        context_section = f"""
+**Additional Context:**
+- Problem being solved: {context.get('problem', 'Not specified')}
+- Target users: {context.get('users', 'Not specified')}
+- Inspiration/Examples: {context.get('inspiration', 'Not specified')}
+"""
+
     return f"""
 You are an expert Python developer tasked with determining the most suitable project type for the following project:
 
-Project Name: {project_name}
-Project Description: {project_description}
+**Project Name:** {project_name}
+**Project Description:** {project_description}
+{context_section}
 
-Please analyze the project description and select the most appropriate project type from the following options:
-1. basic (Standard Python package)
-2. cli (Command-line interface application)
-3. web (Web application, e.g., Flask, FastAPI)
-4. api (API service)
-5. data (Data analysis/science project)
-6. ai (AI/ML project)
-7. gui (Desktop GUI application)
+Please analyze all the information and select the most appropriate project type from these categories:
+
+**Application Types:**
+- cli (Terminal tools and scripts for automation)
+- web (Browser-based interfaces and full-stack applications)
+- mobile-backend (Server-side services specifically for mobile applications)
+- gui (Native desktop applications with graphical interfaces)
+
+**Service Types:**
+- api (RESTful/GraphQL endpoints for general consumption)
+- microservice (Single-responsibility service in distributed architecture)
+
+**Analysis Types:**
+- data (Data processing, analytics, and scientific computing)
+- ai (Machine learning models and AI applications)
+
+**Development Types:**
+- library (Reusable packages and tools for other developers)
+- automation (Workflow automation, bots, and system integration)
 
 Respond with just one of these project types, all lowercase, and a brief explanation of why you selected it.
 Format: "project_type: brief explanation"

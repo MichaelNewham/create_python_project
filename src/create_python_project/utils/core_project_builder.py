@@ -7,6 +7,7 @@ This module contains the core functionality for creating Python projects.
 It handles file creation, directory structure, and template rendering.
 """
 
+import contextlib
 import os
 import shutil
 import subprocess
@@ -65,6 +66,9 @@ def create_project_structure(
         ide_manager.create_vscode_config()
         ide_manager.create_cursor_config()
 
+        # Create GitHub folder with Copilot configuration
+        _create_github_folder(project_dir, project_name, project_type, tech_stack)
+
         # Create Poetry configuration
         _create_pyproject_toml(project_dir, project_name, project_type, tech_stack)
 
@@ -105,8 +109,7 @@ def load_data(file_path: str) -> pd.DataFrame:
 
 def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
     """Perform basic data analysis."""
-    results = {
-        "shape": df.shape,
+    results = {"shape": df.shape,
         "columns": df.columns.tolist(),
         "summary": df.describe().to_dict(),
         "missing_values": df.isnull().sum().to_dict(),
@@ -334,6 +337,17 @@ def _create_environment_files(
     with open(os.path.join(project_dir, ".env.example"), "w", encoding="utf-8") as f:
         f.write(env_content)
 
+    # Create .env.template (copy of .env without keys)
+    template_path = os.path.join(project_dir, ".env.template")
+    with open(template_path, "w", encoding="utf-8") as f:
+        f.write("# Environment variables template\n")
+        f.write("# Copy this to .env and add your actual values\n\n")
+        f.write(
+            env_content.replace("=True", "=your_value_here")
+            .replace("sqlite:///db.sqlite3", "your_database_url_here")
+            .replace("your-secret-key-here", "your_secret_key_here")
+        )
+
     # Enhanced .gitignore
     gitignore_content = """# Python
 __pycache__/
@@ -398,6 +412,25 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
             capture_output=True,
             text=True,
         )
+
+        # Activate Poetry environment
+        subprocess.run(
+            ["poetry", "env", "use", "python"],
+            cwd=project_dir,
+            check=True,
+            capture_output=True,
+        )
+
+        # Install Claude Code CLI globally
+        with contextlib.suppress(subprocess.CalledProcessError):
+            subprocess.run(
+                ["npm", "install", "-g", "@anthropic-ai/claude-desktop"],
+                check=True,
+                capture_output=True,
+            )
+
+        # Install global MCP servers
+        _install_global_mcp_servers()
 
         if result.returncode == 0:
             # Generate requirements.txt for compatibility
@@ -570,3 +603,74 @@ coverage.xml
         return False, f"Failed to initialize Git repository: {e.stderr.decode()}"
     except Exception as e:
         return False, f"Failed to initialize Git repository: {str(e)}"
+
+
+def _create_github_folder(
+    project_dir: str, project_name: str, project_type: str, tech_stack: dict[str, Any]
+) -> bool:
+    """Create .github folder with Copilot configuration."""
+    github_dir = os.path.join(project_dir, ".github")
+    os.makedirs(github_dir, exist_ok=True)
+
+    # Create copilot instructions
+    copilot_content = f"""# {project_name} - GitHub Copilot Instructions
+
+## Project Overview
+{project_type.capitalize()} project with AI-curated technology stack.
+
+## Tech Stack
+{_format_tech_stack_for_copilot(tech_stack)}
+
+## Coding Standards
+- Follow PEP 8 conventions
+- Use type hints for all functions
+- Write comprehensive docstrings
+- Include unit tests for all new code
+- Follow security best practices
+
+## Project Structure
+- Use Poetry for dependency management
+- Keep modules focused and single-purpose
+- Organize tests to mirror source structure
+- Handle configuration through environment variables
+"""
+
+    with open(
+        os.path.join(github_dir, "copilot-instructions.md"), "w", encoding="utf-8"
+    ) as f:
+        f.write(copilot_content)
+
+    return True
+
+
+def _install_global_mcp_servers() -> bool:
+    """Install global MCP servers."""
+    servers = [
+        "@upstash/context7-mcp@latest",
+        "server-perplexity-ask",
+        "@modelcontextprotocol/server-filesystem",
+    ]
+
+    for server in servers:
+        try:
+            subprocess.run(
+                ["npm", "install", "-g", server], check=True, capture_output=True
+            )
+        except subprocess.CalledProcessError:
+            continue  # Skip failed installations
+
+    return True
+
+
+def _format_tech_stack_for_copilot(tech_stack: dict[str, Any]) -> str:
+    """Format tech stack for GitHub Copilot instructions."""
+    if not tech_stack or "categories" not in tech_stack:
+        return "Standard Python project"
+
+    lines = []
+    for category in tech_stack["categories"]:
+        for option in category.get("options", []):
+            if option.get("recommended", False):
+                lines.append(f"- **{category['name']}**: {option['name']}")
+
+    return "\n".join(lines) if lines else "Standard Python project"

@@ -244,15 +244,43 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     # Get available project types
     project_types = config.get_project_types()
 
-    # Step 4: Project Description 🔧
-    console.print(f"\n{cli_state.get_step_header('Project Description')}")
+    # Step 4: Project Context & Inspiration 🔧
+    console.print(f"\n{cli_state.get_step_header('Project Context & Inspiration')}")
     cli_state.print_separator(console)
 
+    console.print(
+        "[italic]Help AI understand your vision by sharing context and inspiration.[/italic]"
+    )
+
+    # Three key contextual questions
+    context_info = {}
+
+    console.print("\n[bold cyan]1. What problem are you solving?[/bold cyan]")
+    problem = enhanced_input("Describe the main problem or need your project addresses")
+    context_info["problem"] = problem
+
+    console.print("\n[bold cyan]2. Who will use this?[/bold cyan]")
+    users = enhanced_input(
+        "Who are the end users? (developers, consumers, businesses, systems, etc.)"
+    )
+    context_info["users"] = users
+
+    console.print("\n[bold cyan]3. What inspired this project?[/bold cyan]")
+    console.print(
+        "[dim]Share websites, apps, or services you admire (URLs welcome):[/dim]"
+    )
+    inspiration = enhanced_input(
+        "Examples, similar apps, or websites that inspired you"
+    )
+    context_info["inspiration"] = inspiration
+
+    # Combine original description with context
     if not project_info.get("project_description"):
-        console.print(
-            "[italic]Describe your project to get AI-powered recommendations for technology stack and structure.[/italic]"
-        )
-        project_info["project_description"] = Prompt.ask("Please describe your project")
+        project_info["project_description"] = problem
+    else:
+        project_info["project_description"] += f"\n\nContext: {problem}"
+
+    project_info["context"] = context_info
 
     # Check AI providers availability with visual feedback
     with console.status("[bold cyan]Checking available AI providers...[/bold cyan]"):
@@ -276,7 +304,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     # Enhanced provider selection with better descriptions
     provider_order = ["DeepSeek", "Anthropic", "Perplexity", "OpenAI", "Gemini"]
     provider_descriptions = {
-        "DeepSeek": "DeepSeek Chat - Excellent for code analysis and technical recommendations",
+        "DeepSeek": "DeepSeek Reasoner - Advanced reasoning model for complex problem analysis and strategic thinking",
         "Anthropic": "Claude models - Superior reasoning and detailed project analysis",
         "Perplexity": "Sonar model - Great for research-based technology recommendations",
         "OpenAI": "GPT models - Fast, versatile, and reliable for general project setup",
@@ -298,7 +326,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     ]
 
     provider_specialties = {
-        "DeepSeek": "Code generation, API design",
+        "DeepSeek": "Complex reasoning, strategic analysis",
         "Anthropic": "Complex analysis, documentation",
         "Perplexity": "Research, tech comparisons",
         "OpenAI": "General projects, prototyping",
@@ -348,10 +376,11 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     ) as progress:
         task = progress.add_task("Analyzing", total=None)
 
-        # Generate type detection prompt
+        # Generate type detection prompt with context
         prompt = ai_prompts.get_project_type_prompt(
             project_info["project_name"],
             project_info["project_description"],
+            project_info.get("context", {}),
         )
 
         # Get AI response for project type
@@ -1240,7 +1269,7 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
                 f"\n[bold green]{cli_state.success_icon} {venv_message}[/bold green]"
             )
             console.print(
-                "[dim]To activate the environment, run [bold]poetry shell[/bold] in your project directory[/dim]"
+                "[dim]To activate the environment, run [bold]poetry env activate[/bold] in your project directory[/dim]"
             )
         else:
             console.print(
@@ -1339,10 +1368,10 @@ def main() -> int:
         from rich.panel import Panel
 
         summary_content = f"""[bold]Project Summary:[/bold]
-• [cyan]Name:[/cyan] {project_info['project_name']}
+• [cyan]Name:[/cyan] {project_info["project_name"]}
 • [cyan]Type:[/cyan] {project_type.capitalize()} Project
-• [cyan]Author:[/cyan] {project_info.get('author_name', 'Not specified')}
-• [cyan]Location:[/cyan] {project_info['project_dir']}"""
+• [cyan]Author:[/cyan] {project_info.get("author_name", "Not specified")}
+• [cyan]Location:[/cyan] {project_info["project_dir"]}"""
 
         summary_panel = Panel(
             summary_content,
@@ -1358,12 +1387,12 @@ def main() -> int:
 
 1. **Navigate to your project directory:**
    ```bash
-   cd {project_info['project_dir']}
+   cd {project_info["project_dir"]}
    ```
 
 2. **Activate the Poetry environment:**
    ```bash
-   poetry shell
+   poetry env use python
    ```
 
 3. **Start coding in the `src/` directory**
@@ -1394,10 +1423,20 @@ def main() -> int:
 
         console.print(Markdown(next_steps))
 
-        # Final success message
+        # Final success message with session information
         console.print(
             f"\n[bold green]{cli_state.complete_icon} Happy coding! Your project is ready for development.[/bold green]"
         )
+
+        # Display generated files information
+        console.print("\n[bold cyan]📄 Generated Documentation:[/bold cyan]")
+        console.print(
+            "  • Project session: [green]ai-docs/project_initialization_*.md[/green]"
+        )
+        console.print(
+            "  • Setup logs: [green]logs/project_creation.log[/green] (if enabled)"
+        )
+        console.print("  • README: [green]README.md[/green] with tech stack summary")
 
         return 0
 
@@ -1416,210 +1455,35 @@ def main() -> int:
 
 def create_default_tech_stack(project_type: str) -> dict[str, Any]:
     """
-    Create a default technology stack structure based on project type.
+    Create minimal fallback tech stack when AI recommendations fail.
 
     Args:
         project_type: Type of the project (web, cli, etc.)
 
     Returns:
-        Dictionary containing default technology stack
+        Dictionary containing minimal generic tech stack
     """
-    # Create a basic structure for the tech stack
-    tech_stack: dict[str, Any] = {
-        "categories": [],  # This will be a list of category dictionaries
-        "analysis": [
-            "Using default configuration",
-            "Customized for your project type",
-            "Based on industry best practices",
-            "Optimized for developer productivity",
-        ],
-    }
-
-    # Add categories based on project type
-    if project_type == "web":
-        tech_stack["categories"] = [
+    return {
+        "categories": [
             {
-                "name": "Backend Framework",
-                "description": "The foundation of your web application",
-                "options": [
-                    {
-                        "name": "Flask",
-                        "description": "Lightweight and flexible web framework",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "FastAPI",
-                        "description": "Modern, high-performance web framework with automatic API documentation",
-                        "recommended": False,
-                    },
-                ],
-            },
-            {
-                "name": "Database",
-                "description": "Storage solution for your application data",
-                "options": [
-                    {
-                        "name": "SQLite",
-                        "description": "Lightweight file-based database for development and small applications",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "PostgreSQL",
-                        "description": "Powerful open-source relational database",
-                        "recommended": False,
-                    },
-                ],
-            },
-        ]
-    elif project_type == "cli":
-        tech_stack["categories"] = [
-            {
-                "name": "CLI Framework",
-                "description": "Framework for building command-line interfaces",
-                "options": [
-                    {
-                        "name": "Click",
-                        "description": "Composable command-line interface toolkit",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "Typer",
-                        "description": "Modern CLI framework based on type hints",
-                        "recommended": False,
-                    },
-                ],
-            }
-        ]
-    elif project_type == "api":
-        tech_stack["categories"] = [
-            {
-                "name": "API Framework",
-                "description": "Framework for building APIs",
-                "options": [
-                    {
-                        "name": "FastAPI",
-                        "description": "Modern, high-performance API framework with automatic documentation",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "Flask-RESTful",
-                        "description": "Extension for Flask that adds support for quickly building REST APIs",
-                        "recommended": False,
-                    },
-                ],
-            },
-            {
-                "name": "Database",
-                "description": "Storage solution for your application data",
-                "options": [
-                    {
-                        "name": "PostgreSQL",
-                        "description": "Powerful open-source relational database",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "MongoDB",
-                        "description": "NoSQL document database for flexible data models",
-                        "recommended": False,
-                    },
-                ],
-            },
-        ]
-    elif project_type == "data":
-        tech_stack["categories"] = [
-            {
-                "name": "Data Processing",
-                "description": "Libraries for data manipulation and analysis",
-                "options": [
-                    {
-                        "name": "Pandas",
-                        "description": "Data analysis and manipulation library",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "NumPy",
-                        "description": "Fundamental package for scientific computing",
-                        "recommended": False,
-                    },
-                ],
-            },
-            {
-                "name": "Visualization",
-                "description": "Libraries for data visualization",
-                "options": [
-                    {
-                        "name": "Matplotlib",
-                        "description": "Comprehensive library for creating static, animated, and interactive visualizations",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "Seaborn",
-                        "description": "Statistical data visualization based on matplotlib",
-                        "recommended": False,
-                    },
-                ],
-            },
-        ]
-    elif project_type == "ai":
-        tech_stack["categories"] = [
-            {
-                "name": "Machine Learning",
-                "description": "Libraries for machine learning",
-                "options": [
-                    {
-                        "name": "Scikit-learn",
-                        "description": "Simple and efficient tools for data analysis and modeling",
-                        "recommended": True,
-                    },
-                    {
-                        "name": "TensorFlow",
-                        "description": "End-to-end open source platform for machine learning",
-                        "recommended": False,
-                    },
-                ],
-            }
-        ]
-    else:  # basic or other types
-        tech_stack["categories"] = [
-            {
-                "name": "Testing",
-                "description": "Libraries for testing your code",
+                "name": "Testing Framework",
+                "description": "Essential testing tools for code quality",
                 "options": [
                     {
                         "name": "Pytest",
-                        "description": "Simple and powerful testing framework",
+                        "description": "Modern Python testing framework with powerful features",
                         "recommended": True,
-                    },
-                    {
-                        "name": "Unittest",
-                        "description": "Built-in Python testing framework",
-                        "recommended": False,
-                    },
+                    }
                 ],
             }
-        ]
-
-    # Add common categories for all project types
-    tech_stack["categories"].append(
-        {
-            "name": "Testing",
-            "description": "Libraries for testing your code",
-            "options": [
-                {
-                    "name": "Pytest",
-                    "description": "Simple and powerful testing framework",
-                    "recommended": True,
-                },
-                {
-                    "name": "Unittest",
-                    "description": "Built-in Python testing framework",
-                    "recommended": False,
-                },
-            ],
-        }
-    )
-
-    return tech_stack
+        ],
+        "analysis": [
+            "AI recommendations unavailable - using minimal configuration",
+            "Essential testing framework included for code quality",
+            f"Consider manually adding {project_type}-specific dependencies",
+            "Run the tool again for AI-curated tech stack recommendations",
+        ],
+    }
 
 
 if __name__ == "__main__":

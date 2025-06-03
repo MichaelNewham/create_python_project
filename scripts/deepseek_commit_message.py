@@ -21,7 +21,7 @@ def main():
     load_dotenv()
 
     api_key = os.environ.get("DEEPSEEK_API_KEY")
-    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-reasoner")
 
     if not api_key:
         print("Update project files")

@@ -120,32 +120,48 @@ def get_project_types() -> dict[str, dict[str, str]]:
         Dictionary mapping project types to their configurations
     """
     return {
-        "basic": {
-            "name": "Basic Python Package",
-            "description": "Modular code with standard structure",
-        },
+        # Application Types
         "cli": {
             "name": "Command-Line Interface",
-            "description": "Terminal-based tools with argument parsing",
+            "description": "Terminal tools and scripts for automation",
         },
         "web": {
             "name": "Web Application",
-            "description": "Browser-based apps with HTML rendering",
+            "description": "Browser-based interfaces and full-stack applications",
         },
+        "mobile-backend": {
+            "name": "Mobile Backend",
+            "description": "Server-side services specifically for mobile applications",
+        },
+        "gui": {
+            "name": "Desktop GUI",
+            "description": "Native desktop applications with graphical interfaces",
+        },
+        # Service Types
         "api": {
             "name": "API Service",
-            "description": "Data endpoints with request validation",
+            "description": "RESTful/GraphQL endpoints for general consumption",
         },
+        "microservice": {
+            "name": "Microservice",
+            "description": "Single-responsibility service in distributed architecture",
+        },
+        # Analysis Types
         "data": {
-            "name": "Data Analysis/Science",
-            "description": "Analytics with visualization and processing",
+            "name": "Data Analysis",
+            "description": "Data processing, analytics, and scientific computing",
         },
         "ai": {
             "name": "AI/ML Project",
-            "description": "Models with training and inference",
+            "description": "Machine learning models and AI applications",
         },
-        "gui": {
-            "name": "GUI Application",
-            "description": "Desktop apps with interactive interfaces",
+        # Development Types
+        "library": {
+            "name": "Library/SDK",
+            "description": "Reusable packages and tools for other developers",
+        },
+        "automation": {
+            "name": "Automation Tool",
+            "description": "Workflow automation, bots, and system integration",
         },
     }

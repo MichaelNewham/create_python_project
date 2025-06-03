@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "All-in-one Python project creator with intelligent setup"
 authors = ["Michael Newham <mail2mick@michaelnewham.me>"]
 readme = "README.md"
-packages = [{include = "create_python_project", from = "src"}]
+packages = [{ include = "create_python_project", from = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.11"
@@ -80,8 +80,8 @@ select = [
     "UP",  # pyupgrade
 ]
 ignore = [
-    "F821",  # Ignore undefined names in template strings
-    "E501",  # Line too long (handled by black)
+    "F821", # Ignore undefined names in template strings
+    "E501", # Line too long (handled by black)
 ]
 
 [tool.ruff.lint.per-file-ignores]

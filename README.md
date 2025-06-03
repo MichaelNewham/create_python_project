@@ -103,7 +103,7 @@ The project follows a clean organization structure:
 1. **OpenAI**: GPT-4o-mini and other OpenAI models
 2. **Anthropic**: Claude 3.7 Sonnet and other Claude models
 3. **Perplexity**: Sonar model for project analysis
-4. **DeepSeek**: DeepSeek Chat model
+4. **DeepSeek**: DeepSeek Reasoner model - Advanced reasoning for complex problem analysis
 5. **Gemini**: Gemini 2.5 Pro and other Gemini models
 
 Each provider helps with:

@@ -273,11 +273,11 @@ class DeepSeekProvider(AIProvider):
 
     def _get_display_name(self) -> str:
         """Get a user-friendly display name for the model."""
-        model = self.model or "deepseek-chat"
+        model = self.model or "deepseek-reasoner"
         if "deepseek-coder" in model.lower():
             return "DeepSeek Coder"
-        elif "deepseek-chat" in model.lower():
-            return "DeepSeek Chat"
+        elif "deepseek-reasoner" in model.lower():
+            return "DeepSeek Reasoner"
         elif "deepseek-math" in model.lower():
             return "DeepSeek Math"
         else:
@@ -293,7 +293,7 @@ class DeepSeekProvider(AIProvider):
             }
 
             payload = {
-                "model": self.model or "deepseek-chat",
+                "model": self.model or "deepseek-reasoner",
                 "messages": [
                     {
                         "role": "system",
@@ -398,7 +398,7 @@ def get_available_ai_providers() -> dict[str, str]:
 
     # Check for DeepSeek
     if os.environ.get("DEEPSEEK_API_KEY"):
-        model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+        model = os.environ.get("DEEPSEEK_MODEL", "deepseek-reasoner")
         providers["DeepSeek"] = model
 
     # Check for Gemini (Google)
@@ -422,7 +422,6 @@ def select_ai_provider(providers: dict[str, str]) -> tuple[bool, AIProvider | No
     if not providers:
         return False, None
 
-    console.print("\n[bold magenta]Step 2: AI Integration[/bold magenta]")
     console.print("Select an AI provider:")
     providers_list = list(providers.keys())
     for i, provider in enumerate(providers_list, 1):

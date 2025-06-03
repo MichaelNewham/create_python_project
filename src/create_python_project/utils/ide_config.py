@@ -38,6 +38,7 @@ class IDEConfigManager:
             self._create_tasks_json(vscode_dir)
             self._create_extensions_json(vscode_dir)
             self._create_launch_json(vscode_dir)
+            self._create_keybindings_json(vscode_dir)
             self._create_mcp_template(vscode_dir)
             return True
         except Exception as e:
@@ -192,6 +193,75 @@ class IDEConfigManager:
         launch_path = os.path.join(config_dir, "launch.json")
         with open(launch_path, "w", encoding="utf-8") as f:
             json.dump(launch_config, f, indent=2)
+
+    def _create_keybindings_json(self, config_dir: str):
+        """Create keybindings.json with project-specific shortcuts."""
+        keybindings = [
+            {
+                "key": "ctrl+alt+r",
+                "command": "workbench.action.tasks.runTask",
+                "args": self._get_main_run_task(),
+                "when": "editorFocus || terminalFocus",
+            },
+            {
+                "key": "ctrl+alt+t",
+                "command": "workbench.action.tasks.runTask",
+                "args": "Run Tests",
+                "when": "editorFocus || terminalFocus",
+            },
+            {
+                "key": "ctrl+alt+f",
+                "command": "workbench.action.tasks.runTask",
+                "args": "Format Code",
+                "when": "editorFocus || terminalFocus",
+            },
+        ]
+
+        # Add project-specific shortcuts
+        if self.project_type == "web":
+            keybindings.append(
+                {
+                    "key": "ctrl+alt+s",
+                    "command": "workbench.action.tasks.runTask",
+                    "args": (
+                        "Run Django Server"
+                        if self._get_tech_choice("Backend Framework") == "Django"
+                        else "Run Server"
+                    ),
+                    "when": "editorFocus || terminalFocus",
+                }
+            )
+        elif self.project_type == "data":
+            keybindings.append(
+                {
+                    "key": "ctrl+alt+j",
+                    "command": "workbench.action.tasks.runTask",
+                    "args": "Start Jupyter Lab",
+                    "when": "editorFocus || terminalFocus",
+                }
+            )
+
+        keybindings_path = os.path.join(config_dir, "keybindings.json")
+        with open(keybindings_path, "w", encoding="utf-8") as f:
+            json.dump(keybindings, f, indent=2)
+
+    def _get_main_run_task(self) -> str:
+        """Get the main run task name for this project type."""
+        task_map = {
+            "web": (
+                "Run Django Server"
+                if self._get_tech_choice("Backend Framework") == "Django"
+                else "Run Server"
+            ),
+            "cli": "Run CLI App",
+            "api": (
+                "Run FastAPI Server"
+                if self._get_tech_choice("API Framework") == "FastAPI"
+                else "Run API Server"
+            ),
+            "data": "Start Jupyter Lab",
+        }
+        return task_map.get(self.project_type, "Run Tests")
 
     def _create_mcp_template(self, config_dir: str):
         """Create MCP configuration templates."""
