@@ -211,16 +211,16 @@ def generate_commit_message():
     # Generate message based on changes
     if len(changes) == 1:
         action, file = changes[0].split("\\t")
-        action_word = {{"A": "add", "M": "update", "D": "remove"}}.get(action, "change")
-        return f"{{action_word}}: {{file}}"
+        action_word = {"A": "add", "M": "update", "D": "remove"}.get(action, "change")
+        return f"{action_word}: {file}"
 
     parts = []
     if added:
-        parts.append(f"add {{len(added)}} file{'s' if len(added) > 1 else ''}")
+        parts.append(f"add {len(added)} file{'s' if len(added) > 1 else ''}")
     if modified:
-        parts.append(f"update {{len(modified)}} file{'s' if len(modified) > 1 else ''}")
+        parts.append(f"update {len(modified)} file{'s' if len(modified) > 1 else ''}")
     if deleted:
-        parts.append(f"remove {{len(deleted)}} file{'s' if len(deleted) > 1 else ''}")
+        parts.append(f"remove {len(deleted)} file{'s' if len(deleted) > 1 else ''}")
 
     return "feat: " + ", ".join(parts)
 
