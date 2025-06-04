@@ -145,6 +145,16 @@
                 "kind": "none",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Setup MCP Configuration",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/setup_mcp.sh",
+            "problemMatcher": [],
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            }
         }
     ],
     "inputs": [

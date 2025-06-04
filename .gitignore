@@ -63,6 +63,10 @@ venv.bak/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/keybindings.json
+!.vscode/settings.json.template
+!.vscode/mcp.json.template
+.vscode/mcp.json
 .vscode/mcp-secrets.json
 
 # VS Code Settings with Secrets

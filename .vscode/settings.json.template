@@ -1,0 +1,98 @@
+{
+    // GitHub Copilot instruction settings
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "chat.promptFiles": true,
+    "chat.instructionsFilesLocations": [
+        ".github/instructions"
+    ],
+    "chat.promptFilesLocations": [
+        ".github/prompts"
+    ],
+    
+    // GitHub Copilot custom instructions for different tasks
+    "github.copilot.chat.codeGeneration.instructions": [
+        {
+            "text": "Follow PEP 8 style guidelines for all Python code."
+        },
+        {
+            "text": "Include type hints for all function parameters and return values."
+        },
+        {
+            "text": "Use Google-style docstrings for all functions and classes."
+        }
+    ],
+    "github.copilot.chat.testGeneration.instructions": [
+        {
+            "text": "Use pytest for all test files."
+        },
+        {
+            "text": "Create tests for edge cases and error conditions."
+        },
+        {
+            "text": "Use appropriate fixtures for test setup."
+        }
+    ],
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        {
+            "text": "Follow conventional commits format (feat, fix, docs, etc.)."
+        },
+        {
+            "text": "Include a clear description of the changes."
+        },
+        {
+            "text": "Reference related issue numbers when applicable."
+        }
+    ],
+    
+    // Python testing settings
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.linting.pylintArgs": [
+        "--disable=C0111"
+    ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": [
+        "--config-file=${workspaceFolder}/.config/mypy.ini"
+    ],
+    "python.linting.mypyPath": "${workspaceFolder}/scripts/run_mypy.sh",
+    "mypy.dmypyExecutable": "${workspaceFolder}/.venv/bin/dmypy",
+    "mypy.runUsingActiveInterpreter": false,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/.venv": true,
+        "**/node_modules": true
+    },
+    "editor.rulers": [88],
+    "python.analysis.typeCheckingMode": "basic",
+    "cSpell.words": [
+        "dotenv"
+    ],
+    // Comment out the mcp-secrets section and reference it from .env
+    // "mcp-secrets": {
+    //     "brightdata": {
+    //         "API_TOKEN": "YOUR_API_TOKEN_HERE"
+    //     }
+    // }
+}

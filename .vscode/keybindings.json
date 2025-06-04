@@ -1,0 +1,20 @@
+[
+    {
+        "key": "ctrl+alt+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Run Main App",
+        "when": "editorFocus || terminalFocus"
+    },
+    {
+        "key": "ctrl+alt+c",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Commit Workflow",
+        "when": "editorFocus || terminalFocus"
+    },
+    {
+        "key": "ctrl+alt+y",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Run Mypy (Daemon Mode)",
+        "when": "editorFocus || terminalFocus"
+    }
+]
