@@ -34,6 +34,9 @@ from create_python_project.utils import (
     ai_prompts,
     config,
     core_project_builder,
+    development_tools,
+    script_templates,
+    workspace_config,
 )
 from create_python_project.utils import logging as log_utils
 
@@ -254,6 +257,9 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
     # Three key contextual questions
     context_info = {}
+
+    # Import the enhanced_input function from our CLI utilities
+    from create_python_project.utils.cli import enhanced_input
 
     console.print("\n[bold cyan]1. What problem are you solving?[/bold cyan]")
     problem = enhanced_input("Describe the main problem or need your project addresses")
@@ -1112,6 +1118,117 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
             return False, message
 
     console.print(f"\n[bold green]{cli_state.success_icon} {message}[/bold green]")
+
+    # Step 8.1: Workspace Configuration 📋
+    console.print(f"\n{cli_state.get_step_header('Workspace Configuration', '📋')}")
+    cli_state.print_separator(console)
+
+    setup_workspace = Confirm.ask(
+        "[bold cyan]📋 Do you want to create a VS Code workspace file?[/bold cyan]",
+        default=True,
+    )
+
+    if setup_workspace:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]📋 Creating workspace configuration...[/bold cyan]"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Creating workspace", total=None)
+
+            (
+                workspace_success,
+                workspace_message,
+            ) = workspace_config.create_workspace_file(
+                project_info["project_dir"],
+                project_info["project_name"],
+                project_type,
+                tech_stack_dict,
+            )
+
+            progress.update(task, completed=True)
+
+        if workspace_success:
+            console.print(
+                f"\n[bold green]{cli_state.success_icon} {workspace_message}[/bold green]"
+            )
+        else:
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} {workspace_message}[/bold red]"
+            )
+
+    # Step 8.2: Development Tools Setup 🛠️
+    console.print(f"\n{cli_state.get_step_header('Development Tools Setup', '🛠️')}")
+    cli_state.print_separator(console)
+
+    setup_dev_tools = Confirm.ask(
+        "[bold cyan]🛠️ Do you want to set up development tools (pre-commit, linting)?[/bold cyan]",
+        default=True,
+    )
+
+    if setup_dev_tools:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]🛠️ Setting up development tools...[/bold cyan]"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Setting up tools", total=None)
+
+            (
+                dev_tools_success,
+                dev_tools_message,
+            ) = development_tools.setup_development_tools(
+                project_info["project_dir"], tech_stack_dict
+            )
+
+            progress.update(task, completed=True)
+
+        if dev_tools_success:
+            console.print(
+                f"\n[bold green]{cli_state.success_icon} {dev_tools_message}[/bold green]"
+            )
+        else:
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} {dev_tools_message}[/bold red]"
+            )
+
+    # Step 8.3: Automation Scripts 🤖
+    console.print(f"\n{cli_state.get_step_header('Automation Scripts', '🤖')}")
+    cli_state.print_separator(console)
+
+    setup_scripts = Confirm.ask(
+        "[bold cyan]🤖 Do you want to create automation scripts (commit workflow, testing)?[/bold cyan]",
+        default=True,
+    )
+
+    if setup_scripts:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]🤖 Creating automation scripts...[/bold cyan]"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Creating scripts", total=None)
+
+            (
+                scripts_success,
+                scripts_message,
+            ) = script_templates.create_automation_scripts(
+                project_info["project_dir"],
+                project_info["package_name"],
+                project_info["project_name"],
+                tech_stack_dict,
+            )
+
+            progress.update(task, completed=True)
+
+        if scripts_success:
+            console.print(
+                f"\n[bold green]{cli_state.success_icon} {scripts_message}[/bold green]"
+            )
+        else:
+            console.print(
+                f"\n[bold red]{cli_state.error_icon} {scripts_message}[/bold red]"
+            )
 
     # Step 9: Git Repository Setup 📚
     console.print(

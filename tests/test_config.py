@@ -3,9 +3,14 @@ Tests for the config module.
 """
 
 import os
+from typing import Any
+
+import pytest
 
 from create_python_project.utils.config import (
+    _extract_dependencies_from_tech_stack,
     create_env_file,
+    get_project_dependencies,
     get_project_types,
     load_env_file,
 )
@@ -76,6 +81,115 @@ class TestCreateEnvFile:
         ), "ANOTHER_VAR not found in .env file"
 
 
+@pytest.fixture
+def mock_tech_stack() -> dict[str, Any]:
+    """Provide a mock tech stack for testing."""
+    return {
+        "categories": [
+            {
+                "name": "Backend Framework",
+                "options": [
+                    {
+                        "name": "Django",
+                        "description": "Full-featured web framework",
+                        "recommended": True,
+                    },
+                    {
+                        "name": "Flask",
+                        "description": "Lightweight web framework",
+                        "recommended": False,
+                    },
+                ],
+            },
+            {
+                "name": "Database",
+                "options": [
+                    {
+                        "name": "PostgreSQL",
+                        "description": "Robust relational database",
+                        "recommended": True,
+                    },
+                ],
+            },
+        ]
+    }
+
+
+class TestGetProjectDependencies:
+    """Tests for the get_project_dependencies function."""
+
+    def test_get_project_dependencies_defaults(self) -> None:
+        """Test getting default dependencies without tech stack."""
+        # Execute
+        dependencies = get_project_dependencies(project_type="web")
+
+        # Assert
+        assert isinstance(dependencies, dict), "Result should be a dictionary"
+        assert "main" in dependencies, "'main' key not found in dependencies"
+        assert "dev" in dependencies, "'dev' key not found in dependencies"
+
+        # Check for specific dependencies
+        assert "flask" in dependencies["main"], "'flask' not found in main dependencies"
+        assert "pytest" in dependencies["dev"], "'pytest' not found in dev dependencies"
+        assert "black" in dependencies["dev"], "'black' not found in dev dependencies"
+
+    def test_get_project_dependencies_with_tech_stack(
+        self, mock_tech_stack: dict[str, Any]
+    ) -> None:
+        """Test getting dependencies with AI tech stack."""
+        # Execute
+        dependencies = get_project_dependencies(
+            project_type="web", tech_stack=mock_tech_stack
+        )
+
+        # Assert
+        assert isinstance(dependencies, dict), "Result should be a dictionary"
+
+        # Check for Django-specific dependencies (from tech stack)
+        assert (
+            "django" in dependencies["main"]
+        ), "'django' not found in main dependencies"
+        assert (
+            "django-environ" in dependencies["main"]
+        ), "'django-environ' not found in main dependencies"
+        assert (
+            "psycopg2-binary" in dependencies["main"]
+        ), "'psycopg2-binary' not found in main dependencies"
+
+        # Dev dependencies should still be present
+        assert "pytest" in dependencies["dev"], "'pytest' not found in dev dependencies"
+
+
+class TestExtractDependenciesFromTechStack:
+    """Tests for the _extract_dependencies_from_tech_stack function."""
+
+    def test_extract_dependencies_from_tech_stack(
+        self, mock_tech_stack: dict[str, Any]
+    ) -> None:
+        """Test extracting dependencies from tech stack."""
+        # Execute
+        dependencies = _extract_dependencies_from_tech_stack(mock_tech_stack)
+
+        # Assert
+        assert isinstance(dependencies, list), "Result should be a list"
+        assert len(dependencies) > 0, "No dependencies extracted"
+
+        # Check for specific dependencies
+        assert "django" in dependencies, "'django' not found in dependencies"
+        assert (
+            "psycopg2-binary" in dependencies
+        ), "'psycopg2-binary' not found in dependencies"
+
+    def test_extract_dependencies_empty_tech_stack(self) -> None:
+        """Test extracting dependencies from empty tech stack."""
+        # Execute
+        dependencies = _extract_dependencies_from_tech_stack({})
+
+        # Assert
+        assert isinstance(dependencies, list), "Result should be a list"
+        assert len(dependencies) == 0, "Empty tech stack should yield no dependencies"
+
+
 class TestGetProjectTypes:
     """Tests for the get_project_types function."""
 
@@ -89,12 +203,8 @@ class TestGetProjectTypes:
         assert len(project_types) > 0, "No project types found"
 
         # Check for specific project types
-        expected_types = ["basic", "web", "cli", "data", "ai"]
+        expected_types = ["web", "cli", "data", "ai"]
         for type_name in expected_types:
-            assert type_name in project_types, f"{type_name} not found in project types"
-            assert isinstance(
-                project_types[type_name], dict
-            ), f"{type_name} entry is not a dictionary"
             assert type_name in project_types, f"{type_name} not found in project types"
             assert isinstance(
                 project_types[type_name], dict

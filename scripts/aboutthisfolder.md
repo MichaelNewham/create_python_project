@@ -22,6 +22,8 @@ scripts/
 ├── fix_specific_lint_issues.py
 ├── force_push_to_remotes.sh
 ├── github_mcp_fix_summary.sh
+├── lint_all.py
+├── lint_src.py
 ├── manage_docs.sh
 ├── manage_logs.sh
 ├── mcp_config_summary.sh
@@ -56,12 +58,14 @@ scripts/
 - `commit_with_docs.sh`: Script to commit changes with documentation updates
 - `create_gitlab_branch.sh`: Script to create a new branch for GitLab when branch protection is enabled
 - `deepseek_commit_message.py`: !/usr/bin/env python3
-- `.doc_history`: ASCII text, with very long lines (782)
+- `.doc_history`: ASCII text, with very long lines (816)
 - `download_pexels_image.sh`: Script to download an image from Pexels using curl
 - `fix_lint_issues.sh`: Quick script to fix common linting issues in the codebase
 - `fix_specific_lint_issues.py`: !/usr/bin/env python
 - `force_push_to_remotes.sh`: This script bypasses pre-commit hooks and pushes to both GitHub and GitLab
 - `github_mcp_fix_summary.sh`: GitHub MCP Server Configuration Fix Summary
+- `lint_all.py`: !/usr/bin/env python3
+- `lint_src.py`: !/usr/bin/env python3
 - `manage_docs.sh`: Documentation management script
 - `manage_logs.sh`: Log management script with improved handling and documentation
 - `mcp_config_summary.sh`: Summary of MCP Configuration Changes - 2025-05-31
@@ -89,9 +93,9 @@ scripts/
 update_documentation.sh.bak
 update_perplexity_mcp.sh
 verify_security.sh
-Tue 03 Jun 2025 01:52:04 IST: ADDED: ai_commit_workflow.sh check_ai_services.sh check_gitlab_connection.sh check_perplexity_config.sh clean_run.py commit_with_docs_fix.sh commit_with_docs.sh create_gitlab_branch.sh deepseek_commit_message.py download_pexels_image.sh fix_lint_issues.sh fix_specific_lint_issues.py force_push_to_remotes.sh github_mcp_fix_summary.sh manage_docs.sh manage_logs.sh mcp_config_summary.sh pexels_instructions.sh post_commit_push.sh remove_large_file.sh remove_sensitive_file.sh run_app.sh run_mypy.sh run_perplexity_mcp.sh run_perplexity_mcp.sh.bak setup_doc_watcher.sh setup_env_template.sh sync_mcp_config.sh test_mcp test_new_file.sh truncate_md_files.sh update_documentation.sh update_documentation.sh.bak update_perplexity_mcp.sh verify_security.sh 
-Tue 03 Jun 2025 01:52:04 IST: REMOVED:                          01:03 01:40 03:59 07:49 10:04 12:47 16:44 2025: 2025: 2025: 2025: 2025: 2025: 2025: 2025: 2025: 20:32 20:43 21:58 25:14 25:17 26:36 27:14 28:57 29:01 32:45 36:18 39:59 40:37 43:09 45:04 45:06 49:48 53:12 59:41 FILES:ai_commit_workflow.sh IST IST IST IST IST IST IST IST IST IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
+Wed 04 Jun 2025 11:51:13 IST: ADDED: ai_commit_workflow.sh check_ai_services.sh check_gitlab_connection.sh check_perplexity_config.sh clean_run.py commit_with_docs_fix.sh commit_with_docs.sh create_gitlab_branch.sh deepseek_commit_message.py download_pexels_image.sh fix_lint_issues.sh fix_specific_lint_issues.py force_push_to_remotes.sh github_mcp_fix_summary.sh lint_all.py lint_src.py manage_docs.sh manage_logs.sh mcp_config_summary.sh pexels_instructions.sh post_commit_push.sh remove_large_file.sh remove_sensitive_file.sh run_app.sh run_mypy.sh run_perplexity_mcp.sh run_perplexity_mcp.sh.bak setup_doc_watcher.sh setup_env_template.sh sync_mcp_config.sh test_mcp test_new_file.sh truncate_md_files.sh update_documentation.sh update_documentation.sh.bak update_perplexity_mcp.sh verify_security.sh 
+Wed 04 Jun 2025 11:51:13 IST: REMOVED:                                    01:03 01:40 03:59 07:49 10:04 12:47 14:39 16:44 2025: 2025: 2025: 2025: 2025: 2025: 2025: 2025: 2025: 20:32 20:43 21:58 25:14 25:17 26:36 27:14 28:57 29:01 30:04 30:30 30:49 32:45 34:49 36:18 37:40 39:59 40:37 42:34 43:09 45:04 45:06 48:15 49:48 50:06 52:04 53:12 59:41 FILES:ai_commit_workflow.sh IST IST IST IST IST IST IST IST IST IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-06-03 01:52:03
+This documentation was automatically generated on: 2025-06-04 11:51:12

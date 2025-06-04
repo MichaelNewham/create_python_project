@@ -4,9 +4,11 @@ Configuration Module
 
 This module handles configuration for the Create Python Project application.
 It manages .env files, project-specific settings, and default configurations.
+Also provides dynamic dependency management based on AI recommendations.
 """
 
 import os
+from typing import Any
 
 
 def load_env_file(env_file: str = ".env") -> dict[str, str]:
@@ -110,6 +112,146 @@ def create_env_file(project_dir: str, variables: dict[str, str]) -> tuple[bool, 
 
     except Exception as e:
         return False, f"Failed to create .env file: {str(e)}"
+
+
+def get_project_dependencies(
+    project_type: str, tech_stack: dict[str, Any] | None = None
+) -> dict[str, list[str]]:
+    """
+    Get project dependencies based on project type and AI recommendations.
+
+    This function dynamically determines project dependencies by analyzing the
+    tech stack recommended by AI, falling back to defaults if no tech stack is provided.
+
+    Args:
+        project_type: The type of project (web, cli, data, etc.)
+        tech_stack: Optional dictionary containing AI-recommended technologies
+
+    Returns:
+        Dictionary containing main and development dependencies
+    """
+    # Initialize dependency structure
+    dependencies: dict[str, list[str]] = {
+        "main": [],
+        "dev": [
+            "pytest",
+            "pytest-cov",
+            "black",
+            "mypy",
+            "ruff",
+            "pre-commit",
+        ],
+    }
+
+    # Default dependencies by project type
+    default_dependencies: dict[str, list[str]] = {
+        "cli": ["click", "rich", "typer"],
+        "web": ["flask", "gunicorn", "requests"],
+        "api": ["fastapi", "uvicorn", "pydantic"],
+        "data": ["pandas", "matplotlib", "jupyter"],
+        "ai": ["scikit-learn", "tensorflow", "pandas"],
+        "gui": ["pyside6", "pyqt6"],
+        # Add other project types as needed
+    }
+
+    # Try to extract dependencies from tech stack if provided
+    if tech_stack and isinstance(tech_stack, dict):
+        extracted_deps = _extract_dependencies_from_tech_stack(tech_stack)
+        if extracted_deps:
+            dependencies["main"].extend(extracted_deps)
+        else:
+            # Fall back to defaults if tech stack didn't yield dependencies
+            if project_type in default_dependencies:
+                dependencies["main"].extend(default_dependencies[project_type])
+    else:
+        # Use defaults when no tech stack is provided
+        if project_type in default_dependencies:
+            dependencies["main"].extend(default_dependencies[project_type])
+
+    # Ensure list items are unique
+    dependencies["main"] = list(set(dependencies["main"]))
+    dependencies["dev"] = list(set(dependencies["dev"]))
+
+    return dependencies
+
+
+def _extract_dependencies_from_tech_stack(tech_stack: dict[str, Any]) -> list[str]:
+    """
+    Extract Python dependencies from the AI-recommended tech stack.
+
+    Args:
+        tech_stack: Dictionary containing AI technology recommendations
+
+    Returns:
+        List of Python package dependencies
+    """
+    dependencies: list[str] = []
+
+    # Check if we have the expected structure
+    if not isinstance(tech_stack, dict) or "categories" not in tech_stack:
+        return dependencies
+
+    # Map common technology names to Python packages
+    tech_to_package = {
+        # Web frameworks
+        "Flask": "flask",
+        "Django": "django",
+        "FastAPI": "fastapi",
+        # Databases
+        "PostgreSQL": "psycopg2-binary",
+        "MongoDB": "pymongo",
+        "SQLite": "sqlite3",  # Built-in, but added for completeness
+        "Redis": "redis",
+        # Authentication
+        "PyJWT": "pyjwt",
+        "OAuth": "authlib",
+        "Passlib": "passlib",
+        # Frontend
+        "React": "react",  # This would be via npm, but included for mapping
+        "Vue.js": "vue",  # This would be via npm, but included for mapping
+        # Data processing
+        "Pandas": "pandas",
+        "NumPy": "numpy",
+        "Matplotlib": "matplotlib",
+        "Jupyter": "jupyter",
+        # AI/ML
+        "TensorFlow": "tensorflow",
+        "PyTorch": "torch",
+        "Scikit-learn": "scikit-learn",
+        # CLI
+        "Click": "click",
+        "Typer": "typer",
+        "ArgParse": "argparse",  # Built-in, but added for completeness
+        # Utilities
+        "Requests": "requests",
+        "Beautiful Soup": "beautifulsoup4",
+        "Celery": "celery",
+    }
+
+    # Examine each category and extract recommended technologies
+    for category in tech_stack["categories"]:
+        if "options" not in category:
+            continue
+
+        for option in category["options"]:
+            # Check if this option is recommended
+            if option.get("recommended", False):
+                tech_name = option.get("name", "")
+
+                # Add the corresponding Python package if we have a mapping
+                if tech_name in tech_to_package:
+                    dependencies.append(tech_to_package[tech_name])
+
+                # Some technologies imply additional dependencies
+                if tech_name == "FastAPI":
+                    dependencies.append("uvicorn")
+                    dependencies.append("pydantic")
+                elif tech_name == "Django":
+                    dependencies.append("django-environ")
+                    dependencies.append("gunicorn")
+
+    # Return unique dependencies
+    return list(set(dependencies))
 
 
 def get_project_types() -> dict[str, dict[str, str]]:

@@ -197,23 +197,23 @@ def generate_commit_message():
         capture_output=True,
         text=True
     )
-
+    
     if not result.stdout:
         return "chore: update project files"
-
+    
     changes = result.stdout.strip().split("\\n")
-
+    
     # Analyze changes
     added = [f for f in changes if f.startswith("A")]
     modified = [f for f in changes if f.startswith("M")]
     deleted = [f for f in changes if f.startswith("D")]
-
+    
     # Generate message based on changes
     if len(changes) == 1:
         action, file = changes[0].split("\\t")
         action_word = {{"A": "add", "M": "update", "D": "remove"}}.get(action, "change")
         return f"{{action_word}}: {{file}}"
-
+    
     parts = []
     if added:
         parts.append(f"add {{len(added)}} file{'s' if len(added) > 1 else ''}")
@@ -221,7 +221,7 @@ def generate_commit_message():
         parts.append(f"update {{len(modified)}} file{'s' if len(modified) > 1 else ''}")
     if deleted:
         parts.append(f"remove {{len(deleted)}} file{'s' if len(deleted) > 1 else ''}")
-
+    
     return "feat: " + ", ".join(parts)
 
 
@@ -231,39 +231,39 @@ def main():
     if not Path(".git").exists():
         print("❌ Not in a git repository!")
         sys.exit(1)
-
+    
     # Stage all changes
     print("📦 Staging all changes...")
     subprocess.run(["git", "add", "."])
-
+    
     # Check if there are changes to commit
     result = subprocess.run(
         ["git", "diff", "--cached", "--quiet"],
         capture_output=True
     )
-
+    
     if result.returncode == 0:
         print("ℹ️  No changes to commit")
         sys.exit(0)
-
+    
     # Run checks
     if not run_pre_commit_checks():
         print("\\n💡 Fix the issues above and run again")
         sys.exit(1)
-
+    
     # Generate commit message
     message = generate_commit_message()
     print(f"\\n📝 Commit message: {{message}}")
-
+    
     # Allow user to edit message
     user_message = input("Press Enter to use this message or type a new one: ").strip()
     if user_message:
         message = user_message
-
+    
     # Commit
     subprocess.run(["git", "commit", "-m", message])
     print("\\n✅ Changes committed successfully!")
-
+    
     # Ask about pushing
     push = input("\\nPush to remote? [y/N]: ").lower().strip()
     if push == 'y':
@@ -496,7 +496,7 @@ skip_covered = false
 
 def _get_dynamic_project_dependencies(tech_stack: dict[Any, Any]) -> str:
     """Extract dependencies from AI-recommended tech stack."""
-    deps: list[str] = []
+    deps = []
 
     # Comprehensive technology to package mapping
     tech_to_packages = {
@@ -581,9 +581,7 @@ def _get_dynamic_project_dependencies(tech_stack: dict[Any, Any]) -> str:
     # Build dependency list
     for tech in recommended_techs:
         if tech in tech_to_packages:
-            tech_deps = tech_to_packages[tech]
-            if isinstance(tech_deps, list):
-                deps.extend(tech_deps)
+            deps.extend(tech_to_packages[tech])
 
     # Remove duplicates while preserving order
     seen = set()
@@ -940,7 +938,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    
     services:
       postgres:
         image: postgres:16
@@ -953,40 +951,40 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-
+    
     steps:
     - uses: actions/checkout@v4
-
+    
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-
+    
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
         version: latest
         virtualenvs-create: true
         virtualenvs-in-project: true
-
+    
     - name: Load cached dependencies
       uses: actions/cache@v4
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
+    
     - name: Install dependencies
       run: poetry install --no-interaction --no-root
-
+    
     - name: Run linting
       run: |
         poetry run black --check src/
         poetry run ruff check src/
         poetry run mypy src/
-
+    
     - name: Run tests
       run: poetry run pytest tests/ -v --cov=src --cov-report=xml
-
+    
     - name: Upload coverage
       uses: codecov/codecov-action@v4
       with:
@@ -1022,7 +1020,7 @@ def _extract_tech_choice(tech_stack: dict[Any, Any], category_name: str) -> str:
             if category.get("name") == category_name:
                 for option in category.get("options", []):
                     if option.get("recommended", False):
-                        return str(option["name"])
+                        return option["name"]
     return ""
 
 
@@ -1042,7 +1040,7 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
         )
 
         # Install dependencies
-        subprocess.run(
+        result = subprocess.run(
             ["poetry", "install"],
             cwd=project_dir,
             check=True,
@@ -1072,14 +1070,13 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
         )
 
         # Install Node dependencies for MCP servers
-        if os.path.exists(os.path.join(project_dir, "package.json")) and shutil.which(
-            "npm"
-        ):
-            subprocess.run(
-                ["npm", "install"],
-                cwd=project_dir,
-                capture_output=True,
-            )
+        if os.path.exists(os.path.join(project_dir, "package.json")):
+            if shutil.which("npm"):
+                subprocess.run(
+                    ["npm", "install"],
+                    cwd=project_dir,
+                    capture_output=True,
+                )
 
         return (
             True,

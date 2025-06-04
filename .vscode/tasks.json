@@ -2,6 +2,21 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Lint All",
+            "type": "shell",
+            "command": "poetry run python ${workspaceFolder}/scripts/lint_all.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "clear": true
+            }
+        },
+        {
             "label": "Commit Workflow",
             "type": "shell",
             "command": "${workspaceFolder}/scripts/ai_commit_workflow.sh",
@@ -43,10 +58,19 @@
             "problemMatcher": []
         },
         {
-            "label": "Format Code",
+            "label": "Format and Lint Code",
             "type": "shell",
-            "command": "poetry run black ${workspaceFolder}/src/create_python_project && poetry run ruff check --fix ${workspaceFolder}/src/create_python_project",
-            "problemMatcher": []
+            "command": "poetry run black ${workspaceFolder}/src/create_python_project && poetry run ruff check --fix ${workspaceFolder}/src/create_python_project && poetry run mypy --config-file=.config/mypy.ini src/create_python_project",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "clear": true
+            }
         },
         {
             "label": "Run Mypy (Daemon Mode)",

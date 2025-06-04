@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# type: ignore
 """
 Project Templates Manager - REFACTORED
 
@@ -18,24 +19,19 @@ class ProjectTemplateManager:
         self.project_name = project_name
         self.tech_stack = tech_stack
         self.package_name = project_name.replace("-", "_").replace(" ", "_").lower()
-
+        
         # Extract key technologies from AI recommendations
         self.backend_framework = self._extract_tech("Backend Framework")
         self.database = self._extract_tech("Database")
         self.frontend_framework = self._extract_tech("Frontend")
         self.auth_solution = self._extract_tech("Authentication")
         self.api_framework = self._extract_tech("API Layer")
-
+        
         # Extract AI analysis insights
         self.ai_analysis = tech_stack.get("analysis", [])
         self.needs_geo = any("geo" in item.lower() for item in self.ai_analysis)
-        self.needs_realtime = any(
-            "real-time" in item.lower() for item in self.ai_analysis
-        )
-        self.needs_auth = any(
-            "auth" in item.lower() or "oauth" in item.lower()
-            for item in self.ai_analysis
-        )
+        self.needs_realtime = any("real-time" in item.lower() for item in self.ai_analysis)
+        self.needs_auth = any("auth" in item.lower() or "oauth" in item.lower() for item in self.ai_analysis)
 
     def create_project_structure(self, project_type: str) -> bool:
         """Create complete project structure based on AI recommendations."""
@@ -64,7 +60,7 @@ class ProjectTemplateManager:
                 if category.get("name") == category_name:
                     for option in category.get("options", []):
                         if option.get("recommended", False):
-                            return str(option["name"])
+                            return option["name"]
         return ""
 
     def _create_django_project(self) -> bool:
@@ -94,33 +90,25 @@ class ProjectTemplateManager:
         # Settings files
         self._create_file(settings_dir, "__init__.py", "")
         self._create_file(settings_dir, "base.py", self._get_django_base_settings())
-        self._create_file(
-            settings_dir, "development.py", self._get_django_dev_settings()
-        )
-        self._create_file(
-            settings_dir, "production.py", self._get_django_prod_settings()
-        )
+        self._create_file(settings_dir, "development.py", self._get_django_dev_settings())
+        self._create_file(settings_dir, "production.py", self._get_django_prod_settings())
 
         # Create apps based on AI analysis
         apps_dir = os.path.join(backend_dir, "apps")
         os.makedirs(apps_dir, exist_ok=True)
-
+        
         # Always create core app
         self._create_django_app(apps_dir, "core", "Core functionality")
-
+        
         # Create apps based on project needs
         if self.needs_auth:
-            self._create_django_app(
-                apps_dir, "accounts", "User authentication and profiles"
-            )
-
+            self._create_django_app(apps_dir, "accounts", "User authentication and profiles")
+        
         if self.needs_geo:
             self._create_django_app(apps_dir, "geo", "Geospatial functionality")
-
+            
         if self.needs_realtime:
-            self._create_django_app(
-                apps_dir, "realtime", "WebSocket and real-time features"
-            )
+            self._create_django_app(apps_dir, "realtime", "WebSocket and real-time features")
 
         # Create frontend if specified
         if self.frontend_framework and "React" in self.frontend_framework:
@@ -148,17 +136,17 @@ class ProjectTemplateManager:
 
         # Create app package structure
         self._create_file(app_dir, "__init__.py", self._get_flask_init())
-
+        
         # Create blueprints based on needs
         blueprints_dir = os.path.join(app_dir, "blueprints")
         os.makedirs(blueprints_dir, exist_ok=True)
         self._create_file(blueprints_dir, "__init__.py", "")
-
+        
         if self.needs_auth:
             auth_dir = os.path.join(blueprints_dir, "auth")
             os.makedirs(auth_dir, exist_ok=True)
             self._create_flask_blueprint(auth_dir, "auth", "Authentication")
-
+        
         # Create models if database is specified
         if self.database:
             models_dir = os.path.join(app_dir, "models")
@@ -184,31 +172,27 @@ class ProjectTemplateManager:
         """Create FastAPI project structure."""
         # API structure in src
         api_dir = os.path.join(self.project_dir, "src", self.package_name)
-
+        
         # Create FastAPI app structure
         self._create_file(api_dir, "main.py", self._get_fastapi_main())
         self._create_file(api_dir, "config.py", self._get_fastapi_config())
-
+        
         # Create API directories
         for subdir in ["api", "core", "models", "schemas", "services"]:
             os.makedirs(os.path.join(api_dir, subdir), exist_ok=True)
             self._create_file(os.path.join(api_dir, subdir), "__init__.py", "")
-
+        
         # Create routers
         routers_dir = os.path.join(api_dir, "api", "v1")
         os.makedirs(routers_dir, exist_ok=True)
         self._create_file(routers_dir, "__init__.py", "")
-
+        
         if self.needs_auth:
             self._create_file(routers_dir, "auth.py", self._get_fastapi_auth_router())
-
+        
         # Database setup
         if self.database:
-            self._create_file(
-                os.path.join(api_dir, "core"),
-                "database.py",
-                self._get_fastapi_database(),
-            )
+            self._create_file(os.path.join(api_dir, "core"), "database.py", self._get_fastapi_database())
 
         return True
 
@@ -220,7 +204,7 @@ class ProjectTemplateManager:
 
         # Source code structure
         src_dir = os.path.join(self.project_dir, "src", self.package_name)
-
+        
         # Data science modules
         self._create_file(src_dir, "data.py", self._get_data_module())
         self._create_file(src_dir, "features.py", self._get_features_module())
@@ -228,9 +212,7 @@ class ProjectTemplateManager:
         self._create_file(src_dir, "visualization.py", self._get_visualization_module())
 
         # Create sample notebook
-        notebook_path = os.path.join(
-            self.project_dir, "notebooks", "01_exploration.ipynb"
-        )
+        notebook_path = os.path.join(self.project_dir, "notebooks", "01_exploration.ipynb")
         self._create_file("", notebook_path, self._get_sample_notebook())
 
         return True
@@ -250,18 +232,18 @@ class ProjectTemplateManager:
     def _create_basic_project(self) -> bool:
         """Create basic Python package structure."""
         src_dir = os.path.join(self.project_dir, "src", self.package_name)
-
+        
         # Basic module
         self._create_file(src_dir, "main.py", self._get_basic_main())
         self._create_file(src_dir, "utils.py", self._get_basic_utils())
-
+        
         return True
 
     def _create_django_app(self, apps_dir: str, app_name: str, description: str):
         """Create a Django app with full structure."""
         app_dir = os.path.join(apps_dir, app_name)
         os.makedirs(app_dir, exist_ok=True)
-
+        
         # Standard Django app files
         files = {
             "__init__.py": "",
@@ -270,24 +252,15 @@ class ProjectTemplateManager:
             "models.py": f'"""Models for {app_name}."""\n\nfrom django.db import models\n\n# Create your models here.\n',
             "views.py": f'"""Views for {app_name}."""\n\nfrom django.shortcuts import render\n\n# Create your views here.\n',
             "urls.py": f'"""URL configuration for {app_name}."""\n\nfrom django.urls import path\nfrom . import views\n\napp_name = "{app_name}"\nurlpatterns = [\n    # Add your URL patterns here\n]\n',
-            "serializers.py": (
-                f'"""Serializers for {app_name}."""\n\nfrom rest_framework import serializers\n\n# Create your serializers here.\n'
-                if self.api_framework
-                else ""
-            ),
+            "serializers.py": f'"""Serializers for {app_name}."""\n\nfrom rest_framework import serializers\n\n# Create your serializers here.\n' if self.api_framework else "",
         }
-
+        
         for filename, content in files.items():
             if content or filename == "__init__.py":  # Always create __init__.py
                 self._create_file(app_dir, filename, content)
-
+        
         # Create subdirectories
-        for subdir in [
-            "migrations",
-            "tests",
-            "templates/" + app_name,
-            "static/" + app_name,
-        ]:
+        for subdir in ["migrations", "tests", "templates/" + app_name, "static/" + app_name]:
             os.makedirs(os.path.join(app_dir, subdir), exist_ok=True)
             if "migrations" in subdir or "tests" in subdir:
                 self._create_file(os.path.join(app_dir, subdir), "__init__.py", "")
@@ -299,7 +272,7 @@ class ProjectTemplateManager:
             "routes.py": f'"""Routes for {name}."""\n\nfrom flask import render_template, request\nfrom . import bp\n\n@bp.route("/")\ndef index():\n    return render_template("{name}/index.html")\n',
             "forms.py": f'"""Forms for {name}."""\n\nfrom flask_wtf import FlaskForm\nfrom wtforms import StringField, PasswordField, SubmitField\nfrom wtforms.validators import DataRequired\n',
         }
-
+        
         for filename, content in files.items():
             self._create_file(blueprint_dir, filename, content)
 
@@ -312,14 +285,12 @@ class ProjectTemplateManager:
         uses_typescript = "TypeScript" in self.frontend_framework
 
         # Create package.json
-        self._create_file(
-            frontend_dir, "package.json", self._get_react_package_json(uses_typescript)
-        )
+        self._create_file(frontend_dir, "package.json", self._get_react_package_json(uses_typescript))
 
         # Create source structure
         src_dir = os.path.join(frontend_dir, "src")
         os.makedirs(src_dir, exist_ok=True)
-
+        
         # Create component directories
         for subdir in ["components", "pages", "services", "utils", "styles"]:
             os.makedirs(os.path.join(src_dir, subdir), exist_ok=True)
@@ -333,16 +304,14 @@ class ProjectTemplateManager:
         # Create API service
         service_ext = "ts" if uses_typescript else "js"
         self._create_file(
-            os.path.join(src_dir, "services"),
-            f"api.{service_ext}",
-            self._get_react_api_service(uses_typescript),
+            os.path.join(src_dir, "services"), 
+            f"api.{service_ext}", 
+            self._get_react_api_service(uses_typescript)
         )
 
         # TypeScript configuration
         if uses_typescript:
-            self._create_file(
-                frontend_dir, "tsconfig.json", self._get_typescript_config()
-            )
+            self._create_file(frontend_dir, "tsconfig.json", self._get_typescript_config())
 
         # Vite configuration
         self._create_file(frontend_dir, "vite.config.ts", self._get_vite_config())
@@ -355,20 +324,23 @@ class ProjectTemplateManager:
         """Create HTMX-based templates for server-side rendering."""
         templates_dir = os.path.join(backend_dir, "templates")
         os.makedirs(templates_dir, exist_ok=True)
-
+        
         # Base template
         self._create_file(templates_dir, "base.html", self._get_htmx_base_template())
-
+        
         # Index template
         self._create_file(templates_dir, "index.html", self._get_htmx_index_template())
 
     def _create_file(self, directory: str, filename: str, content: str):
         """Create a file with the given content."""
-        filepath = os.path.join(directory, filename) if directory else filename
-
+        if directory:
+            filepath = os.path.join(directory, filename)
+        else:
+            filepath = filename
+            
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-
+        
         with open(filepath, "w", encoding="utf-8") as file:
             file.write(content)
 
@@ -398,49 +370,51 @@ if __name__ == '__main__':
             "SECRET_KEY=your-secret-key-here",
             "DEBUG=True",
             "ALLOWED_HOSTS=localhost,127.0.0.1",
-            "",
+            ""
         ]
-
+        
         # Database configuration based on AI recommendation
         if self.database == "PostgreSQL":
-            env_lines.extend(
-                [
-                    "# Database",
-                    "DATABASE_URL=postgresql://user:password@localhost:5432/dbname",
-                    "POSTGRES_DB=dbname",
-                    "POSTGRES_USER=user",
-                    "POSTGRES_PASSWORD=password",
-                    "",
-                ]
-            )
+            env_lines.extend([
+                "# Database",
+                "DATABASE_URL=postgresql://user:password@localhost:5432/dbname",
+                "POSTGRES_DB=dbname",
+                "POSTGRES_USER=user",
+                "POSTGRES_PASSWORD=password",
+                ""
+            ])
         elif self.database == "MongoDB":
-            env_lines.extend(
-                ["# Database", "MONGODB_URI=mongodb://localhost:27017/dbname", ""]
-            )
+            env_lines.extend([
+                "# Database",
+                "MONGODB_URI=mongodb://localhost:27017/dbname",
+                ""
+            ])
         else:  # SQLite or default
-            env_lines.extend(["# Database", "DATABASE_URL=sqlite:///db.sqlite3", ""])
-
+            env_lines.extend([
+                "# Database",
+                "DATABASE_URL=sqlite:///db.sqlite3",
+                ""
+            ])
+        
         # Add auth-specific variables if needed
         if self.needs_auth and "OAuth" in self.auth_solution:
-            env_lines.extend(
-                [
-                    "# OAuth",
-                    "GOOGLE_CLIENT_ID=your-google-client-id",
-                    "GOOGLE_CLIENT_SECRET=your-google-client-secret",
-                    "",
-                ]
-            )
-
+            env_lines.extend([
+                "# OAuth",
+                "GOOGLE_CLIENT_ID=your-google-client-id",
+                "GOOGLE_CLIENT_SECRET=your-google-client-secret",
+                ""
+            ])
+        
         return "\n".join(env_lines)
 
     def _get_django_urls(self) -> str:
         includes = ['path("admin/", admin.site.urls),']
-
+        
         if self.api_framework == "Django REST Framework":
             includes.append('path("api/v1/", include("apps.core.urls")),')
-
+        
         includes_str = "\n    ".join(includes)
-
+        
         return f'''"""
 URL configuration for {self.package_name} project.
 """
@@ -480,44 +454,36 @@ application = get_asgi_application()
             "'django.contrib.messages',",
             "'django.contrib.staticfiles',",
         ]
-
+        
         third_party_apps = []
-
+        
         if self.needs_geo:
             django_apps.insert(-1, "'django.contrib.gis',")
             third_party_apps.append("'leaflet',")
             third_party_apps.append("'djgeojson',")
-
+        
         if self.auth_solution == "Django-Allauth":
             django_apps.append("'django.contrib.sites',")
-            third_party_apps.extend(
-                [
-                    "'allauth',",
-                    "'allauth.account',",
-                    "'allauth.socialaccount',",
-                ]
-            )
-
+            third_party_apps.extend([
+                "'allauth',",
+                "'allauth.account',",
+                "'allauth.socialaccount',",
+            ])
+        
         if self.api_framework == "Django REST Framework":
-            third_party_apps.extend(
-                [
-                    "'rest_framework',",
-                    "'corsheaders',",
-                ]
-            )
-
+            third_party_apps.extend([
+                "'rest_framework',",
+                "'corsheaders',",
+            ])
+        
         # Database engine selection
         if self.database == "PostgreSQL":
-            db_engine = (
-                "django.contrib.gis.db.backends.postgis"
-                if self.needs_geo
-                else "django.db.backends.postgresql"
-            )
+            db_engine = "django.contrib.gis.db.backends.postgis" if self.needs_geo else "django.db.backends.postgresql"
         elif self.database == "MongoDB":
             db_engine = "djongo"
         else:
             db_engine = "django.db.backends.sqlite3"
-
+        
         return f'''"""Base settings for {self.package_name} project."""
 import os
 from pathlib import Path
@@ -620,10 +586,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     def _get_additional_django_settings(self) -> str:
         """Get additional settings based on tech stack."""
         settings = []
-
+        
         if self.auth_solution == "Django-Allauth":
-            settings.append(
-                """
+            settings.append("""
 # Authentication
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -635,12 +600,10 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-"""
-            )
-
+""")
+        
         if self.api_framework == "Django REST Framework":
-            settings.append(
-                """
+            settings.append("""
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -656,21 +619,18 @@ REST_FRAMEWORK = {
 
 # CORS
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:3000'])
-"""
-            )
-
+""")
+        
         if "Celery" in str(self.tech_stack):
-            settings.append(
-                """
+            settings.append("""
 # Celery Configuration
 CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-"""
-            )
-
+""")
+        
         return "\n".join(settings)
 
     def _get_django_dev_settings(self) -> str:
@@ -714,41 +674,41 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 from flask import Flask
 from flask_cors import CORS
-{'from flask_login import LoginManager' if self.auth_solution == 'Flask-Login' else ''}
-{'from flask_sqlalchemy import SQLAlchemy' if self.database else ''}
-{'from flask_socketio import SocketIO' if self.needs_realtime else ''}
+{f'from flask_login import LoginManager' if self.auth_solution == 'Flask-Login' else ''}
+{f'from flask_sqlalchemy import SQLAlchemy' if self.database else ''}
+{f'from flask_socketio import SocketIO' if self.needs_realtime else ''}
 
 from config import Config
 
-{'db = SQLAlchemy()' if self.database else ''}
-{'login_manager = LoginManager()' if self.auth_solution == 'Flask-Login' else ''}
-{'socketio = SocketIO()' if self.needs_realtime else ''}
+{f'db = SQLAlchemy()' if self.database else ''}
+{f'login_manager = LoginManager()' if self.auth_solution == 'Flask-Login' else ''}
+{f'socketio = SocketIO()' if self.needs_realtime else ''}
 
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
     app = Flask(__name__)
     app.config.from_object(config_class)
-
+    
     # Initialize extensions
     CORS(app)
-    {'db.init_app(app)' if self.database else ''}
-    {'login_manager.init_app(app)' if self.auth_solution == 'Flask-Login' else ''}
-    {'socketio.init_app(app, cors_allowed_origins="*")' if self.needs_realtime else ''}
-
+    {f'db.init_app(app)' if self.database else ''}
+    {f'login_manager.init_app(app)' if self.auth_solution == 'Flask-Login' else ''}
+    {f'socketio.init_app(app, cors_allowed_origins="*")' if self.needs_realtime else ''}
+    
     # Register blueprints
     from {self.package_name}.blueprints.main import bp as main_bp
     app.register_blueprint(main_bp)
-
+    
     {f'from {self.package_name}.blueprints.auth import bp as auth_bp' if self.needs_auth else ''}
-    {'app.register_blueprint(auth_bp, url_prefix="/auth")' if self.needs_auth else ''}
-
+    {f'app.register_blueprint(auth_bp, url_prefix="/auth")' if self.needs_auth else ''}
+    
     return app
 
 
 if __name__ == "__main__":
     app = create_app()
-    {'socketio.run(app, debug=True)' if self.needs_realtime else 'app.run(debug=True)'}
+    {f'socketio.run(app, debug=True)' if self.needs_realtime else 'app.run(debug=True)'}
 '''
 
     def _get_flask_config(self) -> str:
@@ -760,17 +720,17 @@ from datetime import timedelta
 class Config:
     """Base configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key'
-
-    {'# Database' if self.database else ''}
-    {'SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///app.db"' if self.database else ''}
-    {'SQLALCHEMY_TRACK_MODIFICATIONS = False' if self.database else ''}
-
+    
+    {f'# Database' if self.database else ''}
+    {f'SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///app.db"' if self.database else ''}
+    {f'SQLALCHEMY_TRACK_MODIFICATIONS = False' if self.database else ''}
+    
     # Session
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
-
-    {'# Authentication' if self.needs_auth else ''}
-    {'LOGIN_URL = "auth.login"' if self.needs_auth else ''}
-    {'LOGIN_MESSAGE = "Please log in to access this page."' if self.needs_auth else ''}
+    
+    {f'# Authentication' if self.needs_auth else ''}
+    {f'LOGIN_URL = "auth.login"' if self.needs_auth else ''}
+    {f'LOGIN_MESSAGE = "Please log in to access this page."' if self.needs_auth else ''}
 
 
 class DevelopmentConfig(Config):
@@ -799,11 +759,11 @@ DATABASE_URL=sqlite:///app.db
         return f'''"""Flask application package."""
 
 from flask import Flask
-{'from flask_sqlalchemy import SQLAlchemy' if self.database else ''}
-{'from flask_login import LoginManager' if self.auth_solution == 'Flask-Login' else ''}
+{f'from flask_sqlalchemy import SQLAlchemy' if self.database else ''}
+{f'from flask_login import LoginManager' if self.auth_solution == 'Flask-Login' else ''}
 
-{'db = SQLAlchemy()' if self.database else ''}
-{'login_manager = LoginManager()' if self.auth_solution == 'Flask-Login' else ''}
+{f'db = SQLAlchemy()' if self.database else ''}
+{f'login_manager = LoginManager()' if self.auth_solution == 'Flask-Login' else ''}
 '''
 
     def _get_flask_models_base(self) -> str:
@@ -818,35 +778,35 @@ db = SQLAlchemy()
 class BaseModel(db.Model):
     """Base model with common fields."""
     __abstract__ = True
-
+    
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 '''
 
-    def _get_fastapi_main(self) -> str:  # type: ignore
+    def _get_fastapi_main(self) -> str:
         return f'''"""Main FastAPI application."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-{'from contextlib import asynccontextmanager' if self.database else ''}
+{f'from contextlib import asynccontextmanager' if self.database else ''}
 
 from .config import settings
-{'from .core.database import init_db' if self.database else ''}
+{f'from .core.database import init_db' if self.database else ''}
 from .api.v1 import router as api_v1_router
 
 
-{'@asynccontextmanager' if self.database else ''}
-{'async def lifespan(app: FastAPI):' if self.database else ''}
-{'    # Initialize database' if self.database else ''}
-{'    await init_db()' if self.database else ''}
-{'    yield' if self.database else ''}
+{f'@asynccontextmanager' if self.database else ''}
+{f'async def lifespan(app: FastAPI):' if self.database else ''}
+{f'    # Initialize database' if self.database else ''}
+{f'    await init_db()' if self.database else ''}
+{f'    yield' if self.database else ''}
 
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.VERSION,
-    {'lifespan=lifespan' if self.database else ''}
+    {f'lifespan=lifespan' if self.database else ''}
 )
 
 # CORS middleware
@@ -863,8 +823,8 @@ app.include_router(api_v1_router, prefix="/api/v1")
 
 
 @app.get("/")
-def read_root():  # type: ignore
-    return {"message": f"Welcome to {settings.APP_NAME}"}
+def read_root():
+    return {{"message": f"Welcome to {{settings.APP_NAME}}"}}
 
 
 @app.get("/health")
@@ -884,18 +844,18 @@ class Settings(BaseSettings):
     APP_NAME: str = "FastAPI App"
     VERSION: str = "0.1.0"
     API_V1_STR: str = "/api/v1"
-
+    
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
-
+    
     # Database
     DATABASE_URL: str = "sqlite:///./app.db"
-
+    
     # Security
     SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
+    
     class Config:
         env_file = ".env"
 
@@ -969,7 +929,7 @@ async def login(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    
     access_token = create_access_token(
         data={"sub": user.username}
     )
@@ -977,7 +937,7 @@ async def login(
 '''
 
     def _get_data_module(self) -> str:
-        return '''"""Data loading and processing module."""
+        return f'''"""Data loading and processing module."""
 
 import pandas as pd
 from pathlib import Path
@@ -990,7 +950,7 @@ def load_data(
 ) -> pd.DataFrame:
     """Load data from various file formats."""
     filepath = Path(filepath)
-
+    
     if filepath.suffix == '.csv':
         return pd.read_csv(filepath, **kwargs)
     elif filepath.suffix in ['.xlsx', '.xls']:
@@ -1000,7 +960,7 @@ def load_data(
     elif filepath.suffix == '.parquet':
         return pd.read_parquet(filepath, **kwargs)
     else:
-        raise ValueError(f"Unsupported file format: {filepath.suffix}")
+        raise ValueError(f"Unsupported file format: {{filepath.suffix}}")
 
 
 def save_data(
@@ -1010,7 +970,7 @@ def save_data(
 ) -> None:
     """Save DataFrame to file."""
     filepath = Path(filepath)
-
+    
     if filepath.suffix == '.csv':
         df.to_csv(filepath, index=False, **kwargs)
     elif filepath.suffix in ['.xlsx', '.xls']:
@@ -1020,7 +980,7 @@ def save_data(
     elif filepath.suffix == '.parquet':
         df.to_parquet(filepath, **kwargs)
     else:
-        raise ValueError(f"Unsupported file format: {filepath.suffix}")
+        raise ValueError(f"Unsupported file format: {{filepath.suffix}}")
 '''
 
     def _get_features_module(self) -> str:
@@ -1045,13 +1005,13 @@ def select_features(
     """Select top features based on correlation with target."""
     # Calculate correlations
     correlations = df.corr()[target_col].abs()
-
+    
     # Remove target from features
     correlations = correlations.drop(target_col)
-
+    
     # Select top n features
     top_features = correlations.nlargest(n_features).index.tolist()
-
+    
     return top_features
 '''
 
@@ -1062,7 +1022,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
 import joblib
 from pathlib import Path
-from typing import Any, Tuple, Union
+from typing import Any, Tuple
 
 
 def train_model(
@@ -1076,19 +1036,19 @@ def train_model(
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state
     )
-
+    
     # Train model
     model.fit(X_train, y_train)
-
+    
     # Make predictions
     y_pred = model.predict(X_test)
-
+    
     # Calculate metrics
     metrics = {
         "train_score": model.score(X_train, y_train),
         "test_score": model.score(X_test, y_test),
     }
-
+    
     return model, metrics
 
 
@@ -1110,7 +1070,6 @@ def load_model(filepath: Union[str, Path]) -> Any:
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import numpy as np
 from typing import Optional, Tuple
 
 
@@ -1127,22 +1086,22 @@ def plot_distribution(
 ) -> None:
     """Plot distribution of a variable."""
     setup_plot_style()
-
+    
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
-
+    
     # Histogram
     data.hist(ax=ax1, bins=30, edgecolor='black')
     ax1.set_title('Histogram')
     ax1.set_xlabel(data.name)
     ax1.set_ylabel('Frequency')
-
+    
     # Box plot
     data.plot(kind='box', ax=ax2)
     ax2.set_title('Box Plot')
-
+    
     if title:
         fig.suptitle(title, fontsize=16)
-
+    
     plt.tight_layout()
     plt.show()
 
@@ -1153,12 +1112,12 @@ def plot_correlation_matrix(
 ) -> None:
     """Plot correlation matrix heatmap."""
     setup_plot_style()
-
+    
     plt.figure(figsize=figsize)
-
+    
     # Calculate correlation matrix
     corr = df.select_dtypes(include=[np.number]).corr()
-
+    
     # Create heatmap
     sns.heatmap(
         corr,
@@ -1169,15 +1128,14 @@ def plot_correlation_matrix(
         square=True,
         linewidths=0.5
     )
-
+    
     plt.title('Correlation Matrix', fontsize=16)
     plt.tight_layout()
     plt.show()
 '''
 
     def _get_sample_notebook(self) -> str:
-        return (
-            """{
+        return '''{
  "cells": [
   {
    "cell_type": "markdown",
@@ -1204,12 +1162,8 @@ def plot_correlation_matrix(
     "import sys\\n",
     "sys.path.append('../src')\\n",
     "\\n",
-    "from """
-            + self.package_name
-            + """.data import load_data\\n",
-    "from """
-            + self.package_name
-            + """.visualization import setup_plot_style, plot_distribution\\n",
+    "from ''' + self.package_name + '''.data import load_data\\n",
+    "from ''' + self.package_name + '''.visualization import setup_plot_style, plot_distribution\\n",
     "\\n",
     "# Set up plotting\\n",
     "setup_plot_style()\\n",
@@ -1248,11 +1202,10 @@ def plot_correlation_matrix(
  },
  "nbformat": 4,
  "nbformat_minor": 4
-}"""
-        )
+}'''
 
     def _get_cli_main(self) -> str:
-        return '''"""Main entry point for CLI application."""
+        return f'''"""Main entry point for CLI application."""
 
 from .cli import cli
 
@@ -1274,7 +1227,7 @@ from .utils import setup_logging
 def cli(ctx, debug):
     """
     {self.project_name} - Command Line Interface
-
+    
     Use --help with any command for more information.
     """
     ctx.ensure_object(dict)
@@ -1322,13 +1275,13 @@ def version():
 def config(show, set):
     """Manage configuration."""
     config_file = Path.home() / f'.{self.package_name}' / 'config.json'
-
+    
     if show:
         if config_file.exists():
             click.echo(config_file.read_text())
         else:
             click.echo("No configuration found.")
-
+    
     elif set:
         key, value = set
         # Implementation for setting config
@@ -1346,7 +1299,7 @@ from pathlib import Path
 def setup_logging(debug: bool = False):
     """Set up logging configuration."""
     level = logging.DEBUG if debug else logging.INFO
-
+    
     logging.basicConfig(
         level=level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -1372,7 +1325,7 @@ def confirm_action(message: str) -> bool:
 
 def main():
     """Main entry point."""
-    print(f"Hello from {self.project_name}!")
+    print(f"Hello from {{self.project_name}}!")
 
 
 if __name__ == "__main__":
@@ -1395,32 +1348,23 @@ def load_config(config_path: Path) -> Dict[str, Any]:
 def setup_directories(base_path: Path) -> None:
     """Set up project directories."""
     directories = ['data', 'logs', 'output']
-
+    
     for dir_name in directories:
         (base_path / dir_name).mkdir(exist_ok=True, parents=True)
 '''
 
     def _get_react_package_json(self, uses_typescript: bool) -> str:
-        # Build package.json content parts to avoid f-string nesting issues
-        build_script = "tsc && vite build" if uses_typescript else "vite build"
-        lint_extensions = "ts,tsx" if uses_typescript else "js,jsx"
-
-        # Conditionally include TypeScript-specific dependencies
-        types_react = '"@types/react": "^18.3.3",' if uses_typescript else ""
-        types_react_dom = '"@types/react-dom": "^18.3.0",' if uses_typescript else ""
-        typescript_dep = '"typescript": "^5.5.3",' if uses_typescript else ""
-
-        return f"""{{
+        return f'''{{{
   "name": "{self.project_name}-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {{
     "dev": "vite",
-    "build": "{build_script}",
+    "build": "BUILD_COMMAND",
     "preview": "vite preview",
     "test": "vitest",
-    "lint": "eslint src --ext {lint_extensions}"
+    "lint": "eslint src --ext LINT_EXTENSIONS"
   }},
   "dependencies": {{
     "react": "^18.3.1",
@@ -1429,25 +1373,24 @@ def setup_directories(base_path: Path) -> None:
     "react-router-dom": "^6.23.1"
   }},
   "devDependencies": {{
-    {types_react}
-    {types_react_dom}
+    TS_TYPES_REACT
+    TS_TYPES_REACT_DOM
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.2",
-    {typescript_dep}
+    TS_TYPESCRIPT
     "vite": "^5.3.1",
     "vitest": "^1.6.0"
   }}
-}}"""
+}}'''
 
     def _get_react_app(self, uses_typescript: bool) -> str:
         lang = "TypeScript" if uses_typescript else "JavaScript"
-        type_annotation = ": React.FC" if uses_typescript else ""
-        return f"""import React from 'react';
+        return f'''import React from 'react';
 import './App.css';
 
-function App{type_annotation} {{
+function App(){f': React.FC' if uses_typescript else ''} {{
   return (
     <div className="App">
       <header className="App-header">
@@ -1459,25 +1402,23 @@ function App{type_annotation} {{
 }}
 
 export default App;
-"""
+'''
 
     def _get_react_main(self, uses_typescript: bool) -> str:
-        file_ext = ".tsx" if uses_typescript else ".jsx"
-        type_cast = " as HTMLElement" if uses_typescript else ""
-        return f"""import React from 'react';
+        return f'''import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App{file_ext}';
+import App from './App{f'.tsx' if uses_typescript else '.jsx'}';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root'){type_cast}).render(
+ReactDOM.createRoot(document.getElementById('root'){f' as HTMLElement' if uses_typescript else ''}).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
-"""
+'''
 
     def _get_react_css(self) -> str:
-        return """/* Global styles */
+        return '''/* Global styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -1509,10 +1450,10 @@ body {
   font-size: calc(10px + 2vmin);
   color: white;
 }
-"""
+'''
 
     def _get_react_api_service(self, uses_typescript: bool) -> str:
-        return f"""import axios from 'axios';
+        return f'''import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -1525,22 +1466,22 @@ const api = axios.create({{
 
 // Request interceptor for auth
 api.interceptors.request.use(
-  (config{': any' if uses_typescript else ''}) => {{
+  (config{f': any' if uses_typescript else ''}) => {{
     const token = localStorage.getItem('access_token');
     if (token) {{
       config.headers.Authorization = `Bearer ${{token}}`;
     }}
     return config;
   }},
-  (error{': any' if uses_typescript else ''}) => {{
+  (error{f': any' if uses_typescript else ''}) => {{
     return Promise.reject(error);
   }}
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response{': any' if uses_typescript else ''}) => response,
-  (error{': any' if uses_typescript else ''}) => {{
+  (response{f': any' if uses_typescript else ''}) => response,
+  (error{f': any' if uses_typescript else ''}) => {{
     if (error.response?.status === 401) {{
       // Handle unauthorized
       localStorage.removeItem('access_token');
@@ -1551,10 +1492,10 @@ api.interceptors.response.use(
 );
 
 export default api;
-"""
+'''
 
     def _get_typescript_config(self) -> str:
-        return """{
+        return '''{
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
@@ -1574,19 +1515,19 @@ export default api;
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
-}"""
+}'''
 
     def _get_vite_config(self) -> str:
         proxy_config = ""
         if self.backend_framework:
             port = "8000" if self.backend_framework in ["Django", "FastAPI"] else "5000"
-            proxy_config = f"""
+            proxy_config = f'''
       '/api': {{
         target: 'http://localhost:{port}',
         changeOrigin: true,
-      }},"""
-
-        return f"""import {{ defineConfig }} from 'vite';
+      }},'''
+        
+        return f'''import {{ defineConfig }} from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({{
@@ -1597,25 +1538,25 @@ export default defineConfig({{
     }},
   }},
 }});
-"""
+'''
 
     def _get_htmx_base_template(self) -> str:
-        return f"""<!DOCTYPE html>
+        return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{% block title %}}{self.project_name}{{% endblock %}}</title>
-
+    
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-
+    
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    
     <!-- CSS -->
     <link rel="stylesheet" href="{{{{ url_for('static', filename='css/style.css') }}}}">
-
+    
     {{% block head %}}{{% endblock %}}
 </head>
 <body>
@@ -1633,7 +1574,7 @@ export default defineConfig({{
             </div>
         </div>
     </nav>
-
+    
     <main>
         {{% with messages = get_flashed_messages(with_categories=true) %}}
             {{% if messages %}}
@@ -1644,23 +1585,23 @@ export default defineConfig({{
                 </div>
             {{% endif %}}
         {{% endwith %}}
-
+        
         {{% block content %}}{{% endblock %}}
     </main>
-
+    
     <footer>
         <div class="container">
             <p>&copy; 2024 {self.project_name}. All rights reserved.</p>
         </div>
     </footer>
-
+    
     {{% block scripts %}}{{% endblock %}}
 </body>
 </html>
-"""
+'''
 
     def _get_htmx_index_template(self) -> str:
-        return f"""{{% extends "base.html" %}}
+        return f'''{{% extends "base.html" %}}
 
 {{% block title %}}Home - {self.project_name}{{% endblock %}}
 
@@ -1669,23 +1610,23 @@ export default defineConfig({{
     <section class="hero">
         <h1>Welcome to {self.project_name}</h1>
         <p>Built with Flask + HTMX + Alpine.js</p>
-
+        
         <div x-data="{{ count: 0 }}">
             <button @click="count++" class="btn btn-primary">
                 Clicked <span x-text="count"></span> times
             </button>
         </div>
     </section>
-
+    
     <section id="dynamic-content" hx-get="/api/data" hx-trigger="load">
         <p>Loading dynamic content...</p>
     </section>
 </div>
 {{% endblock %}}
-"""
+'''
 
     def _get_django_apps_py(self, app_name: str) -> str:
-        class_name = "".join(word.capitalize() for word in app_name.split("_"))
+        class_name = ''.join(word.capitalize() for word in app_name.split('_'))
         return f'''"""Django app configuration for {app_name}."""
 
 from django.apps import AppConfig
