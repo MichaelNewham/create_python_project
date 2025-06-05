@@ -1,23 +1,31 @@
 <!-- filepath: /home/michaelnewham/Projects/create_python_project/.config/aboutthisfolder.md -->
 # .config Folder
 
-Configuration files for the Create Python Project.
+Development tool configurations
 
 ## Purpose
 
-Contains configuration files for linters, formatters, and other development tools.
+Contains configuration files for linters, formatters, type checkers, and other development tools.
 
-## Structure
+## Overview
 
-```
-.config/
-├── mypy.ini
-├── pylintrc
-├── ruff.toml
-└── systemd
-    └── user
-```
+This folder contains:
+
+- **Documentation** (1 files) with guides and references
+- **Configuration** (2 files) for tools and settings
+- **Subdirectories** (1 folders) for organized content
+
+## Files and Directories
+
+- **`mypy.ini`** - Project file
+- **`.post-commit-config.yaml`** - YAML configuration file
+- **`.pre-commit-config.yaml.no-docs`** - Project file
+- **`ruff.toml`** - TOML configuration file
+- **`systemd/`** - Directory containing 2 items
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-05-31 00:22:25
+This documentation was automatically generated on: 2025-06-05 14:43:20
+
+---
+*This file is auto-generated. Do not edit manually - changes will be overwritten.*

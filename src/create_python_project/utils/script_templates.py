@@ -352,7 +352,7 @@ def clear_terminal():
 
 def main():
     """Main execution function."""
-    print("🚀 Starting {package_name}...")
+    print(f"🚀 Starting {{package_name}}...")
     print("=" * 50)
 
     try:
@@ -361,13 +361,13 @@ def main():
 
         # Try to import and run the main module
         try:
-            from {package_name} import main as app_main
+            from {{package_name}} import main as app_main
             app_main()
         except ImportError:
             # Fallback: try to run as module
             import subprocess
             result = subprocess.run([
-                sys.executable, "-m", "{package_name}"
+                sys.executable, "-m", "{{package_name}}"
             ], cwd=Path(__file__).parent.parent)
             sys.exit(result.returncode)
 
@@ -375,7 +375,7 @@ def main():
         print("\\n\\n⏹️  Application stopped by user")
         sys.exit(0)
     except Exception as e:
-        print(f"\\n❌ Error running application: {{e}}")
+        print(f"\\n❌ Error running application: {{{{e}}}}")
         print("\\n🔧 Troubleshooting:")
         print("  - Check that all dependencies are installed: poetry install")
         print("  - Ensure you're in the correct directory")
@@ -457,7 +457,7 @@ def deploy_to_staging():
 
 def main():
     """Main deployment function."""
-    parser = argparse.ArgumentParser(description="Deploy {package_name}")
+    parser = argparse.ArgumentParser(description=f"Deploy {{package_name}}")
     parser.add_argument(
         "environment",
         choices=["staging", "production"],
@@ -557,9 +557,9 @@ def clean_cache():
                     Path(cache_dir).unlink()
                 else:
                     shutil.rmtree(cache_dir)
-                print(f"  ✅ Cleaned {{cache_dir}}")
+                print(f"  ✅ Cleaned {{{{cache_dir}}}}")
             except Exception as e:
-                print(f"  ❌ Failed to clean {{cache_dir}}: {{e}}")
+                print(f"  ❌ Failed to clean {{{{cache_dir}}}}: {{{{e}}}}")
 
 
 def clean_logs():
@@ -579,9 +579,9 @@ def clean_logs():
             file_time = datetime.fromtimestamp(log_file.stat().st_mtime)
             if file_time < cutoff_date:
                 log_file.unlink()
-                print(f"  ✅ Removed old log file: {{log_file.name}}")
+                print(f"  ✅ Removed old log file: {{{{log_file.name}}}}")
         except Exception as e:
-            print(f"  ❌ Failed to remove {{log_file.name}}: {{e}}")
+            print(f"  ❌ Failed to remove {{{{log_file.name}}}}: {{{{e}}}}")
 
 
 def generate_project_report():
@@ -589,7 +589,7 @@ def generate_project_report():
     print("📊 Generating project report...")
 
     report_lines = [
-        f"# Project Report - {{datetime.now().strftime('%Y-%m-%d %H:%M')}}",
+        f"# Project Report - {{{{datetime.now().strftime('%Y-%m-%d %H:%M')}}}}",
         "",
         "## Dependencies Status"
     ]
@@ -618,7 +618,7 @@ def generate_project_report():
     with open(report_file, "w") as f:
         f.write("\\n".join(report_lines))
 
-    print(f"✅ Report generated: {{report_file}}")
+    print(f"✅ Report generated: {{{{report_file}}}}")
 
 
 def main():

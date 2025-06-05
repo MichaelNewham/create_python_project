@@ -9,7 +9,7 @@ It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.
 import importlib.util
 import logging
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import requests
 from rich.console import Console
@@ -79,10 +79,12 @@ class OpenAIProvider(AIProvider):
 
     def _get_display_name(self) -> str:
         """Get a user-friendly display name for the model."""
-        model = self.model or "o4-mini-2025-04-16"
-        if "o4-mini" in model.lower():
+        model = self.model or "gpt-4o-2025-05-13"
+        if "gpt-4o-2025" in model.lower():
+            return "GPT-4o (May 2025)"
+        elif "o4-mini" in model.lower():
             return "GPT-4o-mini"
-        elif "o4" in model.lower():
+        elif "o4" in model.lower() or "gpt-4o" in model.lower():
             return "GPT-4o"
         elif "gpt-4" in model.lower():
             return "GPT-4"
@@ -103,18 +105,29 @@ class OpenAIProvider(AIProvider):
 
             openai.api_key = self.api_key
 
-            response = openai.chat.completions.create(
-                model=self.model or "o4-mini-2025-04-16",
-                messages=[
+            # Use max_completion_tokens for newer models, max_tokens for older ones
+            completion_params: dict[str, Any] = {
+                "model": self.model or "gpt-4o-2025-05-13",
+                "messages": [
                     {
                         "role": "system",
                         "content": "You are a helpful assistant that provides concise Python project guidance.",
                     },
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.7,
-                max_tokens=1000,
-            )
+            }
+
+            # Only add temperature for models that support it
+            if "o4-mini" not in (self.model or "").lower():
+                completion_params["temperature"] = 0.7
+
+            # Use appropriate token parameter based on model
+            if "o4-mini" in (self.model or "").lower():
+                completion_params["max_completion_tokens"] = 1000
+            else:
+                completion_params["max_tokens"] = 1000
+
+            response = openai.chat.completions.create(**completion_params)
 
             # Ensure we're returning a string
             content = str(response.choices[0].message.content or "")
@@ -134,9 +147,14 @@ class AnthropicProvider(AIProvider):
 
     def _get_display_name(self) -> str:
         """Get a user-friendly display name for the model."""
-        model = self.model or "claude-3-7-sonnet-20250219"
+        model = self.model
+        if not model:
+            return "Claude (no model specified)"
+
         if "claude-3-haiku" in model.lower():
             return "Claude 3 Haiku"
+        elif "claude-sonnet-4" in model.lower():
+            return "Claude Sonnet 4"
         elif "claude-3-sonnet" in model.lower() or "claude-3.7-sonnet" in model.lower():
             return "Claude 3.7 Sonnet"
         elif "claude-3-opus" in model.lower() or "claude-3.5-opus" in model.lower():
@@ -164,16 +182,32 @@ class AnthropicProvider(AIProvider):
                 "project guidance."
             )
 
+            if not self.model:
+                return (
+                    False,
+                    "No Anthropic model specified. Please set ANTHROPIC_MODEL in your .env file",
+                )
+
             message = client.messages.create(
-                model=self.model or "claude-3-7-sonnet-20250219",
+                model=self.model,
                 max_tokens=1000,
                 system=system_prompt,
                 messages=[{"role": "user", "content": prompt}],
             )
 
-            # Simply convert the content to a string to avoid type issues
-            # This is a safe fallback that works with any response format
-            return True, str(message.content)
+            # Extract text content from Anthropic response
+            if hasattr(message.content, "__iter__") and len(message.content) > 0:
+                # Handle list of TextBlock objects
+                content_text = (
+                    message.content[0].text
+                    if hasattr(message.content[0], "text")
+                    else str(message.content[0])
+                )
+            else:
+                # Fallback to string conversion
+                content_text = str(message.content)
+
+            return True, content_text
         except Exception as e:
             return False, f"Anthropic API error: {str(e)}"
 
@@ -326,8 +360,10 @@ class GeminiProvider(AIProvider):
 
     def _get_display_name(self) -> str:
         """Get a user-friendly display name for the model."""
-        model = self.model or "gemini-2.5-pro-preview-05-06"
-        if "gemini-pro" in model.lower():
+        model = self.model or "gemini-3.5-pro-latest"
+        if "gemini-3.5-pro" in model.lower():
+            return "Gemini 3.5 Pro"
+        elif "gemini-pro" in model.lower():
             return "Gemini Pro"
         elif "gemini-2.5-pro" in model.lower():
             return "Gemini 2.5 Pro"
@@ -352,7 +388,7 @@ class GeminiProvider(AIProvider):
             genai.configure(api_key=self.api_key)
 
             # Set up the model
-            model = genai.GenerativeModel(self.model or "gemini-pro")
+            model = genai.GenerativeModel(self.model or "gemini-3.5-pro-latest")
 
             # Generate the response
             response = model.generate_content(
@@ -383,12 +419,12 @@ def get_available_ai_providers() -> dict[str, str]:
 
     # Check for OpenAI
     if os.environ.get("OPENAI_API_KEY"):
-        model = os.environ.get("OPENAI_MODEL", "o4-mini-2025-04-16")
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-2025-05-13")
         providers["OpenAI"] = model
 
     # Check for Anthropic
     if os.environ.get("ANTHROPIC_API_KEY"):
-        model = os.environ.get("ANTHROPIC_MODEL", "claude-3-7-sonnet-20250219")
+        model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-0")
         providers["Anthropic"] = model
 
     # Check for Perplexity
@@ -403,7 +439,7 @@ def get_available_ai_providers() -> dict[str, str]:
 
     # Check for Gemini (Google)
     if os.environ.get("GOOGLE_API_KEY"):
-        model = os.environ.get("GEMINI_MODEL", "gemini-2.5-pro-preview-05-06")
+        model = os.environ.get("GEMINI_MODEL", "gemini-3.5-pro-latest")
         providers["Gemini"] = model
 
     return providers
@@ -445,6 +481,10 @@ def select_ai_provider(providers: dict[str, str]) -> tuple[bool, AIProvider | No
             display_name = provider_instance.display_name
 
         console.print(f"[cyan]{i}.[/cyan] {provider} ({display_name})")
+
+    # Add the selection text
+    console.print("\n[bold yellow]AI Selection:[/bold yellow]")
+    console.print("  [dim]• Press Enter or select 1-5 to use AI recommendations[/dim]")
 
     try:
         default = 1

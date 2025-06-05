@@ -40,8 +40,9 @@ from create_python_project.utils import (
 )
 from create_python_project.utils import logging as log_utils
 
-# Initialize logger
-logger = log_utils.setup_logging()
+# Initialize logger with file logging
+logs_dir = os.path.join(os.path.dirname(__file__), "..", "..", "logs")
+logger = log_utils.setup_logging(logs_dir)
 
 
 # Global CLI state management
@@ -310,11 +311,11 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     # Enhanced provider selection with better descriptions
     provider_order = ["DeepSeek", "Anthropic", "Perplexity", "OpenAI", "Gemini"]
     provider_descriptions = {
-        "DeepSeek": "DeepSeek Reasoner - Advanced reasoning model for complex problem analysis and strategic thinking",
-        "Anthropic": "Claude models - Superior reasoning and detailed project analysis",
-        "Perplexity": "Sonar model - Great for research-based technology recommendations",
-        "OpenAI": "GPT models - Fast, versatile, and reliable for general project setup",
-        "Gemini": "Google's AI - Optimized for data projects and Google service integration",
+        "DeepSeek": f"{providers.get('DeepSeek', 'deepseek-reasoner')}: Advanced reasoning model designed for complex problem solving and multi-step analysis. Excels at breaking down complex scenarios step-by-step",
+        "Anthropic": f"{providers.get('Anthropic', 'claude-sonnet-4-20250514')}: Latest Claude model with superior reasoning and comprehensive project analysis. Excellent for nuanced understanding and planning",
+        "Perplexity": f"{providers.get('Perplexity', 'sonar')}: Research-focused model with real-time web access for current tech recommendations. Ideal for finding latest frameworks and best practices",
+        "OpenAI": f"{providers.get('OpenAI', 'gpt-4o-mini')}: Fast, cost-effective model optimized for general tasks and rapid responses. Great balance of speed, capability, and reliability for most projects",
+        "Gemini": f"{providers.get('Gemini', 'gemini-2.5-flash-preview-05-20')}: Google's latest model optimized for data projects and integration with Google services. Strong multimodal capabilities",
     }
 
     from rich.table import Table
@@ -324,7 +325,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     )
     table.add_column("#", style="cyan", no_wrap=True, width=3)
     table.add_column("Provider", style="green", width=12)
-    table.add_column("Description", style="white")
+    table.add_column("Model & Description", style="white")
     table.add_column("Best For", style="dim", width=25)
 
     ordered_providers = [
@@ -332,11 +333,11 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     ]
 
     provider_specialties = {
-        "DeepSeek": "Complex reasoning, strategic analysis",
-        "Anthropic": "Complex analysis, documentation",
-        "Perplexity": "Research, tech comparisons",
-        "OpenAI": "General projects, prototyping",
-        "Gemini": "Data science, ML projects",
+        "DeepSeek": "Strategic planning, complex analysis",
+        "Anthropic": "Detailed analysis, documentation",
+        "Perplexity": "Research, tech recommendations",
+        "OpenAI": "Quick prototyping, general setup",
+        "Gemini": "Data science, ML projects, analytics",
     }
 
     for idx, (name, _) in enumerate(ordered_providers, 1):
@@ -349,11 +350,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
         f"[dim]{cli_state.ai_icon} Choose the provider that best matches your project needs. Default is DeepSeek (1).[/dim]"
     )
 
-    # Add option to skip AI analysis
-    console.print("\n[bold yellow]Advanced Options:[/bold yellow]")
-    console.print(
-        "  [dim]• Press 'x' to skip AI analysis and select project type manually[/dim]"
-    )
+    console.print("\n[bold yellow]AI Selection:[/bold yellow]")
     console.print("  [dim]• Press Enter or select 1-5 to use AI recommendations[/dim]")
 
     provider_success, selected_provider = ai_integration.select_ai_provider(
@@ -366,30 +363,30 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
         )
         return manual_project_type_selection(project_types)
 
-    # Step 6: AI Analysis 🤖
+    # Step 6: AI Analysis & Complete Project Design 🤖
     console.print(
-        f"\n{cli_state.get_step_header('AI Analysis & Recommendations', cli_state.ai_icon)}"
+        f"\n{cli_state.get_step_header('AI Analysis & Complete Project Design', cli_state.ai_icon)}"
     )
     cli_state.print_separator(console)
 
-    # Use AI to determine project type with enhanced progress display
+    # Use AI to get comprehensive analysis with enhanced progress display
     with Progress(
         SpinnerColumn(),
         TextColumn(
-            f"[bold cyan]{cli_state.ai_icon} Analyzing your project description...[/bold cyan]"
+            f"[bold cyan]{cli_state.ai_icon} Analyzing your requirements and designing optimal solution...[/bold cyan]"
         ),
         console=console,
     ) as progress:
         task = progress.add_task("Analyzing", total=None)
 
-        # Generate type detection prompt with context
-        prompt = ai_prompts.get_project_type_prompt(
+        # Generate comprehensive analysis prompt
+        prompt = ai_prompts.get_comprehensive_analysis_prompt(
             project_info["project_name"],
             project_info["project_description"],
             project_info.get("context", {}),
         )
 
-        # Get AI response for project type
+        # Get AI response for comprehensive analysis
         ai_success, response = selected_provider.generate_response(prompt)
 
         # If selected provider fails, try DeepSeek as fallback
@@ -410,452 +407,275 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
 
         if not ai_success:
             console.print(
-                f"[bold red]{cli_state.error_icon} Error getting AI suggestion:[/bold red] {response}"
+                f"[bold red]{cli_state.error_icon} Error getting AI analysis:[/bold red] {response}"
             )
             return manual_project_type_selection(project_types)
 
-        # Extract project type from response
-        project_type = None
-        explanation = ""
-        response_lines = response.strip().split("\n")
-        for line in response_lines:
-            if ":" in line:
-                suggested_type, explanation = line.split(":", 1)
-                suggested_type = suggested_type.strip().lower()
-
-                if suggested_type in project_types:
-                    project_type = suggested_type
-                    break
-
-        if not project_type:
-            console.print(
-                f"[bold yellow]{cli_state.warning_icon} AI couldn't determine a suitable project type from your description.[/bold yellow]"
-            )
-            return manual_project_type_selection(project_types)
-
-    # Now that we have a project type, get technology stack recommendations
-    project_info["project_type"] = project_type
-    # Create a new dictionary specifically for tech_stack
-    project_info["tech_stack"] = {}
-
-    # Enhanced project type display with better formatting
-    console.print(
-        f"\n[bold green]{cli_state.success_icon} AI Analysis Complete![/bold green]"
-    )
-
-    # Display project type recommendation with more detailed description
-    type_info = project_types.get(project_type, {"name": project_type.capitalize()})
-    detailed_descriptions = {
-        "basic": "Standard Python package with modular structure and clean organization.",
-        "cli": "Command-line interface application with argument parsing and terminal interaction.",
-        "web": "Browser-based application with HTML rendering and user interface components.",
-        "api": "RESTful or GraphQL service with data endpoints and request validation.",
-        "data": "Data analysis project with processing pipelines and visualization capabilities.",
-        "ai": "Machine learning project with model training and inference components.",
-        "gui": "Desktop application with interactive graphical user interface elements.",
-    }
-    detailed_description = detailed_descriptions.get(
-        project_type,
-        f"Project with {type_info.get('description', 'specialized functionality')}.",
-    )
-    console.print(
-        f"\n[bold green]Recommended Project Type:[/bold green] {type_info['name']}"
-    )
-    console.print(f"[italic]{detailed_description} {explanation.strip()}[/italic]\n")
-
-    # Step 7: Technology Stack Selection 🔧
-    console.print(f"\n{cli_state.get_step_header('Technology Stack Selection')}")
-    cli_state.print_separator(console)
-
-    # Generate technology stack prompt with enhanced progress
-    with Progress(
-        SpinnerColumn(),
-        TextColumn(
-            f"[bold cyan]{cli_state.ai_icon} Analyzing optimal technology stack...[/bold cyan]"
-        ),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Analyzing", total=None)
-
-        tech_prompt = ai_prompts.get_technology_stack_prompt(
-            project_info["project_name"],
-            project_info["project_description"],
-            project_type,
-        )
-
-        # Get AI response for technology stack
-        tech_success, tech_response = selected_provider.generate_response(tech_prompt)
-
-        # Try up to 2 more times with the same provider if successful but response
-        # might not be valid JSON
-        max_retries = 2
-        retry_count = 0
-
-        # Check if we have a successful response but it doesn't look like valid JSON
-        if tech_success and not (
-            tech_response.strip().startswith("{")
-            and tech_response.strip().endswith("}")
-        ):
-            logger.debug("Response doesn't look like valid JSON, will retry")
-            while retry_count < max_retries:
-                retry_count += 1
-                console.print(
-                    f"[bold yellow]Response format may not be valid JSON. Retrying ({retry_count}/{max_retries})...[/bold yellow]",
-                    end="\r",
-                )
-                # Add stronger emphasis on JSON format in the retry
-                retry_prompt = (
-                    tech_prompt
-                    + "\n\nCRITICAL: Your response MUST be ONLY a valid JSON object with no additional text."
-                )
-                tech_success, retry_response = selected_provider.generate_response(
-                    retry_prompt
-                )
-                if (
-                    tech_success
-                    and retry_response.strip().startswith("{")
-                    and retry_response.strip().endswith("}")
-                ):
-                    tech_response = retry_response
-                    logger.debug(
-                        f"Retry {retry_count} successful, response looks like valid JSON"
-                    )
-                    break
-                logger.debug(
-                    f"Retry {retry_count} failed or response still doesn't look like valid JSON"
-                )
-
-        # If selected provider fails, try DeepSeek as fallback
-        if (
-            not tech_success
-            and selected_provider.__class__.__name__ != "DeepSeekProvider"
-            and "DeepSeek" in providers
-        ):
-            console.print(
-                f"[bold yellow]Selected AI provider failed for tech stack: {tech_response}. Trying DeepSeek as fallback...[/bold yellow]"
-            )
-            deepseek_provider = ai_integration.DeepSeekProvider()
-            tech_success, tech_response = deepseek_provider.generate_response(
-                tech_prompt
-            )
-
-        # Update progress
-        progress.update(task, completed=True)
-        progress.stop()
-
-        if not tech_success:
-            console.print(
-                f"[bold yellow]{cli_state.warning_icon} Could not generate technology recommendations: {tech_response}[/bold yellow]"
-            )
-            return True, project_type
-
-    # Parse the JSON response and display technology stack recommendations
+    # Parse the comprehensive JSON response
     try:
         import json
         import re
 
         # Handle empty or invalid responses
-        if not tech_response or tech_response.strip() == "":
+        if not response or response.strip() == "":
             console.print(
-                f"[bold yellow]{cli_state.warning_icon} No technology stack recommendations received.[/bold yellow]"
+                f"[bold yellow]{cli_state.warning_icon} No analysis received from AI.[/bold yellow]"
             )
-            # Create a default tech stack structure
-            tech_data = create_default_tech_stack(project_type)
-            project_info["tech_stack"] = tech_data
-            return True, project_type
+            return manual_project_type_selection(project_types)
 
         # Log the raw response for debugging
-        logger.debug(f"Raw technology stack response: {tech_response}")
+        logger.debug(f"Raw comprehensive analysis response: {response}")
 
-        # First try direct JSON parsing
+        # Clean the response first - handle markdown-wrapped JSON
+        cleaned_response = response.strip()
+        if cleaned_response.startswith("```json"):
+            cleaned_response = cleaned_response[7:]  # Remove ```json
+        if cleaned_response.startswith("```"):
+            cleaned_response = cleaned_response[3:]  # Remove ```
+        if cleaned_response.endswith("```"):
+            cleaned_response = cleaned_response[:-3]  # Remove trailing ```
+        cleaned_response = cleaned_response.strip()
+
+        # Parse the comprehensive analysis
         try:
-            tech_data = json.loads(tech_response)
-            logger.debug("Successfully parsed JSON directly")
+            analysis_data = json.loads(cleaned_response)
+            logger.debug("Successfully parsed comprehensive analysis JSON")
         except json.JSONDecodeError:
-            # If direct parsing fails, try to extract JSON using regex
+            # Try regex extraction as fallback
             logger.debug("Direct JSON parsing failed, trying regex extraction")
-
-            # Try to extract JSON from the response (in case the AI included extra text)
-            # This improved regex looks for the most complete JSON object in the response
             json_match = re.search(
-                r"(\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})", tech_response
+                r"(\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})",
+                response,
+                re.DOTALL,
             )
 
             if json_match:
                 json_str = json_match.group(1)
-                logger.debug(f"Extracted JSON using regex: {json_str[:100]}...")
-
-                try:
-                    tech_data = json.loads(json_str)
-                    logger.debug("Successfully parsed extracted JSON")
-                except json.JSONDecodeError as e:
-                    logger.debug(f"JSON parsing error after extraction: {str(e)}")
-                    console.print(
-                        f"[bold yellow]{cli_state.warning_icon} Invalid technology stack response format. Using default configuration.[/bold yellow]"
-                    )
-                    # Create a default tech stack structure
-                    tech_data = create_default_tech_stack(project_type)
-                    project_info["tech_stack"] = tech_data
-                    return True, project_type
+                analysis_data = json.loads(json_str)
+                logger.debug("Successfully parsed extracted JSON")
             else:
-                # No JSON found in the response
-                logger.debug("No JSON pattern found in the response")
+                raise json.JSONDecodeError("No valid JSON found", "", 0) from None
+
+        # Extract project type and information
+        architecture = analysis_data.get("recommended_architecture", {})
+        project_type = architecture.get("type", "basic")
+
+        # Validate project type
+        project_types = config.get_project_types()
+        if project_type not in project_types:
+            logger.warning(
+                f"Unknown project type '{project_type}', defaulting to 'basic'"
+            )
+            project_type = "basic"
+
+        # Store analysis results
+        project_info["project_type"] = project_type
+        project_info["tech_stack"] = analysis_data.get("technology_stack", {})
+        project_info["architecture_analysis"] = analysis_data
+
+        # Display comprehensive analysis results
+        console.print(
+            f"\n[bold green]{cli_state.success_icon} AI Analysis Complete![/bold green]"
+        )
+
+        # Display recommended solution architecture
+        console.print("\n[bold cyan]🎯 Recommended Solution Architecture:[/bold cyan]")
+        console.print(
+            f"[green]{architecture.get('approach', 'Optimized solution for your needs')}[/green]"
+        )
+        console.print("\n[bold cyan]💡 Why this approach:[/bold cyan]")
+        console.print(
+            f"[italic]{architecture.get('reasoning', 'Best fit for your requirements')}[/italic]\n"
+        )
+
+        # Display project structure preview
+        project_structure = analysis_data.get("project_structure", {})
+        if project_structure:
+            console.print("[bold cyan]🏗️ Project Structure:[/bold cyan]")
+            console.print(
+                f"[white]{project_structure.get('type', 'Optimized project structure')}[/white]"
+            )
+
+            key_features = project_structure.get("key_features", [])
+            if key_features:
+                console.print("\n[bold cyan]✨ Key Features:[/bold cyan]")
+                for feature in key_features:
+                    console.print(f"  • {feature}")
+
+            user_experience = project_structure.get("user_experience")
+            if user_experience:
+                console.print("\n[bold cyan]👤 User Experience:[/bold cyan]")
+                console.print(f"[italic]{user_experience}[/italic]")
+
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        logger.error(f"Error parsing comprehensive analysis: {str(e)}")
+        console.print(
+            f"[bold yellow]{cli_state.warning_icon} Error parsing AI analysis. Using manual selection.[/bold yellow]"
+        )
+        return manual_project_type_selection(project_types)
+
+    # Step 7: Technology Stack Review 🔧
+    console.print(f"\n{cli_state.get_step_header('Technology Stack Review')}")
+    cli_state.print_separator(console)
+
+    # Display technology stack from comprehensive analysis
+    tech_stack = project_info.get("tech_stack", {})
+
+    if tech_stack and "categories" in tech_stack:
+        from rich.table import Table
+
+        # Create table showing complete technology stack
+        console.print("[bold cyan]🔧 Complete Technology Stack:[/bold cyan]")
+
+        table = Table(
+            show_header=True,
+            header_style="bold magenta",
+            title="🤖 AI-Recommended Technologies",
+        )
+        table.add_column("Component", style="cyan", no_wrap=True, width=15)
+        table.add_column("Technology", style="green", width=15)
+        table.add_column("Why Recommended", style="white", width=50)
+
+        for category in tech_stack["categories"]:
+            recommended = next(
+                (o for o in category["options"] if o.get("recommended", False)),
+                category["options"][0] if category["options"] else None,
+            )
+            if recommended:
+                reasoning = recommended.get(
+                    "reasoning",
+                    recommended.get("description", "Optimal for your project"),
+                )
+                table.add_row(category["name"], recommended["name"], reasoning)
+
+        console.print(table)
+
+        # Display future flexibility if available
+        architecture_analysis = project_info.get("architecture_analysis", {})
+        future_flexibility = architecture_analysis.get("future_flexibility", {})
+
+        if future_flexibility:
+            expansion_options = future_flexibility.get("expansion_options", [])
+            alternative_deployments = future_flexibility.get(
+                "alternative_deployments", []
+            )
+
+            if expansion_options or alternative_deployments:
+                console.print("\n[bold cyan]🚀 Future Flexibility:[/bold cyan]")
+
+                if expansion_options:
+                    console.print("[bold green]Expansion Options:[/bold green]")
+                    for option in expansion_options:
+                        console.print(f"  • {option}")
+
+                if alternative_deployments:
+                    console.print("[bold green]Alternative Deployments:[/bold green]")
+                    for deployment in alternative_deployments:
+                        console.print(f"  • {deployment}")
+
+        # Enhanced technology selection options
+        console.print("\n[bold cyan]Technology Selection Options:[/bold cyan]")
+        console.print(
+            "  [dim]• Press Enter to use this complete solution (recommended)[/dim]"
+        )
+        console.print(
+            "  [dim]• Type 'alternatives' to see other architectural approaches[/dim]"
+        )
+        console.print("  [dim]• Type 'customize' to modify specific technologies[/dim]")
+
+        user_choice = Prompt.ask(
+            "", choices=["", "alternatives", "customize"], default=""
+        )
+
+        if user_choice == "alternatives":
+            console.print("\n[bold cyan]Alternative Approaches:[/bold cyan]")
+            console.print(
+                "1. [cyan]Pure Desktop Application[/cyan] - Traditional GUI with PyQt/Tkinter"
+            )
+            console.print(
+                "2. [cyan]Command-Line Tool[/cyan] - Terminal-based interface with rich output"
+            )
+            console.print(
+                "3. [cyan]API-First Architecture[/cyan] - Backend service with multiple frontend options"
+            )
+            console.print(
+                "4. [cyan]Hybrid Approach[/cyan] - Web app that can be packaged as desktop"
+            )
+
+            alt_choice = Prompt.ask(
+                "Select alternative (or Enter to keep recommended)",
+                choices=["", "1", "2", "3", "4"],
+                default="",
+            )
+
+            if alt_choice:
                 console.print(
-                    f"[bold yellow]{cli_state.warning_icon} Invalid technology stack response format. Using default configuration.[/bold yellow]"
-                )
-                # Create a default tech stack structure
-                tech_data = create_default_tech_stack(project_type)
-                project_info["tech_stack"] = tech_data
-                return True, project_type
-
-        # Display key project features identified by AI
-        if "analysis" in tech_data and tech_data["analysis"]:
-            cli_state.print_subsection(
-                console,
-                f"{cli_state.ai_icon} Key Project Features Identified",
-                "Based on AI analysis of your project description",
-            )
-            for feature in tech_data["analysis"]:
-                console.print(f"  • {feature}", style="cyan")
-            console.print("")
-
-        # Display technology categories and options with enhanced formatting
-        if "categories" in tech_data and tech_data["categories"]:
-            from rich.table import Table
-
-            cli_state.print_subsection(
-                console,
-                f"{cli_state.section_icon} Recommended Technology Stack",
-                "AI-curated technologies optimized for your project",
-            )
-
-            if cli_state.verbose_mode:
-                table = Table(show_header=True, header_style="bold magenta")
-                table.add_column("Category", style="cyan", no_wrap=True)
-                table.add_column("Option", style="green")
-                table.add_column("Description", style="white")
-                table.add_column("Best For", style="dim")
-                for category in tech_data["categories"]:
-                    for option in category["options"]:
-                        is_recommended = option.get("recommended", False)
-                        option_name = (
-                            f"{option['name']} ⭐" if is_recommended else option["name"]
-                        )
-                        table.add_row(
-                            category["name"],
-                            option_name,
-                            option["description"],
-                            get_technology_use_case(option["name"]),
-                        )
-                console.print(table)
-            else:
-                for category in tech_data["categories"]:
-                    # Only show the recommended option and a one-sentence explanation
-                    recommended = next(
-                        (o for o in category["options"] if o.get("recommended", False)),
-                        None,
-                    )
-                    if recommended:
-                        console.print(
-                            f"- [bold cyan]{category['name']}:[/bold cyan] "
-                            f"[green]{recommended['name']}[/green] — "
-                            f"{recommended['description']} "
-                            f"[dim](Best for: {get_technology_use_case(recommended['name'])})[/dim]"
-                        )
-            console.print("")
-
-            # Enhanced customization prompt with advanced options
-            console.print("\n[bold cyan]Technology Selection Options:[/bold cyan]")
-            console.print(
-                "  [dim]• Press Enter to use AI recommendations (recommended)[/dim]"
-            )
-            console.print(
-                "  [dim]• Type 'customize' to manually select technologies[/dim]"
-            )
-            console.print(
-                "  [dim]• Type 'v' to toggle verbose mode for detailed descriptions[/dim]"
-            )
-
-            user_choice = Prompt.ask("", choices=["", "customize", "v"], default="")
-
-            if user_choice == "v":
-                cli_state.verbose_mode = not cli_state.verbose_mode
-                console.print(
-                    f"[yellow]{cli_state.warning_icon} Verbose mode {'enabled' if cli_state.verbose_mode else 'disabled'}[/yellow]"
-                )
-                # Re-display the technology stack with new verbosity setting
-                # ... (redisplay logic here)
-                user_choice = Prompt.ask(
-                    "Select customize or press Enter",
-                    choices=["", "customize"],
-                    default="",
+                    "[yellow]Alternative approach noted. Proceeding with recommended solution for now.[/yellow]"
                 )
 
-            if user_choice == "customize":
-                for category in tech_data["categories"]:
+        elif user_choice == "customize":
+            # Simplified customization - just show key categories
+            key_categories = [
+                "Frontend",
+                "Backend",
+                "Database",
+                "Frontend Technology",
+                "Backend Framework",
+            ]
+
+            for category in tech_stack["categories"]:
+                if any(key in category["name"] for key in key_categories):
                     console.print(
                         f"\n[bold magenta]Select {category['name']}:[/bold magenta]"
                     )
-                    console.print(
-                        f"[italic]This determines how your project will "
-                        f"{get_category_impact(category['name'])}.[/italic]"
-                    )
-                    options = [option["name"] for option in category["options"]]
 
-                    # Find recommended option as default
+                    options = [option["name"] for option in category["options"]]
                     default_option = next(
                         (
                             option["name"]
                             for option in category["options"]
                             if option.get("recommended", False)
                         ),
-                        options[0],
+                        options[0] if options else "Default",
                     )
 
-                    # Display options with numbers and detailed explanations
                     for i, option_name in enumerate(options, 1):
                         is_recommended = option_name == default_option
-                        style = "cyan" if is_recommended else "white"
-                        recommendation = " (AI recommended)" if is_recommended else ""
-                        console.print(
-                            f"  {i}. [bold {style}]{option_name}[/bold {style}]{recommendation}"
-                        )
+                        marker = " ⭐ (recommended)" if is_recommended else ""
+                        console.print(f"  {i}. {option_name}{marker}")
 
-                        # Find option details from category data
-                        option_data = next(
-                            (
-                                opt
-                                for opt in category["options"]
-                                if opt["name"] == option_name
-                            ),
-                            None,
-                        )
-                        if option_data:
-                            console.print(
-                                f"     [dim]{option_data['description']}[/dim]"
-                            )
-                            console.print(
-                                f"     [dim]Best for: {get_technology_use_case(option_name)}[/dim]"
-                            )
-
-                    # Add "Other" option
-                    other_option_number = len(options) + 1
-                    console.print(
-                        f"  {other_option_number}. Other (describe your preference)"
-                    )
-                    console.print(
-                        "     [dim]Tell us what technology you prefer if none of the above meet your needs[/dim]"
-                    )
-
-                    # Ask user to select an option
                     selection = Prompt.ask(
                         "Enter your choice",
-                        choices=[
-                            str(i) for i in range(1, len(options) + 2)
-                        ],  # +2 to include the "Other" option
-                        default=str(options.index(default_option) + 1),
+                        choices=[str(i) for i in range(1, len(options) + 1)],
+                        default=(
+                            str(options.index(default_option) + 1)
+                            if default_option in options
+                            else "1"
+                        ),
                     )
 
-                    selected_index = int(selection) - 1
+                    selected_name = options[int(selection) - 1]
 
-                    # Handle "Other" option
-                    if selected_index == len(options):  # User selected "Other"
-                        console.print("\n")
-                        # Import the enhanced_input function if not already imported
-                        from create_python_project.utils.cli import enhanced_input
-
-                        user_description = enhanced_input(
-                            "Please describe your preferred technology in plain English"
-                        )
-
-                        console.print(
-                            "\n[bold cyan]Processing your preference...[/bold cyan]"
-                        )
-
-                        # Generate a prompt to determine the appropriate technology based on
-                        # user's description
-                        tech_inference_prompt = f"""
-                        The user is setting up a {project_type} project and wants to use a different {category["name"]} than those offered.
-
-                        User's preference: "{user_description}"
-
-                        Based on this description, what specific technology name should be used? Respond with ONLY the name of the technology.
-                        """
-
-                        # Create a provider for inferring technology
-                        from create_python_project.utils.ai_integration import (
-                            AIProvider,
-                            DeepSeekProvider,
-                            OpenAIProvider,
-                        )
-
-                        # Initialize with a concrete implementation
-                        inference_provider: AIProvider
-
-                        if "DeepSeek" in providers:
-                            # Create a DeepSeek provider
-                            inference_provider = DeepSeekProvider()
-                        elif selected_provider is not None:
-                            # Clone the selected provider's properties
-                            if isinstance(selected_provider, DeepSeekProvider):
-                                inference_provider = DeepSeekProvider(
-                                    api_key=selected_provider.api_key,
-                                    model=selected_provider.model,
-                                )
-                            elif isinstance(selected_provider, OpenAIProvider):
-                                inference_provider = OpenAIProvider(
-                                    api_key=selected_provider.api_key,
-                                    model=selected_provider.model,
-                                )
-                            else:
-                                # Default to a concrete implementation
-                                inference_provider = OpenAIProvider()
-
-                        (
-                            inference_success,
-                            inferred_tech,
-                        ) = inference_provider.generate_response(tech_inference_prompt)
-
-                        if inference_success:
-                            inferred_tech = inferred_tech.strip()
-                            console.print(
-                                f"[bold green]Based on your description, I'll use [/bold green][bold yellow]{inferred_tech}[/bold yellow]"
-                            )
-
-                            # Add this as a new option to the category
-                            new_option = {
-                                "name": inferred_tech,
-                                "description": f"Custom selection: {user_description}",
-                                "recommended": True,
-                            }
-
-                            # Add the new option
-                            category["options"].append(new_option)
-
-                            # Set selected_name to the inferred technology
-                            selected_name = inferred_tech
-                        else:
-                            console.print(
-                                "[bold red]Failed to process your custom selection. Using default option.[/bold red]"
-                            )
-                            selected_name = default_option
-                    else:
-                        selected_name = options[selected_index]
-
-                    # Update recommended flag in the tech_data
+                    # Update recommended flag
                     for option in category["options"]:
                         option["recommended"] = option["name"] == selected_name
 
-                console.print(
-                    f"\n[bold green]{cli_state.success_icon} Technology selections updated based on your preferences![/bold green]\n"
-                )
-            else:
-                console.print(
-                    f"[bold cyan]{cli_state.ai_icon} Using AI-recommended technologies for your project.[/bold cyan]\n"
-                )
+            console.print(
+                f"\n[bold green]{cli_state.success_icon} Technology selections updated![/bold green]"
+            )
 
-            # Store technology selections in project_info
-            project_info["tech_stack"] = tech_data
+        else:
+            console.print(
+                f"[bold cyan]{cli_state.ai_icon} Using AI-recommended solution for your project.[/bold cyan]"
+            )
+
+    else:
+        # Fallback if no tech stack provided
+        console.print(
+            f"[bold yellow]{cli_state.warning_icon} No technology stack provided in analysis. Using default configuration.[/bold yellow]"
+        )
+        tech_data = create_default_tech_stack(project_type)
+        project_info["tech_stack"] = tech_data
 
         # --- Write session to markdown in ai-docs/ ---
         try:
@@ -916,11 +736,6 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
             console.print(
                 f"[yellow]{cli_state.warning_icon} Warning: Could not write session log to ai-docs. {e}[/yellow]"
             )
-
-    except (json.JSONDecodeError, KeyError, ValueError) as e:
-        console.print(
-            f"[bold yellow]{cli_state.warning_icon} Error parsing technology recommendations: {str(e)}[/bold yellow]"
-        )
 
     return True, project_type
 
@@ -1093,6 +908,10 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
         # Extract specific parameters to avoid duplicate keyword arguments
         project_name = project_info["project_name"]
         project_dir = project_info["project_dir"]
+
+        # Generate package_name and add it to project_info
+        package_name = project_name.replace("-", "_").replace(" ", "_").lower()
+        project_info["package_name"] = package_name
 
         # Create a copy of project_info without project_name, project_dir,
         # project_type, and tech_stack
@@ -1375,8 +1194,10 @@ def create_project(project_info: dict[str, Any], project_type: str) -> tuple[boo
         ) as progress:
             task = progress.add_task("Setting up", total=None)
 
+            # Pass tech stack to enable dynamic installation
+            tech_stack_for_install = project_info.get("tech_stack", {})
             venv_success, venv_message = core_project_builder.setup_virtual_environment(
-                project_info["project_dir"]
+                project_info["project_dir"], tech_stack_for_install
             )
 
             progress.update(task, completed=True)

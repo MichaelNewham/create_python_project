@@ -28,9 +28,11 @@ def setup_logging(log_dir: str | None = None) -> logging.Logger:
     if logger.handlers:
         logger.handlers.clear()
 
-    # Create console handler
+    # Create console handler - only show warnings and errors by default
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
+    # Check if DEBUG environment variable is set for verbose output
+    console_level = logging.DEBUG if os.getenv("DEBUG") else logging.WARNING
+    console_handler.setLevel(console_level)
     console_format = logging.Formatter("%(levelname)s: %(message)s")
     console_handler.setFormatter(console_format)
     logger.addHandler(console_handler)

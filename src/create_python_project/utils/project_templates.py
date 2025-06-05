@@ -38,24 +38,155 @@ class ProjectTemplateManager:
         )
 
     def create_project_structure(self, project_type: str) -> bool:
-        """Create complete project structure based on AI recommendations."""
+        """Create complete project structure based on AI comprehensive analysis."""
         try:
-            # Create structure based on actual AI recommendations, not project type
-            if self.backend_framework == "Django":
-                return self._create_django_project()
-            elif self.backend_framework == "Flask":
-                return self._create_flask_project()
-            elif self.backend_framework == "FastAPI":
-                return self._create_fastapi_project()
-            elif project_type == "cli":
+            # Use AI comprehensive analysis to determine structure dynamically
+            structure_type = self._determine_structure_from_ai_analysis()
+
+            # Execute the appropriate structure creation method
+            if structure_type == "gui_desktop":
+                return self._create_gui_project()
+            elif structure_type == "cli_application":
                 return self._create_cli_project()
-            elif project_type == "data":
+            elif structure_type == "data_processing":
                 return self._create_data_project()
+            elif structure_type == "web_fullstack":
+                return self._create_fullstack_web_project()
+            elif structure_type == "api_backend":
+                return self._create_api_backend_project()
+            elif structure_type == "django_web":
+                return self._create_django_project()
+            elif structure_type == "flask_web":
+                return self._create_flask_project()
+            elif structure_type == "fastapi_web":
+                return self._create_fastapi_project()
+            elif structure_type == "mobile_backend":
+                return self._create_mobile_backend_project()
+            elif structure_type == "electron_desktop":
+                return self._create_electron_project()
             else:
                 return self._create_basic_project()
+
         except Exception as e:
             print(f"Error creating project structure: {e}")
             return False
+
+    def _determine_structure_from_ai_analysis(self) -> str:
+        """
+        Dynamically determine project structure based on AI's comprehensive technology recommendations.
+
+        Returns:
+            String indicating which structure creation method to use
+        """
+        if not isinstance(self.tech_stack, dict) or "categories" not in self.tech_stack:
+            return "basic"
+
+        # Extract all recommended technologies
+        recommended_techs = []
+        for category in self.tech_stack["categories"]:
+            for option in category.get("options", []):
+                if option.get("recommended", False):
+                    recommended_techs.append(
+                        {"name": option["name"], "category": category["name"]}
+                    )
+
+        # Technology combination analysis
+        has_frontend = any(
+            any(
+                frontend in tech["name"]
+                for frontend in [
+                    "React",
+                    "Vue",
+                    "Angular",
+                    "Svelte",
+                    "HTML",
+                    "JavaScript",
+                    "TypeScript",
+                ]
+            )
+            for tech in recommended_techs
+        )
+
+        has_backend = any(
+            any(
+                backend in tech["name"]
+                for backend in ["Django", "Flask", "FastAPI", "Express", "Node.js"]
+            )
+            for tech in recommended_techs
+        )
+
+        has_gui_framework = any(
+            any(gui in tech["name"] for gui in ["PyQt", "Tkinter", "Kivy", "Electron"])
+            for tech in recommended_techs
+        )
+
+        has_cli_tools = any(
+            any(
+                cli in tech["name"]
+                for cli in ["Click", "Typer", "ArgParse", "Command Line"]
+            )
+            for tech in recommended_techs
+        )
+
+        has_data_tools = any(
+            any(
+                data in tech["name"]
+                for data in [
+                    "Pandas",
+                    "NumPy",
+                    "Jupyter",
+                    "Matplotlib",
+                    "Plotly",
+                    "Scikit-learn",
+                ]
+            )
+            for tech in recommended_techs
+        )
+
+        has_mobile_indicators = any(
+            any(
+                mobile in tech["name"]
+                for mobile in ["Mobile", "API", "REST", "GraphQL"]
+            )
+            for tech in recommended_techs
+        )
+
+        # Specific backend framework detection
+        backend_framework = self._extract_tech(
+            "Backend Framework"
+        ) or self._extract_tech("Backend")
+
+        # Decision logic based on technology combinations
+        if "Electron" in str(recommended_techs):
+            return "electron_desktop"
+        elif has_gui_framework and not has_frontend:
+            return "gui_desktop"
+        elif has_cli_tools and not has_frontend and not has_backend:
+            return "cli_application"
+        elif has_data_tools and not has_frontend:
+            return "data_processing"
+        elif has_frontend and has_backend:
+            # Full-stack web application
+            framework_map = {
+                "Django": "django_web",
+                "Flask": "flask_web",
+                "FastAPI": "fastapi_web",
+            }
+            return framework_map.get(backend_framework, "web_fullstack")
+        elif has_backend and not has_frontend:
+            # API-only backend
+            if has_mobile_indicators:
+                return "mobile_backend"
+            else:
+                return "api_backend"
+        elif backend_framework == "Django":
+            return "django_web"
+        elif backend_framework == "Flask":
+            return "flask_web"
+        elif backend_framework == "FastAPI":
+            return "fastapi_web"
+        else:
+            return "basic"
 
     def _extract_tech(self, category_name: str) -> str:
         """Extract recommended technology for a category."""
@@ -247,6 +378,294 @@ class ProjectTemplateManager:
 
         return True
 
+    def _create_gui_project(self) -> bool:
+        """Create a desktop GUI application structure."""
+        # Get the GUI framework from tech stack
+        gui_framework = (
+            self._extract_tech("Frontend Technology")
+            or self._extract_tech("GUI Framework")
+            or "PyQt"
+        )
+
+        # Create GUI application structure
+        if "pyqt" in gui_framework.lower():
+            return self._create_pyqt_project()
+        elif "tkinter" in gui_framework.lower():
+            return self._create_tkinter_project()
+        elif "kivy" in gui_framework.lower():
+            return self._create_kivy_project()
+        else:
+            # Default to PyQt if GUI framework not recognized
+            return self._create_pyqt_project()
+
+    def _create_pyqt_project(self) -> bool:
+        """Create a PyQt desktop application."""
+        src_dir = os.path.join(self.project_dir, "src", self.package_name)
+
+        # Create main application file
+        main_content = f'''"""Main PyQt application for {self.project_name}."""
+
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox
+from PyQt6.QtCore import Qt
+
+
+class MainWindow(QMainWindow):
+    """Main application window."""
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("{self.project_name.replace('-', ' ').replace('_', ' ').title()}")
+        self.setGeometry(100, 100, 800, 600)
+
+        # Create central widget and layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+
+        # Add welcome label
+        welcome_label = QLabel("Welcome to {self.project_name.replace('-', ' ').replace('_', ' ').title()}!")
+        welcome_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        welcome_label.setStyleSheet("font-size: 18px; font-weight: bold; margin: 20px;")
+        layout.addWidget(welcome_label)
+
+        # Add sample button
+        sample_button = QPushButton("Click Me!")
+        sample_button.clicked.connect(self.on_button_click)
+        layout.addWidget(sample_button)
+
+    def on_button_click(self):
+        """Handle button click event."""
+        QMessageBox.information(self, "Info", "Hello from {self.project_name}!")
+
+
+def main():
+    """Main entry point."""
+    app = QApplication(sys.argv)
+
+    # Create and show main window
+    window = MainWindow()
+    window.show()
+
+    # Start event loop
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
+'''
+        self._create_file(src_dir, "main.py", main_content)
+
+        # Create utilities module
+        utils_content = f'''"""Utility functions for {self.project_name}."""
+
+from PyQt6.QtWidgets import QMessageBox, QWidget
+from typing import Optional
+
+
+def show_error_dialog(parent: Optional[QWidget], title: str, message: str):
+    """Show an error dialog."""
+    QMessageBox.critical(parent, title, message)
+
+
+def show_info_dialog(parent: Optional[QWidget], title: str, message: str):
+    """Show an information dialog."""
+    QMessageBox.information(parent, title, message)
+
+
+def show_warning_dialog(parent: Optional[QWidget], title: str, message: str):
+    """Show a warning dialog."""
+    QMessageBox.warning(parent, title, message)
+'''
+        self._create_file(src_dir, "utils.py", utils_content)
+
+        # Create widgets module for custom widgets
+        widgets_dir = os.path.join(src_dir, "widgets")
+        os.makedirs(widgets_dir, exist_ok=True)
+        self._create_file(
+            widgets_dir, "__init__.py", '"""Custom widgets for the application."""'
+        )
+
+        # Create resources directory for assets
+        resources_dir = os.path.join(self.project_dir, "resources")
+        os.makedirs(resources_dir, exist_ok=True)
+        os.makedirs(os.path.join(resources_dir, "icons"), exist_ok=True)
+        os.makedirs(os.path.join(resources_dir, "images"), exist_ok=True)
+
+        return True
+
+    def _create_tkinter_project(self) -> bool:
+        """Create a Tkinter desktop application."""
+        src_dir = os.path.join(self.project_dir, "src", self.package_name)
+
+        main_content = f'''"""Main Tkinter application for {self.project_name}."""
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+
+class MainApplication:
+    """Main application class."""
+
+    def __init__(self, root):
+        self.root = root
+        self.root.title("{self.project_name.replace('-', ' ').replace('_', ' ').title()}")
+        self.root.geometry("800x600")
+
+        # Create main frame
+        main_frame = ttk.Frame(root, padding="10")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+        # Configure grid weight
+        root.columnconfigure(0, weight=1)
+        root.rowconfigure(0, weight=1)
+        main_frame.columnconfigure(0, weight=1)
+
+        # Add welcome label
+        welcome_label = ttk.Label(
+            main_frame,
+            text="Welcome to {self.project_name.replace('-', ' ').replace('_', ' ').title()}!",
+            font=("Arial", 16, "bold")
+        )
+        welcome_label.grid(row=0, column=0, pady=20)
+
+        # Add sample button
+        sample_button = ttk.Button(
+            main_frame,
+            text="Click Me!",
+            command=self.on_button_click
+        )
+        sample_button.grid(row=1, column=0, pady=10)
+
+    def on_button_click(self):
+        """Handle button click event."""
+        messagebox.showinfo("Info", "Hello from {self.project_name}!")
+
+
+def main():
+    """Main entry point."""
+    root = tk.Tk()
+    app = MainApplication(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+'''
+        self._create_file(src_dir, "main.py", main_content)
+
+        # Create utilities
+        utils_content = f'''"""Utility functions for {self.project_name}."""
+
+import tkinter as tk
+from tkinter import messagebox
+from typing import Optional
+
+
+def show_error_dialog(title: str, message: str):
+    """Show an error dialog."""
+    messagebox.showerror(title, message)
+
+
+def show_info_dialog(title: str, message: str):
+    """Show an information dialog."""
+    messagebox.showinfo(title, message)
+
+
+def show_warning_dialog(title: str, message: str):
+    """Show a warning dialog."""
+    messagebox.showwarning(title, message)
+'''
+        self._create_file(src_dir, "utils.py", utils_content)
+
+        return True
+
+    def _create_kivy_project(self) -> bool:
+        """Create a Kivy desktop application."""
+        src_dir = os.path.join(self.project_dir, "src", self.package_name)
+
+        main_content = f'''"""Main Kivy application for {self.project_name}."""
+
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
+
+
+class MainWidget(BoxLayout):
+    """Main application widget."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.padding = 20
+        self.spacing = 10
+
+        # Add welcome label
+        welcome_label = Label(
+            text="Welcome to {self.project_name.replace('-', ' ').replace('_', ' ').title()}!",
+            size_hint=(1, 0.3),
+            font_size='20sp'
+        )
+        self.add_widget(welcome_label)
+
+        # Add sample button
+        sample_button = Button(
+            text="Click Me!",
+            size_hint=(1, 0.2),
+            on_press=self.on_button_click
+        )
+        self.add_widget(sample_button)
+
+    def on_button_click(self, instance):
+        """Handle button click event."""
+        popup = Popup(
+            title='Info',
+            content=Label(text='Hello from {self.project_name}!'),
+            size_hint=(0.6, 0.4)
+        )
+        popup.open()
+
+
+class MainApp(App):
+    """Main application class."""
+
+    def build(self):
+        return MainWidget()
+
+
+def main():
+    """Main entry point."""
+    MainApp().run()
+
+
+if __name__ == "__main__":
+    main()
+'''
+        self._create_file(src_dir, "main.py", main_content)
+
+        # Create utilities
+        utils_content = f'''"""Utility functions for {self.project_name}."""
+
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+
+
+def show_popup(title: str, message: str, size_hint=(0.6, 0.4)):
+    """Show a popup dialog."""
+    popup = Popup(
+        title=title,
+        content=Label(text=message),
+        size_hint=size_hint
+    )
+    popup.open()
+    return popup
+'''
+        self._create_file(src_dir, "utils.py", utils_content)
+
+        return True
+
     def _create_basic_project(self) -> bool:
         """Create basic Python package structure."""
         src_dir = os.path.join(self.project_dir, "src", self.package_name)
@@ -254,6 +673,135 @@ class ProjectTemplateManager:
         # Basic module
         self._create_file(src_dir, "main.py", self._get_basic_main())
         self._create_file(src_dir, "utils.py", self._get_basic_utils())
+
+        return True
+
+    def _create_fullstack_web_project(self) -> bool:
+        """Create a full-stack web application with separate frontend and backend."""
+        backend_framework = self._extract_tech(
+            "Backend Framework"
+        ) or self._extract_tech("Backend")
+        frontend_framework = self._extract_tech(
+            "Frontend Technology"
+        ) or self._extract_tech("Frontend")
+
+        # Create backend based on detected framework
+        if backend_framework == "Django":
+            self._create_django_project()
+        elif backend_framework == "Flask":
+            self._create_flask_project()
+        elif backend_framework == "FastAPI":
+            self._create_fastapi_project()
+        else:
+            # Default to FastAPI for full-stack
+            self._create_fastapi_project()
+
+        # Create frontend if specified
+        if frontend_framework and any(
+            fw in frontend_framework for fw in ["React", "Vue", "Angular", "Svelte"]
+        ):
+            self._create_react_frontend()  # This will adapt based on framework
+
+        return True
+
+    def _create_api_backend_project(self) -> bool:
+        """Create an API-only backend project."""
+        backend_framework = self._extract_tech(
+            "Backend Framework"
+        ) or self._extract_tech("Backend")
+
+        if backend_framework == "Django":
+            return self._create_django_project()
+        elif backend_framework == "Flask":
+            return self._create_flask_project()
+        elif backend_framework == "FastAPI":
+            return self._create_fastapi_project()
+        else:
+            # Default to FastAPI for APIs
+            return self._create_fastapi_project()
+
+    def _create_mobile_backend_project(self) -> bool:
+        """Create a backend specifically for mobile applications."""
+        # Mobile backends typically use FastAPI or Django REST
+        backend_framework = self._extract_tech(
+            "Backend Framework"
+        ) or self._extract_tech("Backend")
+
+        if backend_framework == "Django":
+            return self._create_django_project()
+        else:
+            # Default to FastAPI for mobile backends
+            return self._create_fastapi_project()
+
+    def _create_electron_project(self) -> bool:
+        """Create an Electron desktop application project."""
+        # Create Electron main process
+        main_content = f'''"""Main Electron process for {self.project_name}."""
+
+const {{ app, BrowserWindow }} = require('electron');
+const path = require('path');
+
+function createWindow() {{
+    const mainWindow = new BrowserWindow({{
+        width: 1200,
+        height: 800,
+        webPreferences: {{
+            nodeIntegration: true,
+            contextIsolation: false
+        }}
+    }});
+
+    // Load the app
+    if (process.env.NODE_ENV === 'development') {{
+        mainWindow.loadURL('http://localhost:3000');
+        mainWindow.webContents.openDevTools();
+    }} else {{
+        mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
+    }}
+}}
+
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {{
+    if (process.platform !== 'darwin') {{
+        app.quit();
+    }}
+}});
+
+app.on('activate', () => {{
+    if (BrowserWindow.getAllWindows().length === 0) {{
+        createWindow();
+    }}
+}});
+'''
+
+        # Create main.js for Electron
+        self._create_file(self.project_dir, "main.js", main_content)
+
+        # Create renderer process (web frontend)
+        frontend_framework = self._extract_tech("Frontend Technology") or "React"
+        if "React" in frontend_framework:
+            self._create_react_frontend()
+
+        # Create Electron-specific package.json
+        electron_package = f"""{{
+  "name": "{self.project_name}",
+  "version": "1.0.0",
+  "description": "Electron application for {self.project_name}",
+  "main": "main.js",
+  "scripts": {{
+    "electron": "electron .",
+    "electron-dev": "NODE_ENV=development electron .",
+    "build": "npm run build-frontend && electron-builder",
+    "build-frontend": "cd frontend && npm run build"
+  }},
+  "devDependencies": {{
+    "electron": "^latest",
+    "electron-builder": "^latest"
+  }}
+}}"""
+
+        self._create_file(self.project_dir, "package.json", electron_package)
 
         return True
 
@@ -825,28 +1373,39 @@ class BaseModel(db.Model):
 '''
 
     def _get_fastapi_main(self) -> str:  # type: ignore
+        lifespan_import = (
+            "from contextlib import asynccontextmanager" if self.database else ""
+        )
+        lifespan_decorator = "@asynccontextmanager" if self.database else ""
+        lifespan_function = "async def lifespan(app: FastAPI):" if self.database else ""
+        lifespan_init = "    # Initialize database" if self.database else ""
+        lifespan_await = "    await init_db()" if self.database else ""
+        lifespan_yield = "    yield" if self.database else ""
+        lifespan_param = "lifespan=lifespan" if self.database else ""
+        db_import = "from .core.database import init_db" if self.database else ""
+
         return f'''"""Main FastAPI application."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-{'from contextlib import asynccontextmanager' if self.database else ''}
+{lifespan_import}
 
 from .config import settings
-{'from .core.database import init_db' if self.database else ''}
+{db_import}
 from .api.v1 import router as api_v1_router
 
 
-{'@asynccontextmanager' if self.database else ''}
-{'async def lifespan(app: FastAPI):' if self.database else ''}
-{'    # Initialize database' if self.database else ''}
-{'    await init_db()' if self.database else ''}
-{'    yield' if self.database else ''}
+{lifespan_decorator}
+{lifespan_function}
+{lifespan_init}
+{lifespan_await}
+{lifespan_yield}
 
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.VERSION,
-    {'lifespan=lifespan' if self.database else ''}
+    {lifespan_param}
 )
 
 # CORS middleware
@@ -864,7 +1423,7 @@ app.include_router(api_v1_router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():  # type: ignore
-    return {"message": f"Welcome to {settings.APP_NAME}"}
+    return {{"message": f"Welcome to {{settings.APP_NAME}}"}}
 
 
 @app.get("/health")

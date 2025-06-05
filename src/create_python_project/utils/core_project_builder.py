@@ -167,7 +167,7 @@ def _create_scripts_directory(project_dir: str, package_name: str):
     scripts_dir = os.path.join(project_dir, "scripts")
     os.makedirs(scripts_dir, exist_ok=True)
 
-    # Create commit workflow script
+    # Create commit workflow script - with f-string literals properly escaped
     commit_workflow = f"""#!/usr/bin/env python3
 \"\"\"AI-powered commit workflow for {package_name}.\"\"\"
 
@@ -211,16 +211,16 @@ def generate_commit_message():
     # Generate message based on changes
     if len(changes) == 1:
         action, file = changes[0].split("\\t")
-        action_word = {"A": "add", "M": "update", "D": "remove"}.get(action, "change")
-        return f"{action_word}: {file}"
+        action_word = {{"A": "add", "M": "update", "D": "remove"}}.get(action, "change")
+        return f"{{action_word}}: {{file}}"
 
     parts = []
     if added:
-        parts.append(f"add {len(added)} file{'s' if len(added) > 1 else ''}")
+        parts.append(f"add {{len(added)}} file{{'s' if len(added) > 1 else ''}}")
     if modified:
-        parts.append(f"update {len(modified)} file{'s' if len(modified) > 1 else ''}")
+        parts.append(f"update {{len(modified)}} file{{'s' if len(modified) > 1 else ''}}")
     if deleted:
-        parts.append(f"remove {len(deleted)} file{'s' if len(deleted) > 1 else ''}")
+        parts.append(f"remove {{len(deleted)}} file{{'s' if len(deleted) > 1 else ''}}")
 
     return "feat: " + ", ".join(parts)
 
@@ -295,7 +295,7 @@ sys.path.insert(0, str(src_path))
 os.system('clear' if os.name != 'nt' else 'cls')
 
 # Run main module
-from {package_name} import main
+from {{package_name}} import main
 
 if __name__ == "__main__":
     main()
@@ -1026,12 +1026,145 @@ def _extract_tech_choice(tech_stack: dict[Any, Any], category_name: str) -> str:
     return ""
 
 
-def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
-    """Set up Poetry environment and install dependencies."""
+def get_installation_commands_from_tech_stack(tech_stack: dict) -> dict[str, list[str]]:
+    """
+    Dynamically determine installation commands based on AI-recommended tech stack.
+
+    Args:
+        tech_stack: Dictionary containing AI technology recommendations
+
+    Returns:
+        Dictionary with 'python' and 'node' command lists
+    """
+    commands: dict[str, list[str]] = {"python": [], "node": [], "other": []}
+
+    if not isinstance(tech_stack, dict) or "categories" not in tech_stack:
+        return commands
+
+    # Technology to installation command mapping
+    tech_to_install = {
+        # Python Backend Frameworks
+        "Django": {"type": "python", "packages": ["django", "django-environ"]},
+        "Flask": {
+            "type": "python",
+            "packages": ["flask", "python-dotenv", "flask-cors"],
+        },
+        "FastAPI": {
+            "type": "python",
+            "packages": ["fastapi", "uvicorn", "pydantic", "pydantic-settings"],
+        },
+        # Python Databases
+        "PostgreSQL": {"type": "python", "packages": ["psycopg2-binary", "sqlalchemy"]},
+        "MongoDB": {"type": "python", "packages": ["pymongo"]},
+        "Redis": {"type": "python", "packages": ["redis"]},
+        # Python Data Processing
+        "Pandas": {"type": "python", "packages": ["pandas"]},
+        "NumPy": {"type": "python", "packages": ["numpy"]},
+        "Matplotlib": {"type": "python", "packages": ["matplotlib"]},
+        "Plotly": {"type": "python", "packages": ["plotly"]},
+        "Scikit-learn": {"type": "python", "packages": ["scikit-learn"]},
+        "TensorFlow": {"type": "python", "packages": ["tensorflow"]},
+        "PyTorch": {"type": "python", "packages": ["torch"]},
+        # Python GUI Frameworks
+        "PyQt": {"type": "python", "packages": ["PyQt6"]},
+        "PyQt6": {"type": "python", "packages": ["PyQt6"]},
+        "PyQt5": {"type": "python", "packages": ["PyQt5"]},
+        "Kivy": {"type": "python", "packages": ["kivy"]},
+        "Tkinter": {"type": "python", "packages": []},  # Built-in
+        # Python CLI Tools
+        "Click": {"type": "python", "packages": ["click"]},
+        "Typer": {"type": "python", "packages": ["typer"]},
+        # Python Authentication
+        "PyJWT": {"type": "python", "packages": ["pyjwt"]},
+        "Authlib": {"type": "python", "packages": ["authlib"]},
+        # Python Utilities
+        "Requests": {"type": "python", "packages": ["requests"]},
+        "Beautiful Soup": {"type": "python", "packages": ["beautifulsoup4"]},
+        "Celery": {"type": "python", "packages": ["celery"]},
+        # Frontend Frameworks (Node.js)
+        "React": {"type": "node", "packages": ["react", "react-dom"]},
+        "Vue.js": {"type": "node", "packages": ["vue"]},
+        "Vue": {"type": "node", "packages": ["vue"]},
+        "Angular": {"type": "node", "packages": ["@angular/core", "@angular/cli"]},
+        "Svelte": {"type": "node", "packages": ["svelte"]},
+        "Next.js": {"type": "node", "packages": ["next", "react", "react-dom"]},
+        "Nuxt.js": {"type": "node", "packages": ["nuxt"]},
+        # Frontend Development Tools (Node.js)
+        "TypeScript": {"type": "node", "packages": ["typescript"]},
+        "Vite": {"type": "node", "packages": ["vite"]},
+        "Webpack": {"type": "node", "packages": ["webpack", "webpack-cli"]},
+        "Babel": {"type": "node", "packages": ["@babel/core", "@babel/preset-env"]},
+        # Frontend Utilities (Node.js)
+        "Axios": {"type": "node", "packages": ["axios"]},
+        "Fetch": {"type": "node", "packages": []},  # Built-in
+        "Recharts": {"type": "node", "packages": ["recharts"]},
+        "Chart.js": {"type": "node", "packages": ["chart.js"]},
+        "D3.js": {"type": "node", "packages": ["d3"]},
+        # CSS Frameworks (Node.js)
+        "Tailwind CSS": {"type": "node", "packages": ["tailwindcss"]},
+        "Bootstrap": {"type": "node", "packages": ["bootstrap"]},
+        "Material-UI": {"type": "node", "packages": ["@mui/material"]},
+        # Development Tools (Node.js)
+        "ESLint": {"type": "node", "packages": ["eslint"]},
+        "Prettier": {"type": "node", "packages": ["prettier"]},
+        "Jest": {"type": "node", "packages": ["jest"]},
+        "Vitest": {"type": "node", "packages": ["vitest"]},
+        # Testing Frameworks (Python)
+        "Pytest": {"type": "python", "packages": ["pytest", "pytest-cov"]},
+        "Unittest": {"type": "python", "packages": []},  # Built-in
+        # Code Quality (Python)
+        "Black": {"type": "python", "packages": ["black"]},
+        "Ruff": {"type": "python", "packages": ["ruff"]},
+        "Mypy": {"type": "python", "packages": ["mypy"]},
+        "Pre-commit": {"type": "python", "packages": ["pre-commit"]},
+    }
+
+    # Extract recommended technologies from AI tech stack
+    for category in tech_stack.get("categories", []):
+        for option in category.get("options", []):
+            if option.get("recommended", False):
+                tech_name = option["name"]
+
+                # Check for exact match first
+                if tech_name in tech_to_install:
+                    install_info = tech_to_install[tech_name]
+                    install_type = install_info["type"]
+                    packages = install_info["packages"]
+
+                    if install_type in commands:
+                        commands[install_type].extend(packages)
+                else:
+                    # Try partial matching for variations
+                    for tech_key, install_info in tech_to_install.items():
+                        if (
+                            tech_key.lower() in tech_name.lower()
+                            or tech_name.lower() in tech_key.lower()
+                        ):
+                            install_type = install_info["type"]
+                            packages = install_info["packages"]
+
+                            if install_type in commands:
+                                commands[install_type].extend(packages)
+                            break
+
+    # Remove duplicates while preserving order
+    for cmd_type in commands:
+        commands[cmd_type] = list(dict.fromkeys(commands[cmd_type]))
+
+    return commands
+
+
+def setup_virtual_environment(
+    project_dir: str, tech_stack: dict | None = None
+) -> tuple[bool, str]:
+    """Set up Poetry environment and install all AI-recommended technologies."""
     try:
         # Check if Poetry is installed
         if not shutil.which("poetry"):
             return False, "Poetry is not installed. Please install Poetry first."
+
+        # Get dynamic installation commands from AI tech stack
+        install_commands = get_installation_commands_from_tech_stack(tech_stack or {})
 
         # Configure Poetry to create venv in project
         subprocess.run(
@@ -1041,7 +1174,23 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
             capture_output=True,
         )
 
-        # Install dependencies
+        # Install AI-recommended Python packages dynamically
+        python_packages = install_commands.get("python", [])
+        if python_packages:
+            for package in python_packages:
+                try:
+                    subprocess.run(
+                        ["poetry", "add", package],
+                        cwd=project_dir,
+                        check=True,
+                        capture_output=True,
+                        text=True,
+                    )
+                except subprocess.CalledProcessError:
+                    # Continue if specific package fails, but log it
+                    print(f"Warning: Failed to install Python package: {package}")
+
+        # Install base dependencies from pyproject.toml (if any)
         subprocess.run(
             ["poetry", "install"],
             cwd=project_dir,
@@ -1064,14 +1213,54 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
             capture_output=True,
         )
 
-        # Install pre-commit hooks
-        subprocess.run(
-            ["poetry", "run", "pre-commit", "install"],
-            cwd=project_dir,
-            capture_output=True,
-        )
+        # Install pre-commit hooks if pre-commit was recommended
+        if "pre-commit" in python_packages:
+            subprocess.run(
+                ["poetry", "run", "pre-commit", "install"],
+                cwd=project_dir,
+                capture_output=True,
+            )
 
-        # Install Node dependencies for MCP servers
+        # Install AI-recommended Node.js packages dynamically
+        node_packages = install_commands.get("node", [])
+        if node_packages and shutil.which("npm"):
+            # Check if frontend directory exists (for React/Vue projects)
+            frontend_dir = os.path.join(project_dir, "frontend")
+            if os.path.exists(frontend_dir):
+                # Install frontend dependencies
+                for package in node_packages:
+                    try:
+                        subprocess.run(
+                            ["npm", "install", package],
+                            cwd=frontend_dir,
+                            check=True,
+                            capture_output=True,
+                            text=True,
+                        )
+                    except subprocess.CalledProcessError:
+                        print(f"Warning: Failed to install Node.js package: {package}")
+
+                # Also run npm install to install any dependencies from package.json
+                subprocess.run(
+                    ["npm", "install"],
+                    cwd=frontend_dir,
+                    capture_output=True,
+                )
+            else:
+                # Install Node packages in project root if no frontend directory
+                for package in node_packages:
+                    try:
+                        subprocess.run(
+                            ["npm", "install", package],
+                            cwd=project_dir,
+                            check=True,
+                            capture_output=True,
+                            text=True,
+                        )
+                    except subprocess.CalledProcessError:
+                        print(f"Warning: Failed to install Node.js package: {package}")
+
+        # Install MCP server dependencies (if package.json exists in root)
         if os.path.exists(os.path.join(project_dir, "package.json")) and shutil.which(
             "npm"
         ):
@@ -1081,10 +1270,12 @@ def setup_virtual_environment(project_dir: str) -> tuple[bool, str]:
                 capture_output=True,
             )
 
-        return (
-            True,
-            "Poetry environment created and all dependencies installed successfully",
-        )
+        # Create installation summary
+        total_python = len(python_packages)
+        total_node = len(node_packages)
+        summary = f"Environment setup complete: {total_python} Python packages, {total_node} Node.js packages installed"
+
+        return True, summary
 
     except subprocess.CalledProcessError as e:
         return False, f"Failed to create virtual environment: {str(e)}"

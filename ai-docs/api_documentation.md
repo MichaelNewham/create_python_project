@@ -24,9 +24,17 @@ The documentation is organized following the package structure:
   - `utils/cli.html` - Documentation for Cli
   - `utils/config.html` - Documentation for Config
   - `utils/core_project_builder.html` - Documentation for Core Project Builder
+  - `utils/development_tools.html` - Documentation for Development Tools
+  - `utils/extension_config.html` - Documentation for Extension Config
+  - `utils/ide_config.html` - Documentation for Ide Config
   - `utils/__init__.html` - Documentation for   Init  
   - `utils/logging.html` - Documentation for Logging
+  - `utils/mcp_config.html` - Documentation for Mcp Config
+  - `utils/project_templates.html` - Documentation for Project Templates
+  - `utils/script_templates.html` - Documentation for Script Templates
+  - `utils/task_config.html` - Documentation for Task Config
   - `utils/templates.html` - Documentation for Templates
+  - `utils/workspace_config.html` - Documentation for Workspace Config
 
 ## Best Practices
 
@@ -39,4 +47,4 @@ To ensure high-quality documentation:
 
 ## Last Updated
 
-This documentation was last updated on: 2025-05-31 01:17:21
+This documentation was last updated on: 2025-06-05 14:43:20

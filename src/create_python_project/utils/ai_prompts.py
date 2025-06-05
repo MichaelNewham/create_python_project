@@ -59,7 +59,92 @@ Please analyze all the information and select the most appropriate project type 
 - automation (Workflow automation, bots, and system integration)
 
 Respond with just one of these project types, all lowercase, and a brief explanation of why you selected it.
-Format: "project_type: brief explanation"
+Format your response EXACTLY as: "project_type: brief explanation" where project_type is one of the exact types listed above.
+
+IMPORTANT: Your first line MUST follow this exact format with the project type appearing first, followed by a colon, then your explanation.
+For example: "cli: This project would be best as a command-line tool because it focuses on automation tasks."
+"""
+
+
+def get_comprehensive_analysis_prompt(
+    project_name: str, project_description: str, context: dict | None = None
+) -> str:
+    """
+    Get a prompt for comprehensive project analysis including architecture and tech stack.
+
+    Args:
+        project_name: Name of the project
+        project_description: Description of the project
+        context: Dictionary with problem, users, inspiration
+
+    Returns:
+        Formatted prompt for AI
+    """
+    context = context or {}
+
+    context_section = ""
+    if context:
+        context_section = f"""
+**Additional Context:**
+- Problem being solved: {context.get('problem', 'Not specified')}
+- Target users: {context.get('users', 'Not specified')}
+- Inspiration/Examples: {context.get('inspiration', 'Not specified')}
+"""
+
+    return f"""
+You are an expert software architect tasked with designing the complete solution for the following project:
+
+**Project Name:** {project_name}
+**Project Description:** {project_description}
+{context_section}
+
+Please provide a comprehensive analysis and design recommendation in the following JSON format:
+
+{{
+  "recommended_architecture": {{
+    "type": "web|cli|gui|api|data|ai|mobile-backend",
+    "approach": "Brief description of the recommended approach",
+    "reasoning": "2-3 sentences explaining why this architecture is optimal for this specific project"
+  }},
+  "technology_stack": {{
+    "categories": [
+      {{
+        "name": "Category Name",
+        "description": "What this technology category handles",
+        "options": [
+          {{
+            "name": "Technology Name",
+            "description": "Why this technology fits this specific project",
+            "recommended": true,
+            "reasoning": "Specific reason why this is best for the user's needs"
+          }}
+        ]
+      }}
+    ]
+  }},
+  "project_structure": {{
+    "type": "Brief description of structure (e.g., 'Modern web app with API backend')",
+    "key_features": [
+      "Feature 1 that directly addresses user needs",
+      "Feature 2 that solves stated problems",
+      "Feature 3 that matches user inspiration"
+    ],
+    "user_experience": "How the end user will interact with this solution"
+  }},
+  "future_flexibility": {{
+    "expansion_options": ["Potential future enhancements"],
+    "alternative_deployments": ["Other ways this could be deployed/packaged"]
+  }}
+}}
+
+Focus on:
+1. Choose architecture that best solves the user's actual problems
+2. Select technologies that work coherently together
+3. Prioritize user experience over technical complexity
+4. Consider the target users' technical expertise level
+5. Ensure technologies support the key features needed
+
+Respond with ONLY the JSON object, no additional text.
 """
 
 

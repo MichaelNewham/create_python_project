@@ -222,6 +222,13 @@ def _extract_dependencies_from_tech_stack(tech_stack: dict[str, Any]) -> list[st
         "Click": "click",
         "Typer": "typer",
         "ArgParse": "argparse",  # Built-in, but added for completeness
+        # GUI Frameworks
+        "PyQt": "PyQt6",
+        "PyQt6": "PyQt6",
+        "PyQt5": "PyQt5",
+        "Tkinter": "",  # Built-in, no package needed
+        "tkinter": "",  # Built-in, no package needed
+        "Kivy": "kivy",
         # Utilities
         "Requests": "requests",
         "Beautiful Soup": "beautifulsoup4",

@@ -69,34 +69,72 @@ poetry run pytest -v
 
 The application is organized into several key components:
 
-1. **Main Module** (`create_python_project.py`): Entry point that orchestrates the CLI interface and project creation flow.
+1. **Main Module** (`create_python_project.py`): Entry point that orchestrates the CLI interface and comprehensive AI-driven project creation flow.
 
-2. **Core Project Builder** (`utils/core_project_builder.py`): Handles file creation, directory structure, and template rendering for different project types.
+2. **Core Project Builder** (`utils/core_project_builder.py`): Handles dynamic file creation, directory structure, and technology installation based on AI recommendations.
 
-3. **AI Integration** (`utils/ai_integration.py`): Manages connections with multiple AI providers (OpenAI, Anthropic, Perplexity, DeepSeek, Gemini) for generating project recommendations.
+3. **AI Integration** (`utils/ai_integration.py`): Manages connections with multiple AI providers (OpenAI, Anthropic, Perplexity, DeepSeek, Gemini) for generating comprehensive project analysis.
 
-4. **AI Prompts** (`utils/ai_prompts.py`): Contains prompt templates for different AI queries like project type detection and dependency recommendations.
+4. **AI Prompts** (`utils/ai_prompts.py`): Contains advanced prompt templates for comprehensive project analysis including architecture recommendations and technology justifications.
 
-5. **Templates** (`utils/templates.py`): Provides project templates and utilities for generating files based on project type.
+5. **Project Templates** (`utils/project_templates.py`): Dynamic template system that creates project structures based on AI technology analysis rather than hardcoded project types.
 
-6. **Project Templates** (`utils/project_templates.py`): Contains specific template definitions for different project types (CLI, Web, Data Analysis, etc.).
+6. **Dynamic Installation System** (`utils/core_project_builder.py`): Automatically installs all AI-recommended technologies (Python packages via Poetry, Node.js packages via npm).
 
-7. **Task Configuration** (`utils/task_config.py`): Manages VS Code task definitions for each project type.
+7. **CLI Utilities** (`utils/cli.py`): Rich terminal UI for enhanced user experience with professional output formatting.
 
-8. **CLI Utilities** (`utils/cli.py`): Helper functions for handling command-line interface operations with rich terminal UI.
+8. **Configuration** (`utils/config.py`): Dynamic configuration management supporting any technology combination.
 
-9. **Configuration** (`utils/config.py`): Manages configuration settings and project type definitions.
+9. **Logging** (`utils/logging.py`): Clean logging system with debug information captured in files, not displayed to users.
 
-10. **Logging** (`utils/logging.py`): Sets up structured logging for the application.
+## Revolutionary AI-Driven Workflow
 
-The workflow is:
-1. User initiates the application
-2. System collects project info via CLI (name, location, author)
-3. AI analyzes project description to recommend project type
-4. System presents AI-recommended technologies for user selection
-5. System scaffolds project structure based on type and selected technologies
-6. Git repository and virtual environment are optionally set up
-7. MCP servers are optionally configured
+**Major Innovation: Comprehensive Single-Step AI Analysis**
+
+The new workflow eliminates artificial constraints and provides intelligent, coherent solutions:
+
+1. **Project Context Collection**: User provides detailed problem description, target users, and inspiration sources
+2. **AI Provider Selection**: Choose from DeepSeek, Anthropic, Perplexity, OpenAI, or Gemini based on project needs
+3. **Comprehensive AI Analysis**: Single AI call provides complete solution including:
+   - Recommended architecture with detailed reasoning
+   - Complete technology stack with specific justifications
+   - Project structure preview and user experience description
+   - Future flexibility and expansion options
+4. **Dynamic Project Creation**: System creates project structure based on actual AI recommendations, not predetermined templates
+5. **Automatic Technology Installation**: All AI-recommended technologies are automatically installed (Python + Node.js)
+6. **Complete Development Environment**: Git, workspace configuration, development tools, and automation scripts
+
+## Key Architectural Improvements
+
+### **Comprehensive AI Analysis System**
+- Single AI call replaces separate "project type" and "technology stack" steps
+- AI provides complete architectural reasoning, not just technology lists
+- Eliminates conflicts between project type and technology selections
+- Future-proof: handles any technology combination AI recommends
+
+### **Dynamic Project Structure Creation**
+- No hardcoded project types or technology assumptions
+- Analyzes AI recommendations to determine appropriate structure:
+  - GUI frameworks → Desktop applications
+  - Frontend + Backend → Full-stack web applications  
+  - CLI tools → Command-line applications
+  - Data processing tools → Data analysis projects
+  - Electron + React → Cross-platform desktop apps
+- Supports hybrid approaches (e.g., web apps that can be packaged as desktop)
+
+### **Universal Technology Installation**
+- Dynamic mapping system supports 50+ technologies
+- Automatically installs Python packages via Poetry
+- Automatically installs Node.js packages via npm
+- Handles frontend dependencies in separate directories
+- Provides installation summaries and error handling
+
+### **Enhanced User Experience**
+- Clean, professional terminal output without debug noise
+- Comprehensive technology explanations with reasoning
+- Alternative architecture options clearly presented
+- Future flexibility options highlighted
+- Real-time progress indication
 
 ## Coding Standards
 

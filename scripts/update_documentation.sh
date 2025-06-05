@@ -248,6 +248,168 @@ generate_directory_tree() {
     fi
 }
 
+# Function to get semantic file description
+get_semantic_description() {
+    local file="$1"
+    local filename=$(basename "$file")
+    local dir_name="$2"
+    
+    # Check if file exists
+    if [[ ! -f "$file" ]]; then
+        echo "File not found"
+        return
+    fi
+    
+    case "$filename" in
+        *.py)
+            # Extract docstring or first comment
+            local desc=$(head -20 "$file" 2>/dev/null | grep -E '^""".*"""$|^""".*|^#[^!].*' | head -1 | sed 's/^[#"]*\s*//' | sed 's/"""$//')
+            if [[ -z "$desc" ]]; then
+                # Try to extract class or function name
+                local class_func=$(head -10 "$file" 2>/dev/null | grep -E '^(class|def) ' | head -1 | cut -d' ' -f2 | cut -d'(' -f1)
+                if [[ -n "$class_func" ]]; then
+                    desc="Python module containing $class_func"
+                else
+                    desc="Python source file"
+                fi
+            fi
+            echo "$desc"
+            ;;
+        *.sh)
+            # Extract comment after shebang
+            local desc=$(head -10 "$file" 2>/dev/null | grep '^#' | grep -v '^#!/' | head -1 | sed 's/^#\s*//')
+            [[ -z "$desc" ]] && desc="Shell script for automation"
+            echo "$desc"
+            ;;
+        *.md)
+            # Extract first heading or line
+            local desc=$(head -5 "$file" 2>/dev/null | grep '^#' | head -1 | sed 's/^#*\s*//')
+            [[ -z "$desc" ]] && desc="Markdown documentation"
+            echo "$desc"
+            ;;
+        *.json)
+            case "$filename" in
+                "package.json") echo "Node.js package configuration" ;;
+                "pyproject.toml"|"poetry.lock") echo "Python package configuration" ;;
+                *) echo "JSON configuration file" ;;
+            esac
+            ;;
+        *.toml)
+            case "$filename" in
+                "pyproject.toml") echo "Python project configuration and dependencies" ;;
+                *) echo "TOML configuration file" ;;
+            esac
+            ;;
+        *.txt|*.log)
+            case "$filename" in
+                "errors.txt") echo "Error logs and debugging information" ;;
+                "requirements.txt") echo "Python package dependencies" ;;
+                *.log) echo "Application log file" ;;
+                *) echo "Text file" ;;
+            esac
+            ;;
+        "LICENSE"|"LICENCE") echo "Project license information" ;;
+        "README"|"README.md") echo "Project overview and documentation" ;;
+        "aboutthisfolder.md") echo "Auto-generated folder documentation" ;;
+        ".gitignore") echo "Git ignore patterns" ;;
+        ".env"|".env.example") echo "Environment variables configuration" ;;
+        *)
+            # Generic description based on extension
+            local ext="${filename##*.}"
+            case "$ext" in
+                "html") echo "HTML web page" ;;
+                "css") echo "CSS stylesheet" ;;
+                "js") echo "JavaScript source file" ;;
+                "yml"|"yaml") echo "YAML configuration file" ;;
+                "xml") echo "XML data file" ;;
+                *) echo "Project file" ;;
+            esac
+            ;;
+    esac
+}
+
+# Function to analyze folder content and generate overview
+generate_folder_overview() {
+    local dir="$1"
+    local folder_name="$2"
+    local overview=""
+    
+    # Count different file types (including hidden files in all subdirectories)
+    local py_count=$(find "$dir" -maxdepth 3 -name "*.py" 2>/dev/null | wc -l)
+    local md_count=$(find "$dir" -maxdepth 3 -name "*.md" 2>/dev/null | wc -l)
+    local sh_count=$(find "$dir" -maxdepth 3 -name "*.sh" 2>/dev/null | wc -l)
+    local config_count=$(find "$dir" -maxdepth 3 \( -name "*.json" -o -name "*.toml" -o -name "*.yml" -o -name "*.yaml" \) 2>/dev/null | wc -l)
+    # Count all immediate subdirectories (including hidden ones)
+    local subdirs=$(find "$dir" -maxdepth 1 -type d ! -path "$dir" 2>/dev/null | wc -l)
+    
+    # Generate content-based overview
+    case "$folder_name" in
+        "ai-docs")
+            overview="This folder serves as the central hub for all AI-related documentation, including:\n\n"
+            if [[ $subdirs -gt 0 ]]; then
+                local subdir_list=$(find "$dir" -maxdepth 1 -type d ! -path "$dir" -exec basename {} \; 2>/dev/null | sort | tr '\n' ', ' | sed 's/, $//')
+                overview+="- **Organized documentation** across $subdirs categories: $subdir_list\n"
+            fi
+            if [[ $md_count -gt 0 ]]; then
+                overview+="- **Documentation files** ($md_count files) covering project setup, API references, and guides\n"
+            fi
+            overview+="- **Development notes** and conversation logs for AI-assisted development\n"
+            overview+="- **API documentation** with auto-generated references\n"
+            overview+="- **Setup guides** for various tools and environments"
+            ;;
+        "src")
+            overview="This folder contains the core implementation of the Create Python Project package:\n\n"
+            if [[ $py_count -gt 0 ]]; then
+                overview+="- **Python modules** ($py_count files) implementing the main functionality\n"
+            fi
+            overview+="- **Package structure** organized by feature areas\n"
+            overview+="- **Utility modules** for common operations\n"
+            overview+="- **Main application logic** and entry points"
+            ;;
+        "tests")
+            overview="This folder contains the test suite for ensuring code quality and reliability:\n\n"
+            if [[ $py_count -gt 0 ]]; then
+                overview+="- **Test files** ($py_count files) covering unit and integration tests\n"
+            fi
+            overview+="- **Test fixtures** and helper utilities\n"
+            overview+="- **Coverage reports** and test configuration\n"
+            overview+="- **Automated testing** for continuous integration"
+            ;;
+        "scripts")
+            overview="This folder contains automation scripts for development workflow:\n\n"
+            if [[ $sh_count -gt 0 ]]; then
+                overview+="- **Shell scripts** ($sh_count files) for build and deployment automation\n"
+            fi
+            if [[ $py_count -gt 0 ]]; then
+                overview+="- **Python scripts** ($py_count files) for specialized tasks\n"
+            fi
+            overview+="- **Development tools** for code quality and formatting\n"
+            overview+="- **CI/CD automation** and deployment scripts"
+            ;;
+        *)
+            # Generic overview based on content analysis
+            overview="This folder contains:\n\n"
+            if [[ $py_count -gt 0 ]]; then
+                overview+="- **Python files** ($py_count files) for implementation\n"
+            fi
+            if [[ $md_count -gt 0 ]]; then
+                overview+="- **Documentation** ($md_count files) with guides and references\n"
+            fi
+            if [[ $sh_count -gt 0 ]]; then
+                overview+="- **Scripts** ($sh_count files) for automation\n"
+            fi
+            if [[ $config_count -gt 0 ]]; then
+                overview+="- **Configuration** ($config_count files) for tools and settings\n"
+            fi
+            if [[ $subdirs -gt 0 ]]; then
+                overview+="- **Subdirectories** ($subdirs folders) for organized content"
+            fi
+            ;;
+    esac
+    
+    echo -e "$overview"
+}
+
 # Function to create/update aboutthisfolder.md files
 create_folder_documentation() {
     echo "Updating folder documentation files..."
@@ -258,7 +420,7 @@ create_folder_documentation() {
     local gitignored_dirs=()
     local tracked_hidden_dirs=()
     
-    # Find all immediate directories in the project root
+    # Find all immediate directories in the project root ONLY (first level)
     while IFS= read -r dir; do
         dir_name=$(basename "$dir")
         
@@ -268,10 +430,17 @@ create_folder_documentation() {
             continue
         fi
         
-        # Track hidden directories separately
+        # Skip system and development directories that don't need documentation
+        if [[ "$dir_name" == ".git" || "$dir_name" == ".vscode" || "$dir_name" == "__pycache__" || "$dir_name" == "node_modules" ]]; then
+            continue
+        fi
+        
+        # Track hidden directories separately (only meaningful ones)
         if [[ "$dir_name" == .* ]]; then
-            # Add hidden directories that are tracked by git to tracked_hidden_dirs
-            tracked_hidden_dirs+=("$dir")
+            # Only include specific hidden directories that are meaningful for documentation
+            if [[ "$dir_name" == ".config" || "$dir_name" == ".github" || "$dir_name" == ".claude" ]]; then
+                tracked_hidden_dirs+=("$dir")
+            fi
             continue
         fi
         
@@ -312,50 +481,54 @@ create_folder_documentation() {
             local folder_purpose=""
             local max_depth=2  # Default depth for most folders
 
-            # Determine folder purpose and max_depth based on folder name
+            # Enhanced folder purpose and description
             case "$folder_name" in
                 "src")
-                    folder_description="Source code for the Create Python Project package."
-                    folder_purpose="Contains the main application code, utilities, and implementation of all features."
-                    max_depth=3  # Show deeper structure for src folder
+                    folder_description="Source code for the Create Python Project package"
+                    folder_purpose="Contains the main application code, utilities, and implementation of all features for the Python project creation tool."
+                    max_depth=3
                     ;;
                 "tests")
-                    folder_description="Tests for the Create Python Project package."
-                    folder_purpose="Contains test files that verify the functionality of the project components."
+                    folder_description="Test suite for the Create Python Project package"
+                    folder_purpose="Contains comprehensive test files that verify functionality, ensure code quality, and enable continuous integration."
                     ;;
                 "scripts")
-                    folder_description="Utility scripts for the Create Python Project."
-                    folder_purpose="Contains helper scripts for development, documentation, and automation tasks."
+                    folder_description="Development and automation scripts"
+                    folder_purpose="Contains helper scripts for development workflow, build automation, documentation generation, and deployment tasks."
                     ;;
                 "ai-docs")
-                    folder_description="AI documentation for the Create Python Project."
-                    folder_purpose="Contains AI-related documentation, API documentation, and development notes."
-                    max_depth=3  # Show deeper structure for ai-docs folder
-                    ;;
-                "sketches")
-                    folder_description="Design sketches and visual assets for the Create Python Project."
-                    folder_purpose="Contains visual design elements, mockups, and reference images for the project."
+                    folder_description="AI-assisted development documentation hub"
+                    folder_purpose="Central repository for all AI-related documentation, including API references, setup guides, conversation logs, and development notes."
+                    max_depth=2
                     ;;
                 "logs")
-                    folder_description="Log files for the Create Python Project."
-                    folder_purpose="Contains log output from application runs and build processes."
+                    folder_description="Application and build log files"
+                    folder_purpose="Contains log output from application runs, build processes, and debugging sessions."
+                    ;;
+                "imagesandvids")
+                    folder_description="Media assets and visual resources"
+                    folder_purpose="Contains images, videos, and other media files used in documentation, UI, or project demonstrations."
+                    ;;
+                "TaskMasterTasks")
+                    folder_description="Task management and workflow organization"
+                    folder_purpose="Contains task definitions, workflow configurations, and project management resources."
                     ;;
                 ".config")
-                    folder_description="Configuration files for the Create Python Project."
-                    folder_purpose="Contains configuration files for linters, formatters, and other development tools."
+                    folder_description="Development tool configurations"
+                    folder_purpose="Contains configuration files for linters, formatters, type checkers, and other development tools."
                     ;;
                 ".vscode")
-                    folder_description="Visual Studio Code configuration for the Create Python Project."
-                    folder_purpose="Contains VS Code settings, tasks, and extensions configuration."
+                    folder_description="Visual Studio Code workspace configuration"
+                    folder_purpose="Contains VS Code specific settings, tasks, launch configurations, and extension recommendations."
                     ;;
                 *)
-                    # For hidden directories that don't match specific cases
+                    # Generic handling for unknown folders
                     if [[ "$folder_name" == .* ]]; then
-                        folder_description="Hidden directory for the Create Python Project."
+                        folder_description="Configuration directory"
                         folder_purpose="Contains configuration and system files for $folder_name."
                     else
-                        folder_description="Project folder for the Create Python Project."
-                        folder_purpose="Contains project files related to $folder_name functionality."
+                        folder_description="Project directory"
+                        folder_purpose="Contains project files and resources related to $folder_name functionality."
                     fi
                     ;;
             esac
@@ -363,89 +536,239 @@ create_folder_documentation() {
             # Check if the folder contents have changed since the last aboutthisfolder.md update
             local should_update=true
             if [[ -f "$doc_file" ]]; then
-                local doc_timestamp=$(stat -c %Y "$doc_file")
-                local folder_timestamp=$(find "$dir" -type f -not -path "$doc_file" -newer "$doc_file" | wc -l)
-                if [[ $folder_timestamp -eq 0 ]]; then
+                local doc_timestamp=$(stat -c %Y "$doc_file" 2>/dev/null || echo 0)
+                
+                # Comprehensive change detection for files, hidden files, and directories
+                # Check for newer files (including hidden files) - additions and modifications
+                local newer_files=$(find "$dir" -not -path "$doc_file" -newer "$doc_file" 2>/dev/null | wc -l)
+                
+                # Count all files (including hidden files) in all subdirectories
+                local current_file_count=$(find "$dir" -type f -not -path "$doc_file" 2>/dev/null | wc -l)
+                
+                # Count all directories (including hidden directories) in all subdirectories
+                local current_dir_count=$(find "$dir" -type d -not -path "$dir" 2>/dev/null | wc -l)
+                
+                # Combined count for comprehensive tracking
+                local current_total_count=$((current_file_count + current_dir_count))
+                
+                # Get previous counts from documentation
+                local previous_file_count=0
+                local previous_dir_count=0
+                local previous_total_count=0
+                
+                if [[ -f "$doc_file" ]]; then
+                    # Extract file count from the existing documentation (files listed with backticks, no trailing /)
+                    previous_file_count=$(grep -c "^- \*\*\`[^/]*\`\*\* -" "$doc_file" 2>/dev/null || echo "0")
+                    # Extract directory count from the existing documentation (directories with trailing /)
+                    previous_dir_count=$(grep -c "^- \*\*\`[^/]*/\`\*\* -" "$doc_file" 2>/dev/null || echo "0")
+                    
+                    # Ensure we have valid numbers
+                    [[ -z "$previous_file_count" || ! "$previous_file_count" =~ ^[0-9]+$ ]] && previous_file_count=0
+                    [[ -z "$previous_dir_count" || ! "$previous_dir_count" =~ ^[0-9]+$ ]] && previous_dir_count=0
+                    
+                    previous_total_count=$((previous_file_count + previous_dir_count))
+                fi
+                
+                # Store current counts in a history file for tracking
+                local doc_history_file="$dir/.doc_history"
+                echo "files:$current_file_count" > "$doc_history_file"
+                echo "dirs:$current_dir_count" >> "$doc_history_file"
+                echo "total:$current_total_count" >> "$doc_history_file"
+                echo "timestamp:$(date +%s)" >> "$doc_history_file"
+                
+                # Update if there are newer items OR if counts changed (files, directories, or total)
+                if [[ $newer_files -eq 0 && $current_total_count -eq $previous_total_count ]]; then
                     should_update=false
                     if [[ "$VERBOSE" == "true" ]]; then
-                        echo "Skipping $folder_name folder - contents have not changed"
+                        echo "Skipping $folder_name folder - contents unchanged (files: $current_file_count, dirs: $current_dir_count, total: $current_total_count, newer: $newer_files)"
+                    fi
+                else
+                    if [[ "$VERBOSE" == "true" ]]; then
+                        echo "Updating $folder_name folder - detected changes:"
+                        echo "  Files: $current_file_count (was: $previous_file_count)"
+                        echo "  Directories: $current_dir_count (was: $previous_dir_count)" 
+                        echo "  Total items: $current_total_count (was: $previous_total_count)"
+                        echo "  Newer items: $newer_files"
                     fi
                 fi
             fi
 
             # Only update the file if the folder contents have changed or the file doesn't exist
             if [[ "$should_update" == true ]]; then
-                # Generate tree visualization for the folder structure
-                local tree_output=""
-
-                # Special handling for ai-docs folder due to its complex structure
-                if [[ "$folder_name" == "ai-docs" ]]; then
-                    # Create a hardcoded tree structure for ai-docs
-                    cat > "$doc_file" << EOF
+                echo "Creating/updating documentation for $folder_name folder..."
+                
+                # Generate the aboutthisfolder.md file with enhanced content
+                cat > "$doc_file" << EOF
 <!-- filepath: $doc_file -->
-# Ai-docs Folder
+# ${folder_name^} Folder
 
-AI documentation for the Create Python Project.
+$folder_description
 
 ## Purpose
 
-Contains AI-related documentation, API documentation, and development notes.
+$folder_purpose
 
-## Structure
+## Overview
 
-\`\`\`
-ai-docs/
-├── aboutthisfolder.md
-├── api/
-│   ├── create_python_project/
-│   │   ├── create_python_project.html
-│   │   ├── index.html
-│   │   └── utils/
-│   ├── doc_updates.log
-│   └── project_structure.md
-├── api_documentation.md
-├── convo.md
-├── convo.md.bak
-├── git_workflow.md
-└── updated_files.txt
-\`\`\`
+$(generate_folder_overview "$dir" "$folder_name")
+
+## Files and Directories
+
+EOF
+
+                # Add detailed file and directory descriptions (including hidden items)
+                # Use find to get all immediate items including hidden files and directories
+                local all_items=()
+                
+                # Get all files and directories in the immediate directory, including hidden ones
+                while IFS= read -r -d '' item; do
+                    local item_name=$(basename "$item")
+                    # Skip the aboutthisfolder.md file itself and .doc_history
+                    if [[ "$item_name" != "aboutthisfolder.md" && "$item_name" != ".doc_history" ]]; then
+                        all_items+=("$item_name")
+                    fi
+                done < <(find "$dir" -maxdepth 1 -not -path "$dir" -print0 2>/dev/null | sort -z)
+                
+                if [[ ${#all_items[@]} -gt 0 ]]; then
+                    for item in "${all_items[@]}"; do
+                        local item_path="$dir/$item"
+                        if [[ -f "$item_path" ]]; then
+                            local desc=$(get_semantic_description "$item_path" "$folder_name")
+                            echo "- **\`$item\`** - $desc" >> "$doc_file"
+                        elif [[ -d "$item_path" ]]; then
+                            # Count all items in subdirectory (including hidden files and nested directories)
+                            local count=$(find "$item_path" -type f -o -type d 2>/dev/null | wc -l)
+                            # Subtract 1 to exclude the directory itself from the count
+                            count=$((count - 1))
+                            local dir_desc=""
+                            case "$item" in
+                                "utils") dir_desc="Utility modules and helper functions" ;;
+                                "api") dir_desc="API documentation and references" ;;
+                                "setup") dir_desc="Installation and configuration guides" ;;
+                                "security") dir_desc="Security documentation and best practices" ;;
+                                "workflows") dir_desc="Development workflow documentation" ;;
+                                "mcp-explainers") dir_desc="Model Context Protocol service documentation" ;;
+                                "tests") dir_desc="Test files and test utilities" ;;
+                                "scripts") dir_desc="Automation and utility scripts" ;;
+                                "development") dir_desc="Development notes and documentation" ;;
+                                "historical") dir_desc="Historical documentation and archived files" ;;
+                                "templates") dir_desc="Template files and boilerplate code" ;;
+                                "__pycache__") dir_desc="Python bytecode cache (auto-generated)" ;;
+                                ".git") dir_desc="Git version control data" ;;
+                                ".github") dir_desc="GitHub Actions and repository configuration" ;;
+                                ".config") dir_desc="Development tool configurations" ;;
+                                ".vscode") dir_desc="VS Code workspace settings" ;;
+                                "node_modules") dir_desc="Node.js dependencies" ;;
+                                *) 
+                                    if [[ "$item" == .* ]]; then
+                                        dir_desc="Hidden directory containing $count items"
+                                    else
+                                        dir_desc="Directory containing $count items"
+                                    fi
+                                    ;;
+                            esac
+                            echo "- **\`$item/\`** - $dir_desc" >> "$doc_file"
+                        fi
+                    done
+                else
+                    echo "*(Empty directory)*" >> "$doc_file"
+                fi
+
+                # Add navigation section for complex folders
+                if [[ "$folder_name" == "ai-docs" ]]; then
+                    cat >> "$doc_file" << EOF
+
+## Quick Navigation
+
+### Getting Started
+- **\`README.md\`** - Start here for an overview of all documentation
+- **\`setup/MCP_SETUP.md\`** - Essential setup guide for new users
+
+### Development Resources
+- **\`api/\`** - Auto-generated API documentation
+- **\`workflows/\`** - Development workflow guides
+- **\`security/\`** - Security configuration guides
+
+### Reference Materials
+- **\`mcp-explainers/\`** - Service-specific documentation
+- **\`handover.md\`** - Detailed project status and recent changes
+EOF
+                elif [[ "$folder_name" == "scripts" ]]; then
+                    cat >> "$doc_file" << EOF
+
+## Common Tasks
+
+### Documentation
+- **\`update_documentation.sh\`** - Regenerate all project documentation
+- **\`manage_docs.sh\`** - Watch for changes and auto-update docs
+
+### Development Workflow
+- **\`ai_commit_workflow.sh\`** - AI-assisted commit message generation
+- **\`lint_all.py\`** - Run all linting and formatting tools
+
+### Build and Deploy
+- **\`clean_run.py\`** - Clean build and run the application
+- **\`force_push_to_remotes.sh\`** - Deploy to multiple git remotes
+EOF
+                fi
+
+                # Add footer
+                cat >> "$doc_file" << EOF
 
 ## Last Updated
 
 This documentation was automatically generated on: $TIMESTAMP
+
+---
+*This file is auto-generated. Do not edit manually - changes will be overwritten.*
 EOF
-                    # Skip the normal file creation since we've already created it
-                    echo "Created/updated documentation for $folder_name folder"
-                    continue
-                else
-                    # For other folders, use the tree generation function
-                    tree_output=$(generate_directory_tree "$dir" "$max_depth")
-                fi
 
-                # Create/update the aboutthisfolder.md file
-                echo "<!-- filepath: $doc_file -->" > "$doc_file"
-                echo "# ${folder_name^} Folder" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "$folder_description" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "## Purpose" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "$folder_purpose" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "## Structure" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "\`\`\`" >> "$doc_file"
-                echo -e "$tree_output" >> "$doc_file"
-                echo "\`\`\`" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "## Last Updated" >> "$doc_file"
-                echo "" >> "$doc_file"
-                echo "This documentation was automatically generated on: $TIMESTAMP" >> "$doc_file"
-
-                echo "Created/updated documentation for $folder_name folder"
+                echo "✅ Created/updated documentation for $folder_name folder"
             fi
         fi
     done
+}
+
+# Function to clean up aboutthisfolder.md files from unwanted directories
+cleanup_unwanted_documentation() {
+    echo "Cleaning up unwanted aboutthisfolder.md files..."
+    
+    # List of directories where we DON'T want aboutthisfolder.md files
+    local unwanted_dirs=(
+        ".git"
+        ".vscode" 
+        ".mypy_cache"
+        ".pytest_cache"
+        ".ruff_cache"
+        ".venv"
+        ".cursor"
+        "__pycache__"
+        "node_modules"
+    )
+    
+    # Remove aboutthisfolder.md from unwanted directories
+    for unwanted_dir in "${unwanted_dirs[@]}"; do
+        local unwanted_file="${PROJECT_DIR}/${unwanted_dir}/aboutthisfolder.md"
+        if [[ -f "$unwanted_file" ]]; then
+            rm "$unwanted_file"
+            echo "✅ Removed unwanted documentation from $unwanted_dir"
+        fi
+    done
+    
+    # Also check for any aboutthisfolder.md files deeper than first level and remove them
+    while IFS= read -r deep_file; do
+        # Calculate depth relative to project root
+        local relative_path="${deep_file#${PROJECT_DIR}/}"
+        local depth=$(echo "$relative_path" | grep -o "/" | wc -l)
+        
+        # If depth > 1, it's deeper than first level, so remove it
+        if [[ $depth -gt 1 ]]; then
+            local dir_path=$(dirname "$deep_file")
+            local relative_dir="${dir_path#${PROJECT_DIR}/}"
+            rm "$deep_file"
+            echo "✅ Removed deep documentation from $relative_dir (depth: $depth)"
+        fi
+    done < <(find "${PROJECT_DIR}" -name "aboutthisfolder.md" -type f 2>/dev/null)
 }
 
 # Function to update the main README.md file
