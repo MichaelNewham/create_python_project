@@ -1,10 +1,10 @@
 🚀 Starting Python Project Initializer...
 
 
-╭───────────────────────────────────────────────────────────────────────────────────────────────╮
-│                               🐍 Python Project Initializer 🐍                                │
-╰─────────────────────── Create professional Python projects in seconds ────────────────────────╯
-                    ⚡ AI-Powered ⚡ Best Practices ⚡ Fully Customizable ⚡                     
+╭───────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                 🐍 Python Project Initializer 🐍                                  │
+╰───────────────────────── Create professional Python projects in seconds ──────────────────────────╯
+                      ⚡ AI-Powered ⚡ Best Practices ⚡ Fully Customizable ⚡                       
 
 
 ────────────────────────────────────────────────────────────────────────────────
@@ -12,13 +12,13 @@ Welcome to Python Project Initializer! Let's set up your new project with intell
 
 Step 1: Project Name 🔧
 ────────────────────────────────────────────────────────────────────────────────
-Please enter a name for your project: revolut-expense-tracker
+Please enter a name for your project: content_management_System
 
 Step 2: Project Directory 🔧
 ────────────────────────────────────────────────────────────────────────────────
-Default location: /home/michaelnewham/Projects/revolut_expense_tracker
-⚠️ Warning: Directory already exists!
-Do you want to overwrite the existing directory? [y/n] (n): y
+Default location: /home/michaelnewham/Projects/content_management_system
+Press Enter to accept the default or type a new path:
+> 
 
 Step 3: Author Information (Optional) 🔧
 ────────────────────────────────────────────────────────────────────────────────
@@ -34,43 +34,40 @@ Step 4: Project Context & Inspiration 🔧
 Help AI understand your vision by sharing context and inspiration.
 
 1. What problem are you solving?
-Describe the main problem or need your project addresses: I'm constantly struggling to keep track of my Revolut spending and it's becoming a real headache at tax time. Every month   I have to manually download CSV files from Revolut, open them in Excel, and try to categorize hundreds of transactions  by hand which takes hours. I end up with messy spreadsheets that don't give me clear insights into where my money is  actually going, and I often miss important business expenses or forget to separate personal from business spending. What  I really need is something that can automatically import my Revolut data, smart enough to learn my spending patterns, and   give me proper reports without all this manual work.
+Describe the main problem or need your project addresses: I'm developing a content management system specifically for academic researchers who need to organize, annotate, and collaborate on research papers. Existing tools don't understand the unique workflow of academic research and make citation management unnecessarily complicated.
 
 2. Who will use this?
-Who are the end users? (developers, consumers, businesses, systems, etc.):   This would be perfect for busy professionals like me who use Revolut as their main bank but struggle with expense  tracking and financial organization. Small business owners and freelancers would love this because they need to separate  business expenses from personal spending for tax purposes, but don't want to pay expensive monthly fees for enterprise  accounting software. Even regular consumers who just want better budgeting tools would benefit - people who feel  overwhelmed by their spending and want clear, visual insights into their financial habits without becoming spreadsheet  experts.
+Who are the end users? (developers, consumers, businesses, systems, etc.): Graduate students, postdocs, and faculty researchers in universities who collaborate on research projects. They need tools that understand academic workflows and integrate with institutional systems like library databases and publishing platforms.
 
 3. What inspired this project?
 Share websites, apps, or services you admire (URLs welcome):
-Examples, similar apps, or websites that inspired you:   I love how Mint.com automatically categorizes transactions and shows you spending trends in beautiful charts, but it  doesn't work with Revolut and feels outdated. YNAB has great budgeting philosophy but it's too complex for casual users  and requires too much manual input. I want something that combines the automatic import and smart categorization of  modern fintech apps like Emma or Yolt, with the detailed reporting capabilities of business tools like Expensify, but  specifically designed to work seamlessly with Revolut's data format and built for people who aren't financial experts.
+Examples, similar apps, or websites that inspired you: I love how Notion revolutionized note-taking with its flexible structure, and Zotero citation management is excellent, but nothing bridges the gap between collecting research and actually writing papers. I want to create the missing link in the academic research workflow.
 
 Step 5: AI Provider Selection 🤖
 ────────────────────────────────────────────────────────────────────────────────
-                                    🤖 Available AI Providers                                    
-┏━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ #   ┃ Provider     ┃ Model & Description                          ┃ Best For                  ┃
-┡━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ 1   │ DeepSeek     │ deepseek-reasoner: Advanced reasoning model  │ Strategic planning,       │
-│     │              │ designed for complex problem solving and     │ complex analysis          │
-│     │              │ multi-step analysis. Excels at breaking down │                           │
-│     │              │ complex scenarios step-by-step               │                           │
-│ 2   │ Anthropic    │ claude-sonnet-4-20250514: Latest Claude      │ Detailed analysis,        │
-│     │              │ model with superior reasoning and            │ documentation             │
-│     │              │ comprehensive project analysis. Excellent    │                           │
-│     │              │ for nuanced understanding and planning       │                           │
-│ 3   │ Perplexity   │ sonar: Research-focused model with real-time │ Research, tech            │
-│     │              │ web access for current tech recommendations. │ recommendations           │
-│     │              │ Ideal for finding latest frameworks and best │                           │
-│     │              │ practices                                    │                           │
-│ 4   │ OpenAI       │ gpt-4o-mini: Fast, cost-effective model      │ Quick prototyping,        │
-│     │              │ optimized for general tasks and rapid        │ general setup             │
-│     │              │ responses. Great balance of speed,           │                           │
-│     │              │ capability, and reliability for most         │                           │
-│     │              │ projects                                     │                           │
-│ 5   │ Gemini       │ gemini-2.5-flash-preview-05-20: Google's     │ Data science, ML          │
-│     │              │ latest model optimized for data projects and │ projects, analytics       │
-│     │              │ integration with Google services. Strong     │                           │
-│     │              │ multimodal capabilities                      │                           │
-└─────┴──────────────┴──────────────────────────────────────────────┴───────────────────────────┘
+                                        🤖 Available AI Providers                                        
+┏━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ #   ┃ Provider     ┃ Model & Description                                  ┃ Best For                  ┃
+┡━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 1   │ DeepSeek     │ deepseek-reasoner: Advanced reasoning model designed │ Strategic planning,       │
+│     │              │ for complex problem solving and multi-step analysis. │ complex analysis          │
+│     │              │ Excels at breaking down complex scenarios            │                           │
+│     │              │ step-by-step                                         │                           │
+│ 2   │ Anthropic    │ claude-sonnet-4-20250514: Latest Claude model with   │ Detailed analysis,        │
+│     │              │ superior reasoning and comprehensive project         │ documentation             │
+│     │              │ analysis. Excellent for nuanced understanding and    │                           │
+│     │              │ planning                                             │                           │
+│ 3   │ Perplexity   │ sonar: Research-focused model with real-time web     │ Research, tech            │
+│     │              │ access for current tech recommendations. Ideal for   │ recommendations           │
+│     │              │ finding latest frameworks and best practices         │                           │
+│ 4   │ OpenAI       │ gpt-4o-mini: Fast, cost-effective model optimized    │ Quick prototyping,        │
+│     │              │ for general tasks and rapid responses. Great balance │ general setup             │
+│     │              │ of speed, capability, and reliability for most       │                           │
+│     │              │ projects                                             │                           │
+│ 5   │ Gemini       │ gemini-2.5-flash-preview-05-20: Google's latest      │ Data science, ML          │
+│     │              │ model optimized for data projects and integration    │ projects, analytics       │
+│     │              │ with Google services. Strong multimodal capabilities │                           │
+└─────┴──────────────┴──────────────────────────────────────────────────────┴───────────────────────────┘
 🤖 Choose the provider that best matches your project needs. Default is DeepSeek (1).
 
 AI Selection:
@@ -83,207 +80,162 @@ Select an AI provider:
 5. Gemini (gemini-2.5-flash-preview-05-20)
 
 AI Selection:
-  • Press Enter or select 1-5 to use AI recommendations
-Enter your choice (1): 3
+  • Enter a number (1-5) to select an AI provider
+  • Press Enter to use the default (1)
+3
 
 Using Perplexity with model Sonar
 
-Step 6: AI Analysis & Recommendations 🤖
+Step 6: AI Analysis & Complete Project Design 🤖
 ────────────────────────────────────────────────────────────────────────────────
-⠹ 🤖 Analyzing your project description...
+⠏ 🤖 Analyzing your requirements and designing optimal solution...
+DEBUG:create_python_project:Raw comprehensive analysis response: ```json
+{
+  "recommended_architecture": {
+    "type": "web",
+    "approach": "A web-based architecture providing a centralized platform for users to organize, 
+annotate, and collaborate on research papers",
+    "reasoning": "This architecture allows for easy access and collaboration across different locations 
+and devices, making it ideal for researchers. It also supports integration with institutional systems and
+publishing platforms. The web-based nature facilitates intuitive user interfaces similar to Notion, which
+users are familiar with."
+  },
+  "technology_stack": {
+    "categories": [
+      {
+        "name": "Backend Framework",
+        "description": "Handles server-side logic and API interactions",
+        "options": [
+          {
+            "name": "fastapi",
+            "description": "FastAPI provides fast and efficient API development with strong support for 
+asynchronous tasks, making it suitable for handling concurrent requests from multiple researchers.",
+            "recommended": true,
+            "reasoning": "FastAPI is well-suited for building robust APIs that can handle real-time 
+collaboration and data updates.",
+            "install_type": "python"
+          }
+        ]
+      },
+      {
+        "name": "Database Management",
+        "description": "Manages data storage and retrieval",
+        "options": [
+          {
+            "name": "postgresql",
+            "description": "PostgreSQL offers robust data management with support for complex queries and
+concurrent access, essential for collaborative research environments.",
+            "recommended": true,
+            "reasoning": "PostgreSQL is reliable and scalable, making it ideal for handling large volumes
+of research data and metadata.",
+            "install_type": "system"
+          }
+        ]
+      },
+      {
+        "name": "Frontend Framework",
+        "description": "Handles user interface and client-side logic",
+        "options": [
+          {
+            "name": "react",
+            "description": "React provides a flexible and responsive UI framework, ideal for creating 
+interactive components like note-taking and annotation tools.",
+            "recommended": true,
+            "reasoning": "React's component-based architecture facilitates the development of complex, 
+interactive interfaces that mirror the flexibility of Notion.",
+            "install_type": "npm"
+          }
+        ]
+      }
+    ]
+  },
+  "project_structure": {
+    "type": "Modern web app with API backend",
+    "key_features": [
+      "Centralized repository for organizing research papers",
+      "Real-time collaboration tools for annotating and discussing papers",
+      "Seamless integration with citation management tools like Zotero"
+    ],
+    "user_experience": "Users interact with the system through a user-friendly web interface, where they 
+can easily upload, annotate, and collaborate on research papers. The system integrates with Zotero for 
+citation management and provides real-time updates for collaborative work."
+  },
+  "future_flexibility": {
+    "expansion_options": [
+      "Integration with AI tools for literature analysis",
+      "Support for multimedia content and presentations"
+    ],
+    "alternative_deployments": [
+      "Mobile app for offline access to research materials",
+      "Desktop application for local data management"
+    ]
+  }
+}
+```
+DEBUG:create_python_project:Successfully parsed comprehensive analysis JSON
 
 ✅ AI Analysis Complete!
 
-Recommended Project Type: Desktop GUI
-Desktop application with interactive graphical user interface elements. This project would be 
-best suited as a native desktop application with a graphical interface (gui) because it involves 
-visualizing financial data, categorizing transactions, and providing detailed reports. These 
-features are typically easier to implement and more user-friendly in a desktop environment, 
-especially for users who are not familiar with complex spreadsheet management or financial 
-software. Additionally, a gui application can integrate machine learning for smart categorization
-and provide clear visual insights into spending patterns, aligning well with the project's 
-requirements to simplify financial management for non-experts.
+🎯 Recommended Solution Architecture:
+A web-based architecture providing a centralized platform for users to organize, annotate, and 
+collaborate on research papers
 
+💡 Why this approach:
+This architecture allows for easy access and collaboration across different locations and devices, making
+it ideal for researchers. It also supports integration with institutional systems and publishing 
+platforms. The web-based nature facilitates intuitive user interfaces similar to Notion, which users are 
+familiar with.
 
-Step 7: Technology Stack Selection 🔧
+🏗️ Project Structure:
+Modern web app with API backend
+
+✨ Key Features:
+  • Centralized repository for organizing research papers
+  • Real-time collaboration tools for annotating and discussing papers
+  • Seamless integration with citation management tools like Zotero
+
+👤 User Experience:
+Users interact with the system through a user-friendly web interface, where they can easily upload, 
+annotate, and collaborate on research papers. The system integrates with Zotero for citation management 
+and provides real-time updates for collaborative work.
+
+Step 7: Technology Stack Review 🔧
 ────────────────────────────────────────────────────────────────────────────────
-⠋ 🤖 Analyzing optimal technology stack...
-DEBUG:create_python_project:Raw technology stack response: ```json
-{
-  "categories": [
-    {
-      "name": "Frontend Technology",
-      "description": "Library or framework used for creating the Graphical User Interface (GUI) 
-of the application.",
-      "options": [
-        {
-          "name": "PyQt",
-          "description": "A powerful GUI framework built on top of Qt, offering robust features, 
-cross-platform compatibility, and a professional look.",
-          "recommended": true
-        },
-        {
-          "name": "Tkinter",
-          "description": "Python's built-in GUI library, ideal for simple applications but 
-lacking in customization options.",
-          "recommended": false
-        },
-        {
-          "name": "Kivy",
-          "description": "A cross-platform GUI library, suitable for creating multi-touch 
-applications but might require more learning.",
-          "recommended": false
-        }
-      ]
-    },
-    {
-      "name": "Backend Framework",
-      "description": "Framework used for handling server-side logic and data processing.",
-      "options": [
-        {
-          "name": "Flask",
-          "description": "A lightweight and flexible web framework, ideal for building RESTful 
-APIs and small applications.",
-          "recommended": true
-        },
-        {
-          "name": "Django",
-          "description": "A high-level framework providing an architecture, templates, and APIs 
-for complex projects.",
-          "recommended": false
-        }
-      ]
-    },
-    {
-      "name": "Database",
-      "description": "Database management system for storing transaction data.",
-      "options": [
-        {
-          "name": "SQLite",
-          "description": "A lightweight, self-contained, file-based database, suitable for 
-smaller applications.",
-          "recommended": true
-        },
-        {
-          "name": "PostgreSQL",
-          "description": "A powerful, feature-rich relational database, ideal for larger or more 
-complex applications.",
-          "recommended": false
-        }
-      ]
-    },
-    {
-      "name": "Authentication",
-      "description": "Mechanism for securely authenticating users, if required.",
-      "options": [
-        {
-          "name": "OAuth2 with Revolut API",
-          "description": "Using OAuth2 to authenticate with Revolut for secure data access.",
-          "recommended": true
-        }
-      ]
-    },
-    {
-      "name": "Data Processing",
-      "description": "Libraries used for importing CSV data and learning spending patterns.",
-      "options": [
-        {
-          "name": "Pandas",
-          "description": "A powerful library for data manipulation and analysis, ideal for 
-handling CSV files.",
-          "recommended": true
-        },
-        {
-          "name": "Scikit-learn",
-          "description": "A machine learning library that can be used to analyze spending 
-patterns.",
-          "recommended": true
-        }
-      ]
-    },
-    {
-      "name": "Testing Tools",
-      "description": "Tools used for writing unit tests and ensuring application reliability.",
-      "options": [
-        {
-          "name": "Pytest",
-          "description": "A popular testing framework that provides a lot of flexibility.",
-          "recommended": true
-        },
-        {
-          "name": "Unittest",
-          "description": "Python's built-in testing framework, simple and easy to use.",
-          "recommended": false
-        }
-      ]
-    },
-    {
-      "name": "Deployment Options",
-      "description": "Methods for deploying the application to users.",
-      "options": [
-        {
-          "name": "Standalone Application",
-          "description": "Deploying the application as a standalone executable for easy 
-distribution.",
-          "recommended": true
-        }
-      ]
-    }
-  ],
-  "analysis": [
-    "Key feature needed: Automatic import of Revolut data via CSV files.",
-    "Key feature needed: Machine learning capabilities to learn spending patterns.",
-    "Key feature needed: Generation of clear and insightful reports.",
-    "Key feature needed: Secure authentication for accessing Revolut data."
-  ]
-}
-```
-DEBUG:create_python_project:Successfully parsed JSON after cleaning
+🔧 Complete Technology Stack:
+                              🤖 AI-Recommended Technologies                              
+┏━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Component       ┃ Technology      ┃ Why Recommended                                    ┃
+┡━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ Backend Framew… │ fastapi         │ FastAPI is well-suited for building robust APIs    │
+│                 │                 │ that can handle real-time collaboration and data   │
+│                 │                 │ updates.                                           │
+│ Database Manag… │ postgresql      │ PostgreSQL is reliable and scalable, making it     │
+│                 │                 │ ideal for handling large volumes of research data  │
+│                 │                 │ and metadata.                                      │
+│ Frontend Frame… │ react           │ React's component-based architecture facilitates   │
+│                 │                 │ the development of complex, interactive interfaces │
+│                 │                 │ that mirror the flexibility of Notion.             │
+└─────────────────┴─────────────────┴────────────────────────────────────────────────────┘
 
-🤖 Key Project Features Identified
-Based on AI analysis of your project description
-  • Key feature needed: Automatic import of Revolut data via CSV files.
-  • Key feature needed: Machine learning capabilities to learn spending patterns.
-  • Key feature needed: Generation of clear and insightful reports.
-  • Key feature needed: Secure authentication for accessing Revolut data.
-
-
-🔧 Recommended Technology Stack
-AI-curated technologies optimized for your project
-- Frontend Technology: PyQt — A powerful GUI framework built on top of Qt, offering robust 
-features, cross-platform compatibility, and a professional look. (Best for: projects that match 
-its specific strengths and features)
-- Backend Framework: Flask — A lightweight and flexible web framework, ideal for building RESTful
-APIs and small applications. (Best for: lightweight applications with flexible routing and 
-minimal constraints)
-- Database: SQLite — A lightweight, self-contained, file-based database, suitable for smaller 
-applications. (Best for: development environments, small applications, or embedded databases)
-- Authentication: OAuth2 with Revolut API — Using OAuth2 to authenticate with Revolut for secure 
-data access. (Best for: projects that match its specific strengths and features)
-- Data Processing: Pandas — A powerful library for data manipulation and analysis, ideal for 
-handling CSV files. (Best for: projects that match its specific strengths and features)
-- Testing Tools: Pytest — A popular testing framework that provides a lot of flexibility. (Best 
-for: projects that match its specific strengths and features)
-- Deployment Options: Standalone Application — Deploying the application as a standalone 
-executable for easy distribution. (Best for: projects that match its specific strengths and 
-features)
-
+🚀 Future Flexibility:
+Expansion Options:
+  • Integration with AI tools for literature analysis
+  • Support for multimedia content and presentations
+Alternative Deployments:
+  • Mobile app for offline access to research materials
+  • Desktop application for local data management
 
 Technology Selection Options:
-  • Press Enter to use AI recommendations (recommended)
-  • Type 'customize' to manually select technologies
-  • Type 'v' to toggle verbose mode for detailed descriptions
- [/customize/v] (): 
-🤖 Using AI-recommended technologies for your project.
-
-✅ Session log saved to: 
-/home/michaelnewham/Projects/revolut_expense_tracker/ai-docs/project_initialization_2025-06-05T01
--03-38.md
+  • Press Enter to use this complete solution (recommended)
+  • Type 'alternatives' to see other architectural approaches
+  • Type 'customize' to modify specific technologies
+ [/alternatives/customize] (): 
+🤖 Using AI-recommended solution for your project.
 
 Step 8: Creating Project Structure 🔧
 ────────────────────────────────────────────────────────────────────────────────
 
-🔧 Building Desktop GUI project...
+🔧 Building Web Application project...
 📁 Creating directory structure
 📄 Generating configuration files
 🔧 Setting up project templates
@@ -293,8 +245,7 @@ Step 8: Creating Project Structure 🔧
 ✨ Finalizing project setup
   Building your Python project...
 
-✅ Complete AI-driven project structure created at 
-/home/michaelnewham/Projects/revolut_expense_tracker
+✅ Complete AI-driven project structure created at /home/michaelnewham/Projects/content_management_system
 
 Step 9: Workspace Configuration 📋
 ────────────────────────────────────────────────────────────────────────────────
@@ -302,12 +253,12 @@ Step 9: Workspace Configuration 📋
 ⠋ 📋 Creating workspace configuration...
 
 ✅ Workspace file created: 
-/home/michaelnewham/Projects/revolut_expense_tracker/revolut-expense-tracker.code-workspace
+/home/michaelnewham/Projects/content_management_system/content_management_System.code-workspace
 
 Step 10: Development Tools Setup 🛠️
 ────────────────────────────────────────────────────────────────────────────────
 🛠️ Do you want to set up development tools (pre-commit, linting)? [y/n] (y): 
-⠦ 🛠️ Setting up development tools...
+⠧ 🛠️ Setting up development tools...
 
 ✅ Development tools configured successfully
 
@@ -350,14 +301,19 @@ Use 'git push -u origin main' to push your code when ready.
 Step 13: Poetry Environment Setup 📦
 ────────────────────────────────────────────────────────────────────────────────
 📦 Do you want to set up Poetry and install dependencies? [y/n] (y): 
-⠇ 📦 Setting up Poetry environment...
+⠴ 📦 Setting up Poetry environment...
 
-✅ Poetry environment created and all dependencies installed successfully
+✅ ✅ Python packages installed: 6 (fastapi, uvicorn, pydantic, pydantic-settings, psycopg2-binary, 
+sqlalchemy)
+✅ Node.js packages installed: 5 (react, react-dom, @types/react, @types/react-dom, typescript)
+✅ Python imports verified: fastapi, uvicorn, pydantic, pydantic-settings, sqlalchemy
+⚠️ Python imports failed: psycopg2-binary
+✅ Node.js packages in package.json: react, react-dom, @types/react, @types/react-dom, typescript
 To activate the environment, run poetry env activate in your project directory
 
 Step 14: MCP Configuration Setup 🤖
 ────────────────────────────────────────────────────────────────────────────────
-🤖 Do you want to configure MCP servers for your IDE? [y/n] (y): 
+
 MCP configuration templates have been created in .vscode/ and .cursor/ directories
 Edit the mcp.json files and add your API keys to the .env file
 ✅ MCP configuration ready for customization
@@ -366,46 +322,46 @@ Step 15: Project Created Successfully! 🎉
 ────────────────────────────────────────────────────────────────────────────────
 
 🎉 Your new Python project has been created!
-  📁 /home/michaelnewham/Projects/revolut_expense_tracker
-╭─ 🎯 Project Overview ─────────────────────────────────────────────────────────────────────────╮
-│ Project Summary:                                                                              │
-│ • Name: revolut-expense-tracker                                                               │
-│ • Type: Gui Project                                                                           │
-│ • Author: Michael Newham                                                                      │
-│ • Location: /home/michaelnewham/Projects/revolut_expense_tracker                              │
-╰───────────────────────────────────────────────────────────────────────────────────────────────╯
+  📁 /home/michaelnewham/Projects/content_management_system
+╭─ 🎯 Project Overview ─────────────────────────────────────────────────────────────────────────────────╮
+│ Project Summary:                                                                                      │
+│ • Name: content_management_System                                                                     │
+│ • Type: Web Project                                                                                   │
+│ • Author: Michael Newham                                                                              │
+│ • Location: /home/michaelnewham/Projects/content_management_system                                    │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────╯
 
-                                         🚀 Next steps:                                          
+                                             🚀 Next steps:                                              
 
- 1 Navigate to your project directory:                                                           
-                                                                                                 
-    cd /home/michaelnewham/Projects/revolut_expense_tracker                                      
-                                                                                                 
- 2 Activate the Poetry environment:                                                              
-                                                                                                 
-    poetry env use python                                                                        
-                                                                                                 
- 3 Start coding in the src/ directory                                                            
- 4 Add your tests in the tests/ directory                                                        
- 5 Use Poetry to manage dependencies:                                                            
-                                                                                                 
-    # Add a production dependency                                                                
-    poetry add <package-name>                                                                    
-                                                                                                 
-    # Add a development dependency                                                               
-    poetry add --group dev <package-name>                                                        
-                                                                                                 
- 6 Additional helpful commands:                                                                  
-                                                                                                 
-    # Run tests                                                                                  
-    poetry run pytest                                                                            
-                                                                                                 
-    # Format code                                                                                
-    poetry run black src/                                                                        
-                                                                                                 
-    # Type checking                                                                              
-    poetry run mypy src/                                                                         
-                                                                                                 
+ 1 Navigate to your project directory:                                                                   
+                                                                                                         
+    cd /home/michaelnewham/Projects/content_management_system                                            
+                                                                                                         
+ 2 Activate the Poetry environment:                                                                      
+                                                                                                         
+    poetry env use python                                                                                
+                                                                                                         
+ 3 Start coding in the src/ directory                                                                    
+ 4 Add your tests in the tests/ directory                                                                
+ 5 Use Poetry to manage dependencies:                                                                    
+                                                                                                         
+    # Add a production dependency                                                                        
+    poetry add <package-name>                                                                            
+                                                                                                         
+    # Add a development dependency                                                                       
+    poetry add --group dev <package-name>                                                                
+                                                                                                         
+ 6 Additional helpful commands:                                                                          
+                                                                                                         
+    # Run tests                                                                                          
+    poetry run pytest                                                                                    
+                                                                                                         
+    # Format code                                                                                        
+    poetry run black src/                                                                                
+                                                                                                         
+    # Type checking                                                                                      
+    poetry run mypy src/                                                                                 
+                                                                                                         
 
 🎉 Happy coding! Your project is ready for development.
 

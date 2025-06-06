@@ -83,4 +83,4 @@ fi
 
 echo -e "${BLUE}===== Configuration Check Complete =====${NC}"
 echo -e "${YELLOW}Note: If any warnings were shown, run the sync_mcp_config.sh script to fix configuration issues.${NC}"
-echo -e "${YELLOW}To test the Perplexity MCP server, run: ./scripts/run_perplexity_mcp.sh${NC}"
+echo -e "${YELLOW}To test the Perplexity MCP server, run: ./scripts/setup/run_perplexity_mcp.sh${NC}"

@@ -12,7 +12,7 @@ echo -e "${BLUE}===== Updating Perplexity MCP Runner =====${NC}"
 
 # Define global .env path
 GLOBAL_ENV_PATH="/home/michaelnewham/Projects/.env"
-PERPLEXITY_SCRIPT_PATH="/home/michaelnewham/Projects/create_python_project/scripts/run_perplexity_mcp.sh"
+PERPLEXITY_SCRIPT_PATH="/home/michaelnewham/Projects/create_python_project/scripts/setup/run_perplexity_mcp.sh"
 
 # Check if global .env exists
 if [ ! -f "$GLOBAL_ENV_PATH" ]; then

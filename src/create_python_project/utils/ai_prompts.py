@@ -113,10 +113,11 @@ Please provide a comprehensive analysis and design recommendation in the followi
         "description": "What this technology category handles",
         "options": [
           {{
-            "name": "Technology Name",
+            "name": "Exact Package Name",
             "description": "Why this technology fits this specific project",
             "recommended": true,
-            "reasoning": "Specific reason why this is best for the user's needs"
+            "reasoning": "Specific reason why this is best for the user's needs",
+            "install_type": "python|npm|system|manual"
           }}
         ]
       }}
@@ -137,14 +138,34 @@ Please provide a comprehensive analysis and design recommendation in the followi
   }}
 }}
 
+**CRITICAL PACKAGE NAMING REQUIREMENTS:**
+
+For "name" field in technology options, you MUST use EXACT installable package names:
+- Python packages: Use actual PyPI names (e.g., "fastapi", "flask", "psycopg2-binary", "elasticsearch")
+- npm packages: Use actual npm names (e.g., "react", "vue", "@types/node", "express")
+- System services: Use "install_type": "system" and provide setup instructions in description
+- Custom components: Use "install_type": "manual" and provide build instructions
+
+**INVALID EXAMPLES TO AVOID:**
+❌ "Custom Python Agent" (not a real package)
+❌ "Elasticsearch + Kibana" (multiple services, use separate entries)
+❌ "Python (Flask/FastAPI)" (multiple options, pick one)
+❌ "Vue.js or React" (multiple options, pick one)
+
+**VALID EXAMPLES:**
+✅ "fastapi" with install_type: "python"
+✅ "react" with install_type: "npm"
+✅ "postgresql" with install_type: "system"
+✅ "monitoring-agent" with install_type: "manual"
+
 Focus on:
 1. Choose architecture that best solves the user's actual problems
 2. Select technologies that work coherently together
-3. Prioritize user experience over technical complexity
+3. Use ONLY real, installable package names or mark as system/manual
 4. Consider the target users' technical expertise level
 5. Ensure technologies support the key features needed
 
-Respond with ONLY the JSON object, no additional text.
+IMPORTANT: Respond with ONLY the valid JSON object. Do not include any markdown formatting, code blocks, or additional text. Start your response with {{ and end with }}.
 """
 
 

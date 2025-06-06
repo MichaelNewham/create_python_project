@@ -73,6 +73,7 @@ def test_all_providers():
     # Provider classes to test
     test_providers = {
         "DeepSeek": ai_integration.DeepSeekProvider,
+        "Anthropic": ai_integration.AnthropicProvider,
         "Perplexity": ai_integration.PerplexityProvider,
         "OpenAI": ai_integration.OpenAIProvider,
         "Gemini": ai_integration.GeminiProvider,

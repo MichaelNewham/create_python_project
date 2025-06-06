@@ -174,3 +174,10 @@ The project requires environment variables for AI provider API keys:
 - `GEMINI_API_KEY`
 
 Copy `.env.example` to `.env` and fill in your API keys before running.
+
+## Recommended Memory Management
+
+Consistently keep in memory:
+- This CLAUDE.md file
+- The main README.md in the root folder
+- The ABOUT.md files in most folders directly under the root folder

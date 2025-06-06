@@ -423,8 +423,11 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
             )
             return manual_project_type_selection(project_types)
 
-        # Log the raw response for debugging
+        # Log the raw response for debugging (file only)
         logger.debug(f"Raw comprehensive analysis response: {response}")
+
+        # Show formatted AI response to user
+        console.print("\n[dim]🤖 AI Analysis Response:[/dim]")
 
         # Clean the response first - handle markdown-wrapped JSON
         cleaned_response = response.strip()
@@ -436,23 +439,57 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
             cleaned_response = cleaned_response[:-3]  # Remove trailing ```
         cleaned_response = cleaned_response.strip()
 
+        # Display clean formatted JSON to user
+        try:
+            parsed_for_display = json.loads(cleaned_response)
+            formatted_json = json.dumps(parsed_for_display, indent=2)
+
+            # Show formatted JSON in a panel
+            from rich.syntax import Syntax
+
+            syntax = Syntax(formatted_json, "json", theme="monokai", line_numbers=False)
+            console.print(
+                Panel(syntax, title="🤖 AI Comprehensive Analysis", border_style="blue")
+            )
+        except json.JSONDecodeError:
+            # Fallback: show raw response in a panel
+            console.print(
+                Panel(cleaned_response, title="🤖 AI Response", border_style="yellow")
+            )
+
         # Parse the comprehensive analysis
         try:
             analysis_data = json.loads(cleaned_response)
             logger.debug("Successfully parsed comprehensive analysis JSON")
-        except json.JSONDecodeError:
-            # Try regex extraction as fallback
-            logger.debug("Direct JSON parsing failed, trying regex extraction")
-            json_match = re.search(
-                r"(\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})",
-                response,
-                re.DOTALL,
-            )
+        except json.JSONDecodeError as e:
+            # Try multiple regex patterns as fallback
+            logger.debug(f"Direct JSON parsing failed: {e}, trying regex extraction")
+
+            patterns = [
+                r"(\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})",  # Complex nested pattern
+                r"\{[\s\S]*\}",  # Everything between first { and last }
+            ]
+
+            json_match = None
+            for pattern in patterns:
+                json_match = re.search(pattern, response, re.DOTALL)
+                if json_match:
+                    break
 
             if json_match:
-                json_str = json_match.group(1)
-                analysis_data = json.loads(json_str)
-                logger.debug("Successfully parsed extracted JSON")
+                json_str = (
+                    json_match.group(1)
+                    if len(json_match.groups()) > 0
+                    else json_match.group(0)
+                )
+                try:
+                    analysis_data = json.loads(json_str)
+                    logger.debug("Successfully parsed extracted JSON")
+                except json.JSONDecodeError as e2:
+                    logger.error(f"Extracted JSON still invalid: {e2}")
+                    raise json.JSONDecodeError(
+                        "Extracted JSON is malformed", "", 0
+                    ) from None
             else:
                 raise json.JSONDecodeError("No valid JSON found", "", 0) from None
 
@@ -676,6 +713,10 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
         )
         tech_data = create_default_tech_stack(project_type)
         project_info["tech_stack"] = tech_data
+
+        # Get project type info for logging
+        project_types = config.get_project_types()
+        type_info = project_types.get(project_type, {"name": project_type.capitalize()})
 
         # --- Write session to markdown in ai-docs/ ---
         try:
@@ -1302,12 +1343,20 @@ def main() -> int:
         )
         console.print(f"  📁 [cyan]{project_info['project_dir']}[/cyan]")
 
-        # Project summary panel
+        # Project summary panel with enhanced project type detection
         from rich.panel import Panel
+
+        from create_python_project.utils.core_project_builder import detect_project_type
+
+        # Use enhanced project type detection with description context
+        enhanced_project_type = detect_project_type(
+            project_info.get("tech_stack", {}),
+            project_info.get("project_description", ""),
+        )
 
         summary_content = f"""[bold]Project Summary:[/bold]
 • [cyan]Name:[/cyan] {project_info["project_name"]}
-• [cyan]Type:[/cyan] {project_type.capitalize()} Project
+• [cyan]Type:[/cyan] {enhanced_project_type}
 • [cyan]Author:[/cyan] {project_info.get("author_name", "Not specified")}
 • [cyan]Location:[/cyan] {project_info["project_dir"]}"""
 

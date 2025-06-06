@@ -18,7 +18,7 @@ git add .
 
 # Step 2: Run documentation update separately (not as part of pre-commit)
 echo "2. Running documentation update"
-./scripts/update_documentation.sh --list-only
+../update_documentation.sh --list-only
 
 # Ask user if they want to proceed with documentation update
 # Skip interactive prompts in VS Code/Cursor tasks
@@ -31,7 +31,7 @@ if [[ "$proceed" != "y" && "$proceed" != "Y" ]]; then
     echo "Documentation update skipped."
 else
     echo "Running documentation update..."
-    ./scripts/update_documentation.sh
+    ../update_documentation.sh
 
     # Add documentation changes to git
     echo "Adding documentation changes to git"
@@ -63,6 +63,6 @@ git commit -m "$COMMIT_MESSAGE"
 
 # Step 5: Push changes
 echo "5. Pushing changes"
-./scripts/post_commit_push.sh
+../post_commit_push.sh
 
 echo "=== Process completed successfully ==="

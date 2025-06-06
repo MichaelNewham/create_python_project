@@ -48,7 +48,7 @@ fi
 
 # Check 4: Security scripts exist
 echo -n "Checking security scripts: "
-if [ -f "scripts/remove_sensitive_file.sh" ] && [ -f "scripts/setup_env_template.sh" ]; then
+if [ -f "scripts/git/remove_sensitive_file.sh" ] && [ -f "scripts/setup/setup_env_template.sh" ]; then
     echo -e "${GREEN}PASSED${NC} - Security scripts exist"
 else
     echo -e "${RED}FAILED${NC} - Security scripts missing"

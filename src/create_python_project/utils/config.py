@@ -313,4 +313,9 @@ def get_project_types() -> dict[str, dict[str, str]]:
             "name": "Automation Tool",
             "description": "Workflow automation, bots, and system integration",
         },
+        # Generic fallback type
+        "basic": {
+            "name": "Basic Python Project",
+            "description": "Simple Python project with minimal dependencies",
+        },
     }

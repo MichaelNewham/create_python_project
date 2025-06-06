@@ -123,9 +123,9 @@ class OpenAIProvider(AIProvider):
 
             # Use appropriate token parameter based on model
             if "o4-mini" in (self.model or "").lower():
-                completion_params["max_completion_tokens"] = 1000
+                completion_params["max_completion_tokens"] = 2500
             else:
-                completion_params["max_tokens"] = 1000
+                completion_params["max_tokens"] = 2500
 
             response = openai.chat.completions.create(**completion_params)
 
@@ -190,7 +190,7 @@ class AnthropicProvider(AIProvider):
 
             message = client.messages.create(
                 model=self.model,
-                max_tokens=1000,
+                max_tokens=2500,
                 system=system_prompt,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -257,7 +257,7 @@ class PerplexityProvider(AIProvider):
                     },
                     {"role": "user", "content": prompt},
                 ],
-                "max_tokens": 1000,
+                "max_tokens": 2500,
             }
 
             # Log request details for debugging (without API key)
@@ -335,7 +335,7 @@ class DeepSeekProvider(AIProvider):
                     },
                     {"role": "user", "content": prompt},
                 ],
-                "max_tokens": 1000,
+                "max_tokens": 2500,
             }
 
             response = requests.post(url, headers=headers, json=payload)
@@ -384,6 +384,7 @@ class GeminiProvider(AIProvider):
 
             # Import google.generativeai locally
             import google.generativeai as genai
+            from google.generativeai.types import HarmBlockThreshold, HarmCategory
 
             genai.configure(api_key=self.api_key)
 
@@ -395,7 +396,13 @@ class GeminiProvider(AIProvider):
                 prompt,
                 generation_config={
                     "temperature": 0.7,
-                    "max_output_tokens": 1000,
+                    "max_output_tokens": 2500,
+                },
+                safety_settings={
+                    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
                 },
             )
 
@@ -484,7 +491,8 @@ def select_ai_provider(providers: dict[str, str]) -> tuple[bool, AIProvider | No
 
     # Add the selection text
     console.print("\n[bold yellow]AI Selection:[/bold yellow]")
-    console.print("  [dim]• Press Enter or select 1-5 to use AI recommendations[/dim]")
+    console.print("  [dim]• Enter a number (1-5) to select an AI provider[/dim]")
+    console.print("  [dim]• Press Enter to use the default (1)[/dim]")
 
     try:
         default = 1

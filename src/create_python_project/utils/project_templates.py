@@ -1824,7 +1824,7 @@ if __name__ == "__main__":
 
 import click
 from .commands import hello, version, config
-from .utils import setup_logging
+# Logging is handled by main application
 
 
 @click.group()
@@ -1838,7 +1838,7 @@ def cli(ctx, debug):
     """
     ctx.ensure_object(dict)
     ctx.obj['DEBUG'] = debug
-    setup_logging(debug)
+    # Logging is configured by the main application
 
 
 # Register commands
@@ -1902,15 +1902,7 @@ import click
 from pathlib import Path
 
 
-def setup_logging(debug: bool = False):
-    """Set up logging configuration."""
-    level = logging.DEBUG if debug else logging.INFO
-
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+# Logging setup removed - handled by main application logging module
 
 
 def ensure_config_dir() -> Path:

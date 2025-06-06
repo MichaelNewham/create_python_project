@@ -44,8 +44,8 @@ Stats: $commit_stats
 
 Focus on the main operation (add/update/delete/refactor)"
     
-    if [ -f "${PROJECT_DIR}/scripts/deepseek_commit_message.py" ]; then
-        poetry run python "${PROJECT_DIR}/scripts/deepseek_commit_message.py" "$prompt" 2>/dev/null || echo "Update project files"
+    if [ -f "${PROJECT_DIR}/scripts/testing/deepseek_commit_message.py" ]; then
+        poetry run python "${PROJECT_DIR}/scripts/testing/deepseek_commit_message.py" "$prompt" 2>/dev/null || echo "Update project files"
     else
         echo "Update project files"
     fi
@@ -71,9 +71,9 @@ print_message "$GREEN" "✅ Files staged successfully"
 print_message "$BLUE" "📚 Updating project documentation..."
 log_step "DOCS: Starting documentation update"
 
-if [ -f "./scripts/manage_docs.sh" ]; then
-    chmod +x ./scripts/manage_docs.sh
-    ./scripts/manage_docs.sh >/dev/null 2>&1 || true
+if [ -f "./scripts/docs/manage_docs.sh" ]; then
+    chmod +x ./scripts/docs/manage_docs.sh
+    ./scripts/docs/manage_docs.sh >/dev/null 2>&1 || true
     git add "**/aboutthisfolder.md" >/dev/null 2>&1 || true
 fi
 
