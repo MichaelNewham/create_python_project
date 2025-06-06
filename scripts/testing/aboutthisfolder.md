@@ -30,12 +30,12 @@ testing/
 
 ## Change History
 
-test_ai_providers.py
-test_all_providers.py
 test_anthropic_api.py
 test_json_parsing.py
 test_mcp
+Sat 07 Jun 2025 00:06:21 IST: ADDED: deepseek_commit_message.py test_ai_provider_selection.py test_ai_providers.py test_all_providers.py test_anthropic_api.py test_json_parsing.py test_mcp 
+Sat 07 Jun 2025 00:06:21 IST: REMOVED:  04:26 39:00 FILES:deepseek_commit_message.py IST: IST: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-06-05 23:38:59
+This documentation was automatically generated on: 2025-06-07 00:06:19

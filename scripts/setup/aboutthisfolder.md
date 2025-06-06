@@ -36,12 +36,12 @@ setup/
 
 ## Change History
 
-setup_env_template.sh
-sync_mcp_config.sh
 update_documentation.sh.bak
 update_perplexity_mcp.sh
 verify_security.sh
+Sat 07 Jun 2025 00:06:20 IST: ADDED: check_perplexity_config.sh github_mcp_fix_summary.sh mcp_config_summary.sh run_perplexity_mcp.sh run_perplexity_mcp.sh.bak setup_env_template.sh sync_mcp_config.sh update_documentation.sh.bak update_perplexity_mcp.sh verify_security.sh 
+Sat 07 Jun 2025 00:06:20 IST: REMOVED:  04:26 39:00 FILES:check_perplexity_config.sh IST: IST: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-06-05 23:38:59
+This documentation was automatically generated on: 2025-06-07 00:06:19

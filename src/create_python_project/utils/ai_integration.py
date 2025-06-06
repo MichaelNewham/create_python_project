@@ -9,6 +9,7 @@ It supports multiple AI providers such as OpenAI, Anthropic, Perplexity, etc.
 import importlib.util
 import logging
 import os
+import random
 from typing import TYPE_CHECKING, Any
 
 import requests
@@ -538,3 +539,79 @@ def select_ai_provider(providers: dict[str, str]) -> tuple[bool, AIProvider | No
     except Exception as e:
         console.print(f"Error selecting AI provider: {str(e)}", style="bold red")
         return False, None
+
+
+def get_random_ai_provider(
+    providers: dict[str, str], exclude: list[str] | None = None
+) -> tuple[bool, AIProvider | None]:
+    """
+    Get a random AI provider from available providers, excluding specific ones.
+
+    Args:
+        providers: Dictionary of available providers
+        exclude: List of provider names to exclude from selection
+
+    Returns:
+        Tuple containing success status and selected provider
+    """
+
+    if not providers:
+        return False, None
+
+    exclude = exclude or []
+
+    # Filter out excluded providers
+    available_providers = {
+        name: model for name, model in providers.items() if name not in exclude
+    }
+
+    if not available_providers:
+        return False, None
+
+    # Randomly select a provider
+    provider_name = random.choice(list(available_providers.keys()))
+    model = available_providers[provider_name]
+
+    # Create the appropriate provider instance
+    selected_provider: AIProvider | None = None
+
+    if provider_name == "OpenAI":
+        selected_provider = OpenAIProvider(model=model)
+    elif provider_name == "Anthropic":
+        selected_provider = AnthropicProvider(model=model)
+    elif provider_name == "Perplexity":
+        selected_provider = PerplexityProvider(model=model)
+    elif provider_name == "DeepSeek":
+        selected_provider = DeepSeekProvider(model=model)
+    elif provider_name == "Gemini":
+        selected_provider = GeminiProvider(model=model)
+
+    if selected_provider:
+        return True, selected_provider
+
+    return False, None
+
+
+def create_provider_instance(provider_name: str, model: str) -> AIProvider | None:
+    """
+    Create an instance of the appropriate AI provider.
+
+    Args:
+        provider_name: Name of the provider
+        model: Model to use
+
+    Returns:
+        AIProvider instance or None if provider not supported
+    """
+    if provider_name == "OpenAI":
+        return OpenAIProvider(model=model)
+    elif provider_name == "Anthropic":
+        return AnthropicProvider(model=model)
+    elif provider_name == "Perplexity":
+        return PerplexityProvider(model=model)
+    elif provider_name == "DeepSeek":
+        return DeepSeekProvider(model=model)
+    elif provider_name == "Gemini":
+        return GeminiProvider(model=model)
+    else:
+        return None

@@ -235,9 +235,9 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     return True, project_info
 
 
-def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
+def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str]:
     """
-    Determine the project type based on project description with enhanced UI.
+    Conduct a multi-expert AI consultation to generate a comprehensive PRD.
 
     Args:
         project_info: Dictionary containing project information
@@ -253,7 +253,7 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
     cli_state.print_separator(console)
 
     console.print(
-        "[italic]Help AI understand your vision by sharing context and inspiration.[/italic]"
+        "[italic]Help our expert AI team understand your vision by sharing context and inspiration.[/italic]"
     )
 
     # Three key contextual questions
@@ -302,483 +302,326 @@ def determine_project_type(project_info: dict[str, Any]) -> tuple[bool, str]:
         )
         return manual_project_type_selection(project_types)
 
-    # Step 5: AI Provider Selection 🤖
+    # Step 5: Expert Consultation Phase 🤖
     console.print(
-        f"\n{cli_state.get_step_header('AI Provider Selection', cli_state.ai_icon)}"
+        f"\n{cli_state.get_step_header('Expert Consultation Phase', cli_state.ai_icon)}"
     )
     cli_state.print_separator(console)
 
-    # Enhanced provider selection with better descriptions
-    provider_order = ["DeepSeek", "Anthropic", "Perplexity", "OpenAI", "Gemini"]
-    provider_descriptions = {
-        "DeepSeek": f"{providers.get('DeepSeek', 'deepseek-reasoner')}: Advanced reasoning model designed for complex problem solving and multi-step analysis. Excels at breaking down complex scenarios step-by-step",
-        "Anthropic": f"{providers.get('Anthropic', 'claude-sonnet-4-20250514')}: Latest Claude model with superior reasoning and comprehensive project analysis. Excellent for nuanced understanding and planning",
-        "Perplexity": f"{providers.get('Perplexity', 'sonar')}: Research-focused model with real-time web access for current tech recommendations. Ideal for finding latest frameworks and best practices",
-        "OpenAI": f"{providers.get('OpenAI', 'gpt-4o-mini')}: Fast, cost-effective model optimized for general tasks and rapid responses. Great balance of speed, capability, and reliability for most projects",
-        "Gemini": f"{providers.get('Gemini', 'gemini-2.5-flash-preview-05-20')}: Google's latest model optimized for data projects and integration with Google services. Strong multimodal capabilities",
-    }
+    console.print("[bold cyan]🎯 PRD Stage: Multi-Expert Consultation[/bold cyan]")
+    console.print(
+        "[italic]Three expert AI personas will analyze your project, then Claude Opus4 will synthesize their insights into a comprehensive PRD.[/italic]"
+    )
 
+    # Display expert team
     from rich.table import Table
 
-    table = Table(
-        show_header=True, header_style="bold magenta", title="🤖 Available AI Providers"
+    experts_table = Table(
+        show_header=True, header_style="bold magenta", title="🎓 Expert Team"
     )
-    table.add_column("#", style="cyan", no_wrap=True, width=3)
-    table.add_column("Provider", style="green", width=12)
-    table.add_column("Model & Description", style="white")
-    table.add_column("Best For", style="dim", width=25)
+    experts_table.add_column("Expert", style="cyan", width=20)
+    experts_table.add_column("Role", style="green", width=15)
+    experts_table.add_column("Expertise", style="white", width=40)
 
-    ordered_providers = [
-        (name, providers[name]) for name in provider_order if name in providers
-    ]
+    experts_table.add_row(
+        "Anya Sharma", "UX Lead", "User research, interface design, accessibility"
+    )
+    experts_table.add_row(
+        "Ben Carter", "Product Lead", "Strategy, go-to-market, feature prioritization"
+    )
+    experts_table.add_row(
+        "Dr. Chloe Evans", "Chief Architect", "System design, scalability, tech stack"
+    )
+    experts_table.add_row(
+        "Product Instigator",
+        "Final Synthesis",
+        "Comprehensive PRD creation (Claude Opus4)",
+    )
 
-    provider_specialties = {
-        "DeepSeek": "Strategic planning, complex analysis",
-        "Anthropic": "Detailed analysis, documentation",
-        "Perplexity": "Research, tech recommendations",
-        "OpenAI": "Quick prototyping, general setup",
-        "Gemini": "Data science, ML projects, analytics",
-    }
-
-    for idx, (name, _) in enumerate(ordered_providers, 1):
-        desc = provider_descriptions.get(name, "")
-        specialty = provider_specialties.get(name, "General purpose")
-        table.add_row(str(idx), name, desc, specialty)
-
-    console.print(table)
+    console.print(experts_table)
     console.print(
-        f"[dim]{cli_state.ai_icon} Choose the provider that best matches your project needs. Default is DeepSeek (1).[/dim]"
+        "\n[dim]Each expert will be represented by a randomly selected AI provider.[/dim]"
     )
 
-    console.print("\n[bold yellow]AI Selection:[/bold yellow]")
-    console.print("  [dim]• Press Enter or select 1-5 to use AI recommendations[/dim]")
+    # Track used providers to ensure diversity
+    used_providers: list[str] = []
+    expert_analyses: dict[str, str] = {}
 
-    provider_success, selected_provider = ai_integration.select_ai_provider(
-        dict(ordered_providers)
+    # Expert 1: Anya Sharma (UX Lead)
+    console.print(
+        "\n[bold green]👥 Consulting with Anya Sharma (UX Lead)...[/bold green]"
     )
 
-    if not provider_success or not selected_provider:
+    success, anya_provider = ai_integration.get_random_ai_provider(
+        providers, used_providers
+    )
+    if not success or anya_provider is None:
         console.print(
-            f"[bold yellow]{cli_state.warning_icon} Failed to select an AI provider. Using manual selection.[/bold yellow]"
+            f"[bold red]{cli_state.error_icon} Failed to assign AI provider to Anya[/bold red]"
         )
         return manual_project_type_selection(project_types)
 
-    # Step 6: AI Analysis & Complete Project Design 🤖
-    console.print(
-        f"\n{cli_state.get_step_header('AI Analysis & Complete Project Design', cli_state.ai_icon)}"
-    )
-    cli_state.print_separator(console)
+    used_providers.append(anya_provider.__class__.__name__.replace("Provider", ""))
+    console.print(f"[dim]Represented by: {anya_provider.display_name}[/dim]")
 
-    # Use AI to get comprehensive analysis with enhanced progress display
     with Progress(
         SpinnerColumn(),
         TextColumn(
-            f"[bold cyan]{cli_state.ai_icon} Analyzing your requirements and designing optimal solution...[/bold cyan]"
+            "[bold cyan]👥 Anya analyzing user experience requirements...[/bold cyan]"
         ),
         console=console,
     ) as progress:
-        task = progress.add_task("Analyzing", total=None)
+        task = progress.add_task("UX Analysis", total=None)
 
-        # Generate comprehensive analysis prompt
-        prompt = ai_prompts.get_comprehensive_analysis_prompt(
+        anya_prompt = ai_prompts.get_anya_ux_prompt(
             project_info["project_name"],
             project_info["project_description"],
             project_info.get("context", {}),
         )
 
-        # Get AI response for comprehensive analysis
-        ai_success, response = selected_provider.generate_response(prompt)
-
-        # If selected provider fails, try DeepSeek as fallback
-        if (
-            not ai_success
-            and selected_provider.__class__.__name__ != "DeepSeekProvider"
-            and "DeepSeek" in providers
-        ):
-            console.print(
-                f"[bold yellow]Selected AI provider failed: {response}. Trying DeepSeek as fallback...[/bold yellow]"
-            )
-            deepseek_provider = ai_integration.DeepSeekProvider()
-            ai_success, response = deepseek_provider.generate_response(prompt)
-
-        # Update progress
+        anya_success, anya_response = anya_provider.generate_response(anya_prompt)
         progress.update(task, completed=True)
-        progress.stop()
 
-        if not ai_success:
-            console.print(
-                f"[bold red]{cli_state.error_icon} Error getting AI analysis:[/bold red] {response}"
-            )
-            return manual_project_type_selection(project_types)
-
-    # Parse the comprehensive JSON response
-    try:
-        import json
-        import re
-
-        # Handle empty or invalid responses
-        if not response or response.strip() == "":
-            console.print(
-                f"[bold yellow]{cli_state.warning_icon} No analysis received from AI.[/bold yellow]"
-            )
-            return manual_project_type_selection(project_types)
-
-        # Log the raw response for debugging (file only)
-        logger.debug(f"Raw comprehensive analysis response: {response}")
-
-        # Show formatted AI response to user
-        console.print("\n[dim]🤖 AI Analysis Response:[/dim]")
-
-        # Clean the response first - handle markdown-wrapped JSON
-        cleaned_response = response.strip()
-        if cleaned_response.startswith("```json"):
-            cleaned_response = cleaned_response[7:]  # Remove ```json
-        if cleaned_response.startswith("```"):
-            cleaned_response = cleaned_response[3:]  # Remove ```
-        if cleaned_response.endswith("```"):
-            cleaned_response = cleaned_response[:-3]  # Remove trailing ```
-        cleaned_response = cleaned_response.strip()
-
-        # Display clean formatted JSON to user
-        try:
-            parsed_for_display = json.loads(cleaned_response)
-            formatted_json = json.dumps(parsed_for_display, indent=2)
-
-            # Show formatted JSON in a panel
-            from rich.syntax import Syntax
-
-            syntax = Syntax(formatted_json, "json", theme="monokai", line_numbers=False)
-            console.print(
-                Panel(syntax, title="🤖 AI Comprehensive Analysis", border_style="blue")
-            )
-        except json.JSONDecodeError:
-            # Fallback: show raw response in a panel
-            console.print(
-                Panel(cleaned_response, title="🤖 AI Response", border_style="yellow")
-            )
-
-        # Parse the comprehensive analysis
-        try:
-            analysis_data = json.loads(cleaned_response)
-            logger.debug("Successfully parsed comprehensive analysis JSON")
-        except json.JSONDecodeError as e:
-            # Try multiple regex patterns as fallback
-            logger.debug(f"Direct JSON parsing failed: {e}, trying regex extraction")
-
-            patterns = [
-                r"(\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})",  # Complex nested pattern
-                r"\{[\s\S]*\}",  # Everything between first { and last }
-            ]
-
-            json_match = None
-            for pattern in patterns:
-                json_match = re.search(pattern, response, re.DOTALL)
-                if json_match:
-                    break
-
-            if json_match:
-                json_str = (
-                    json_match.group(1)
-                    if len(json_match.groups()) > 0
-                    else json_match.group(0)
-                )
-                try:
-                    analysis_data = json.loads(json_str)
-                    logger.debug("Successfully parsed extracted JSON")
-                except json.JSONDecodeError as e2:
-                    logger.error(f"Extracted JSON still invalid: {e2}")
-                    raise json.JSONDecodeError(
-                        "Extracted JSON is malformed", "", 0
-                    ) from None
-            else:
-                raise json.JSONDecodeError("No valid JSON found", "", 0) from None
-
-        # Extract project type and information
-        architecture = analysis_data.get("recommended_architecture", {})
-        project_type = architecture.get("type", "basic")
-
-        # Validate project type
-        project_types = config.get_project_types()
-        if project_type not in project_types:
-            logger.warning(
-                f"Unknown project type '{project_type}', defaulting to 'basic'"
-            )
-            project_type = "basic"
-
-        # Store analysis results
-        project_info["project_type"] = project_type
-        project_info["tech_stack"] = analysis_data.get("technology_stack", {})
-        project_info["architecture_analysis"] = analysis_data
-
-        # Display comprehensive analysis results
+    if not anya_success:
         console.print(
-            f"\n[bold green]{cli_state.success_icon} AI Analysis Complete![/bold green]"
-        )
-
-        # Display recommended solution architecture
-        console.print("\n[bold cyan]🎯 Recommended Solution Architecture:[/bold cyan]")
-        console.print(
-            f"[green]{architecture.get('approach', 'Optimized solution for your needs')}[/green]"
-        )
-        console.print("\n[bold cyan]💡 Why this approach:[/bold cyan]")
-        console.print(
-            f"[italic]{architecture.get('reasoning', 'Best fit for your requirements')}[/italic]\n"
-        )
-
-        # Display project structure preview
-        project_structure = analysis_data.get("project_structure", {})
-        if project_structure:
-            console.print("[bold cyan]🏗️ Project Structure:[/bold cyan]")
-            console.print(
-                f"[white]{project_structure.get('type', 'Optimized project structure')}[/white]"
-            )
-
-            key_features = project_structure.get("key_features", [])
-            if key_features:
-                console.print("\n[bold cyan]✨ Key Features:[/bold cyan]")
-                for feature in key_features:
-                    console.print(f"  • {feature}")
-
-            user_experience = project_structure.get("user_experience")
-            if user_experience:
-                console.print("\n[bold cyan]👤 User Experience:[/bold cyan]")
-                console.print(f"[italic]{user_experience}[/italic]")
-
-    except (json.JSONDecodeError, KeyError, ValueError) as e:
-        logger.error(f"Error parsing comprehensive analysis: {str(e)}")
-        console.print(
-            f"[bold yellow]{cli_state.warning_icon} Error parsing AI analysis. Using manual selection.[/bold yellow]"
+            f"[bold red]{cli_state.error_icon} Anya's analysis failed: {anya_response}[/bold red]"
         )
         return manual_project_type_selection(project_types)
 
-    # Step 7: Technology Stack Review 🔧
-    console.print(f"\n{cli_state.get_step_header('Technology Stack Review')}")
-    cli_state.print_separator(console)
+    expert_analyses["anya"] = anya_response
+    console.print(
+        f"[green]{cli_state.success_icon} Anya's UX analysis complete[/green]"
+    )
 
-    # Display technology stack from comprehensive analysis
-    tech_stack = project_info.get("tech_stack", {})
+    # Expert 2: Ben Carter (Product Lead)
+    console.print(
+        "\n[bold green]📈 Consulting with Ben Carter (Product Lead)...[/bold green]"
+    )
 
-    if tech_stack and "categories" in tech_stack:
-        from rich.table import Table
-
-        # Create table showing complete technology stack
-        console.print("[bold cyan]🔧 Complete Technology Stack:[/bold cyan]")
-
-        table = Table(
-            show_header=True,
-            header_style="bold magenta",
-            title="🤖 AI-Recommended Technologies",
-        )
-        table.add_column("Component", style="cyan", no_wrap=True, width=15)
-        table.add_column("Technology", style="green", width=15)
-        table.add_column("Why Recommended", style="white", width=50)
-
-        for category in tech_stack["categories"]:
-            recommended = next(
-                (o for o in category["options"] if o.get("recommended", False)),
-                category["options"][0] if category["options"] else None,
-            )
-            if recommended:
-                reasoning = recommended.get(
-                    "reasoning",
-                    recommended.get("description", "Optimal for your project"),
-                )
-                table.add_row(category["name"], recommended["name"], reasoning)
-
-        console.print(table)
-
-        # Display future flexibility if available
-        architecture_analysis = project_info.get("architecture_analysis", {})
-        future_flexibility = architecture_analysis.get("future_flexibility", {})
-
-        if future_flexibility:
-            expansion_options = future_flexibility.get("expansion_options", [])
-            alternative_deployments = future_flexibility.get(
-                "alternative_deployments", []
-            )
-
-            if expansion_options or alternative_deployments:
-                console.print("\n[bold cyan]🚀 Future Flexibility:[/bold cyan]")
-
-                if expansion_options:
-                    console.print("[bold green]Expansion Options:[/bold green]")
-                    for option in expansion_options:
-                        console.print(f"  • {option}")
-
-                if alternative_deployments:
-                    console.print("[bold green]Alternative Deployments:[/bold green]")
-                    for deployment in alternative_deployments:
-                        console.print(f"  • {deployment}")
-
-        # Enhanced technology selection options
-        console.print("\n[bold cyan]Technology Selection Options:[/bold cyan]")
+    success, ben_provider = ai_integration.get_random_ai_provider(
+        providers, used_providers
+    )
+    if not success or ben_provider is None:
         console.print(
-            "  [dim]• Press Enter to use this complete solution (recommended)[/dim]"
+            f"[bold red]{cli_state.error_icon} Failed to assign AI provider to Ben[/bold red]"
         )
+        return manual_project_type_selection(project_types)
+
+    used_providers.append(ben_provider.__class__.__name__.replace("Provider", ""))
+    console.print(f"[dim]Represented by: {ben_provider.display_name}[/dim]")
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]📈 Ben analyzing product strategy...[/bold cyan]"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Product Analysis", total=None)
+
+        ben_prompt = ai_prompts.get_ben_product_prompt(
+            project_info["project_name"],
+            project_info["project_description"],
+            project_info.get("context", {}),
+            anya_response,
+        )
+
+        ben_success, ben_response = ben_provider.generate_response(ben_prompt)
+        progress.update(task, completed=True)
+
+    if not ben_success:
         console.print(
-            "  [dim]• Type 'alternatives' to see other architectural approaches[/dim]"
+            f"[bold red]{cli_state.error_icon} Ben's analysis failed: {ben_response}[/bold red]"
         )
-        console.print("  [dim]• Type 'customize' to modify specific technologies[/dim]")
+        return manual_project_type_selection(project_types)
 
-        user_choice = Prompt.ask(
-            "", choices=["", "alternatives", "customize"], default=""
+    expert_analyses["ben"] = ben_response
+    console.print(
+        f"[green]{cli_state.success_icon} Ben's product analysis complete[/green]"
+    )
+
+    # Expert 3: Dr. Chloe Evans (Chief Architect)
+    console.print(
+        "\n[bold green]🏗️ Consulting with Dr. Chloe Evans (Chief Architect)...[/bold green]"
+    )
+
+    success, chloe_provider = ai_integration.get_random_ai_provider(
+        providers, used_providers
+    )
+    if not success or chloe_provider is None:
+        console.print(
+            f"[bold red]{cli_state.error_icon} Failed to assign AI provider to Dr. Chloe[/bold red]"
+        )
+        return manual_project_type_selection(project_types)
+
+    used_providers.append(chloe_provider.__class__.__name__.replace("Provider", ""))
+    console.print(f"[dim]Represented by: {chloe_provider.display_name}[/dim]")
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn(
+            "[bold cyan]🏗️ Dr. Chloe analyzing technical architecture...[/bold cyan]"
+        ),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Architecture Analysis", total=None)
+
+        chloe_prompt = ai_prompts.get_chloe_architect_prompt(
+            project_info["project_name"],
+            project_info["project_description"],
+            project_info.get("context", {}),
+            anya_response,
+            ben_response,
         )
 
-        if user_choice == "alternatives":
-            console.print("\n[bold cyan]Alternative Approaches:[/bold cyan]")
+        chloe_success, chloe_response = chloe_provider.generate_response(chloe_prompt)
+        progress.update(task, completed=True)
+
+    if not chloe_success:
+        console.print(
+            f"[bold red]{cli_state.error_icon} Dr. Chloe's analysis failed: {chloe_response}[/bold red]"
+        )
+        return manual_project_type_selection(project_types)
+
+    expert_analyses["chloe"] = chloe_response
+    console.print(
+        f"[green]{cli_state.success_icon} Dr. Chloe's architecture analysis complete[/green]"
+    )
+
+    # Final Synthesis: Product Instigator (Claude Opus4)
+    console.print(
+        "\n[bold green]🎯 Product Instigator Synthesis (Claude Opus4)...[/bold green]"
+    )
+
+    # Force use of Anthropic (Claude Opus4) for final synthesis
+    anthropic_provider = None
+    if "Anthropic" in providers:
+        anthropic_provider = ai_integration.create_provider_instance(
+            "Anthropic", providers["Anthropic"]
+        )
+
+    if not anthropic_provider:
+        console.print(
+            f"[bold yellow]{cli_state.warning_icon} Claude Opus4 not available, using alternative for synthesis[/bold yellow]"
+        )
+        success, synthesis_provider = ai_integration.get_random_ai_provider(providers)
+        if not success or synthesis_provider is None:
             console.print(
-                "1. [cyan]Pure Desktop Application[/cyan] - Traditional GUI with PyQt/Tkinter"
+                f"[bold red]{cli_state.error_icon} No provider available for synthesis[/bold red]"
             )
-            console.print(
-                "2. [cyan]Command-Line Tool[/cyan] - Terminal-based interface with rich output"
-            )
-            console.print(
-                "3. [cyan]API-First Architecture[/cyan] - Backend service with multiple frontend options"
-            )
-            console.print(
-                "4. [cyan]Hybrid Approach[/cyan] - Web app that can be packaged as desktop"
-            )
-
-            alt_choice = Prompt.ask(
-                "Select alternative (or Enter to keep recommended)",
-                choices=["", "1", "2", "3", "4"],
-                default="",
-            )
-
-            if alt_choice:
-                console.print(
-                    "[yellow]Alternative approach noted. Proceeding with recommended solution for now.[/yellow]"
-                )
-
-        elif user_choice == "customize":
-            # Simplified customization - just show key categories
-            key_categories = [
-                "Frontend",
-                "Backend",
-                "Database",
-                "Frontend Technology",
-                "Backend Framework",
-            ]
-
-            for category in tech_stack["categories"]:
-                if any(key in category["name"] for key in key_categories):
-                    console.print(
-                        f"\n[bold magenta]Select {category['name']}:[/bold magenta]"
-                    )
-
-                    options = [option["name"] for option in category["options"]]
-                    default_option = next(
-                        (
-                            option["name"]
-                            for option in category["options"]
-                            if option.get("recommended", False)
-                        ),
-                        options[0] if options else "Default",
-                    )
-
-                    for i, option_name in enumerate(options, 1):
-                        is_recommended = option_name == default_option
-                        marker = " ⭐ (recommended)" if is_recommended else ""
-                        console.print(f"  {i}. {option_name}{marker}")
-
-                    selection = Prompt.ask(
-                        "Enter your choice",
-                        choices=[str(i) for i in range(1, len(options) + 1)],
-                        default=(
-                            str(options.index(default_option) + 1)
-                            if default_option in options
-                            else "1"
-                        ),
-                    )
-
-                    selected_name = options[int(selection) - 1]
-
-                    # Update recommended flag
-                    for option in category["options"]:
-                        option["recommended"] = option["name"] == selected_name
-
-            console.print(
-                f"\n[bold green]{cli_state.success_icon} Technology selections updated![/bold green]"
-            )
-
-        else:
-            console.print(
-                f"[bold cyan]{cli_state.ai_icon} Using AI-recommended solution for your project.[/bold cyan]"
-            )
-
+            return manual_project_type_selection(project_types)
     else:
-        # Fallback if no tech stack provided
-        console.print(
-            f"[bold yellow]{cli_state.warning_icon} No technology stack provided in analysis. Using default configuration.[/bold yellow]"
+        synthesis_provider = anthropic_provider
+
+    console.print(f"[dim]Final synthesis by: {synthesis_provider.display_name}[/dim]")
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn(
+            "[bold cyan]🎯 Synthesizing expert insights into comprehensive PRD...[/bold cyan]"
+        ),
+        console=console,
+    ) as progress:
+        task = progress.add_task("PRD Synthesis", total=None)
+
+        synthesis_prompt = ai_prompts.get_product_instigator_prompt(
+            project_info["project_name"],
+            project_info["project_description"],
+            project_info.get("context", {}),
+            anya_response,
+            ben_response,
+            chloe_response,
         )
-        tech_data = create_default_tech_stack(project_type)
-        project_info["tech_stack"] = tech_data
 
-        # Get project type info for logging
-        project_types = config.get_project_types()
-        type_info = project_types.get(project_type, {"name": project_type.capitalize()})
+        synthesis_success, prd_response = synthesis_provider.generate_response(
+            synthesis_prompt
+        )
+        progress.update(task, completed=True)
 
-        # --- Write session to markdown in ai-docs/ ---
-        try:
-            import datetime
+    if not synthesis_success:
+        console.print(
+            f"[bold red]{cli_state.error_icon} PRD synthesis failed: {prd_response}[/bold red]"
+        )
+        return manual_project_type_selection(project_types)
 
-            ai_docs_dir = os.path.join(project_info["project_dir"], "ai-docs")
-            os.makedirs(ai_docs_dir, exist_ok=True)
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-            session_md = os.path.join(
-                ai_docs_dir, f"project_initialization_{timestamp}.md"
-            )
-            with open(session_md, "w", encoding="utf-8") as f:
-                f.write("# Project Initialization Session\n\n")
-                f.write(f"**Project Name:** {project_info['project_name']}\n\n")
-                f.write(f"**Project Directory:** {project_info['project_dir']}\n\n")
-                f.write(
-                    f"**Author:** {project_info.get('author_name', '')} {project_info.get('author_email', '')}\n\n"
-                )
-                f.write(f"**Project Type:** {type_info['name']}\n\n")
-                f.write("## Key Features\n")
-                for feature in tech_data.get("analysis", []):
-                    f.write(f"- {feature}\n")
-                f.write("\n## Recommended Technology Stack\n")
-                for category in tech_data.get("categories", []):
-                    recommended = next(
-                        (o for o in category["options"] if o.get("recommended", False)),
-                        None,
-                    )
-                    if recommended:
-                        f.write(
-                            f"- **{category['name']}**: {recommended['name']} — "
-                            f"{recommended['description']} "
-                            f"(Best for: {get_technology_use_case(recommended['name'])})\n"
-                        )
-            # --- Write summary to README.md ---
-            readme_path = os.path.join(project_info["project_dir"], "README.md")
-            with open(readme_path, "a", encoding="utf-8") as f:
-                f.write("\n## Project Initialization Summary\n")
-                f.write(f"- **Project Name:** {project_info['project_name']}\n")
-                f.write(f"- **Project Type:** {type_info['name']}\n")
-                f.write("- **Key Features:**\n")
-                for feature in tech_data.get("analysis", []):
-                    f.write(f"  - {feature}\n")
-                f.write("- **Recommended Stack:**\n")
-                for category in tech_data.get("categories", []):
-                    recommended = next(
-                        (o for o in category["options"] if o.get("recommended", False)),
-                        None,
-                    )
-                    if recommended:
-                        f.write(f"  - {category['name']}: {recommended['name']}\n")
-            # Enhanced session logging with better formatting
-            console.print(
-                f"[green]{cli_state.success_icon} Session log saved to:[/green] {session_md}"
-            )
-        except Exception as e:
-            logger.warning(f"Failed to write session markdown or README summary: {e}")
-            console.print(
-                f"[yellow]{cli_state.warning_icon} Warning: Could not write session log to ai-docs. {e}[/yellow]"
-            )
+    console.print(f"[green]{cli_state.success_icon} Comprehensive PRD created![/green]")
 
-    return True, project_type
+    # Store all analyses in project_info
+    project_info["expert_consultation"] = {
+        "anya_analysis": anya_response,
+        "ben_analysis": ben_response,
+        "chloe_analysis": chloe_response,
+        "final_prd": prd_response,
+        "ai_providers_used": {
+            "anya": anya_provider.display_name if anya_provider else "Unknown",
+            "ben": ben_provider.display_name if ben_provider else "Unknown",
+            "chloe": chloe_provider.display_name if chloe_provider else "Unknown",
+            "synthesis": (
+                synthesis_provider.display_name if synthesis_provider else "Unknown"
+            ),
+        },
+    }
+
+    # Create PRD file in TaskMaster directory structure
+    try:
+        import datetime
+        import os
+
+        # Create TaskMaster directory structure
+        taskmaster_dir = os.path.join(project_info["project_dir"], "TaskMaster")
+        os.makedirs(taskmaster_dir, exist_ok=True)
+
+        # Write comprehensive PRD
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
+        prd_filename = (
+            f"PRD_{project_info['project_name'].replace(' ', '_')}_{timestamp}.md"
+        )
+        prd_path = os.path.join(taskmaster_dir, prd_filename)
+
+        with open(prd_path, "w", encoding="utf-8") as f:
+            f.write(prd_response)
+
+        # Write expert consultation log
+        consultation_log_path = os.path.join(
+            taskmaster_dir, f"Expert_Consultation_Log_{timestamp}.md"
+        )
+        with open(consultation_log_path, "w", encoding="utf-8") as f:
+            f.write("# Expert Consultation Log\n\n")
+            f.write(f"**Project:** {project_info['project_name']}\n")
+            f.write(f"**Date:** {timestamp}\n\n")
+            f.write("## AI Provider Assignments\n\n")
+            for expert, provider in project_info["expert_consultation"][
+                "ai_providers_used"
+            ].items():
+                f.write(f"- **{expert.title()}:** {provider}\n")
+            f.write("\n## Expert Analyses\n\n")
+            f.write("### Anya Sharma (UX Lead)\n\n")
+            f.write(anya_response)
+            f.write("\n\n### Ben Carter (Product Lead)\n\n")
+            f.write(ben_response)
+            f.write("\n\n### Dr. Chloe Evans (Chief Architect)\n\n")
+            f.write(chloe_response)
+
+        console.print(
+            f"[green]{cli_state.success_icon} PRD saved to:[/green] {prd_path}"
+        )
+        console.print(
+            f"[green]{cli_state.success_icon} Consultation log saved to:[/green] {consultation_log_path}"
+        )
+
+    except Exception as e:
+        logger.warning(f"Failed to write PRD files: {e}")
+        console.print(
+            f"[yellow]{cli_state.warning_icon} Warning: Could not write PRD files. {e}[/yellow]"
+        )
+
+    # For compatibility with existing project creation flow, set a default project type
+    # This will be overridden by the PRD specifications
+    project_info["project_type"] = "web"  # Default for PRD Stage
+    project_info["tech_stack"] = {
+        "categories": []
+    }  # Empty tech stack - PRD will define this
+    project_info["prd_stage"] = True  # Flag to indicate this is PRD Stage
+
+    return True, "web"
 
 
 def get_category_impact(category_name: str) -> str:
@@ -1315,11 +1158,11 @@ def main() -> int:
             )
             return 1
 
-        # Determine project type
-        success, project_type = determine_project_type(project_info)
+        # Conduct expert consultation for PRD Stage
+        success, project_type = conduct_expert_consultation(project_info)
         if not success:
             console.print(
-                f"\n[bold red]{cli_state.error_icon} Failed to determine project type.[/bold red]"
+                f"\n[bold red]{cli_state.error_icon} Failed to complete expert consultation.[/bold red]"
             )
             return 1
 
