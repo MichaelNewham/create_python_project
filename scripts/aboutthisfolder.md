@@ -17,7 +17,6 @@ scripts/
 ├── create_gitlab_branch.sh
 ├── deepseek_commit_message.py
 ├── .doc_history
-├── download_pexels_image.sh
 ├── fix_lint_issues.sh
 ├── fix_specific_lint_issues.py
 ├── force_push_to_remotes.sh
@@ -27,7 +26,6 @@ scripts/
 ├── manage_docs.sh
 ├── manage_logs.sh
 ├── mcp_config_summary.sh
-├── pexels_instructions.sh
 ├── post_commit_push.sh
 ├── remove_large_file.sh
 ├── remove_sensitive_file.sh
@@ -60,7 +58,6 @@ scripts/
 - `create_gitlab_branch.sh`: Script to create a new branch for GitLab when branch protection is enabled
 - `deepseek_commit_message.py`: !/usr/bin/env python3
 - `.doc_history`: ASCII text, with very long lines (819)
-- `download_pexels_image.sh`: Script to download an image from Pexels using curl
 - `fix_lint_issues.sh`: Quick script to fix common linting issues in the codebase
 - `fix_specific_lint_issues.py`: !/usr/bin/env python
 - `force_push_to_remotes.sh`: This script bypasses pre-commit hooks and pushes to both GitHub and GitLab
@@ -70,7 +67,6 @@ scripts/
 - `manage_docs.sh`: Documentation management script
 - `manage_logs.sh`: Log management script with improved handling and documentation
 - `mcp_config_summary.sh`: Summary of MCP Configuration Changes - 2025-05-31
-- `pexels_instructions.sh`: Get image location from Pexels API
 - `post_commit_push.sh`: This script runs after a successful commit
 - `remove_large_file.sh`: Script to remove a large file from git history
 - `remove_sensitive_file.sh`: Script to remove sensitive files from git repository history

@@ -11,7 +11,6 @@ The project uses several AI services through the Model Context Protocol (MCP):
 3. **Perplexity**: For research and information retrieval
 4. **AI Task Master**: For task management
 5. **Bright Data**: For web scraping
-6. **Pexels**: For stock photos and videos
 
 ## Configuration Files
 

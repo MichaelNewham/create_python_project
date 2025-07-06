@@ -9,9 +9,97 @@ Now fully AI-driven without hardcoded technology choices.
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from typing import Any
+from urllib.parse import urlparse
+
+
+def is_remote_path(path: str) -> bool:
+    """Check if the path is a remote SFTP URL."""
+    return path.startswith("sftp://")
+
+
+def parse_remote_path(sftp_url: str) -> tuple[str, str, int, str]:
+    """
+    Parse an SFTP URL to extract connection details.
+
+    Args:
+        sftp_url: SFTP URL in format sftp://user@host:port/path
+
+    Returns:
+        Tuple of (user, host, port, path)
+    """
+    parsed = urlparse(sftp_url)
+    user = parsed.username or "mail2mick"
+    host = parsed.hostname or "manjarodell-to-pi"
+    port = parsed.port or 8850
+    path = parsed.path or "/"
+    return user, host, port, path
+
+
+def execute_remote_command(sftp_url: str, command: str) -> tuple[bool, str]:
+    """
+    Execute a command on a remote server via SSH.
+
+    Args:
+        sftp_url: SFTP URL with connection details
+        command: Command to execute
+
+    Returns:
+        Tuple of (success, output/error message)
+    """
+    user, host, port, _ = parse_remote_path(sftp_url)
+    ssh_command = f"ssh {user}@{host} '{command}'"
+
+    try:
+        result = subprocess.run(
+            ssh_command, shell=True, capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            return True, result.stdout
+        else:
+            return False, result.stderr
+    except Exception as e:
+        return False, str(e)
+
+
+def create_remote_directory(sftp_url: str) -> tuple[bool, str]:
+    """Create a directory on a remote server."""
+    _, _, _, path = parse_remote_path(sftp_url)
+    command = f"mkdir -p {path}"
+    return execute_remote_command(sftp_url, command)
+
+
+def create_remote_file(
+    sftp_url: str, content: str, relative_path: str
+) -> tuple[bool, str]:
+    """Create a file on a remote server."""
+    user, host, port, base_path = parse_remote_path(sftp_url)
+    full_path = os.path.join(base_path, relative_path)
+
+    # Create parent directory
+    parent_dir = os.path.dirname(full_path)
+    mkdir_cmd = f"mkdir -p {parent_dir}"
+    execute_remote_command(sftp_url, mkdir_cmd)
+
+    # Write file using SSH and cat
+    escaped_content = content.replace("'", "'\\''")
+    command = f"cat > {full_path} << 'EOF'\n{escaped_content}\nEOF"
+
+    ssh_command = f"ssh {user}@{host} '{command}'"
+
+    try:
+        result = subprocess.run(
+            ssh_command, shell=True, capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            return True, f"Created {relative_path}"
+        else:
+            return False, result.stderr
+    except Exception as e:
+        return False, str(e)
 
 
 def create_project_structure(
@@ -40,7 +128,57 @@ def create_project_structure(
         tech_stack = tech_stack or {}
         package_name = project_name.replace("-", "_").replace(" ", "_").lower()
 
-        # Create project directory if it doesn't exist
+        # Check if this is a remote directory
+        is_remote = kwargs.get("is_remote", False) or is_remote_path(project_dir)
+
+        # Apply ARM64 optimizations if target is ARM
+        target_arch = kwargs.get("target_architecture", "x86_64")
+        if target_arch == "arm64" and tech_stack:
+            # ARM64 optimizations temporarily disabled
+            print("ARM64 target detected - optimizations available but disabled")
+
+        if is_remote:
+            # Handle remote project creation
+            print(f"Creating remote project at: {project_dir}")
+
+            # Create remote directory
+            success, msg = create_remote_directory(project_dir)
+            if not success:
+                return False, f"Failed to create remote directory: {msg}"
+
+            # For remote projects, create a minimal structure
+            # and provide instructions for full setup
+            _, _, _, remote_path = parse_remote_path(project_dir)
+
+            # Create basic structure remotely
+            basic_files = {
+                "README.md": f"# {project_name}\n\nCreated via remote connection.",
+                "src/__init__.py": "",
+                f"src/{package_name}/__init__.py": f'"""Package {package_name}."""\n__version__ = "0.1.0"\n',
+                ".gitignore": "*.pyc\n__pycache__/\n.env\n.venv/\nvenv/\n",
+            }
+
+            for file_path, content in basic_files.items():
+                success, msg = create_remote_file(project_dir, content, file_path)
+                if not success:
+                    print(f"Warning: Failed to create {file_path}: {msg}")
+
+            # Provide instructions for completing setup
+            instructions = f"""
+Remote project initialized at: {remote_path}
+
+To complete the setup:
+1. SSH into your Raspberry Pi: ssh {parse_remote_path(project_dir)[0]}@{parse_remote_path(project_dir)[1]}
+2. Navigate to: cd {remote_path}
+3. Run: git init
+4. Install Poetry: curl -sSL https://install.python-poetry.org | python3 -
+5. Create pyproject.toml and install dependencies
+
+Or, clone this project locally, complete setup, and push to the Pi.
+"""
+            return True, instructions
+
+        # Local directory creation (existing logic)
         os.makedirs(project_dir, exist_ok=True)
 
         # Extract AI analysis for intelligent structure creation
@@ -1535,7 +1673,6 @@ def _intelligent_pattern_discovery(tech_name: str) -> dict[str, list[str]]:
 
 def _clean_invalid_package_name(tech_name: str) -> str:
     """Clean up invalid package names with special characters."""
-    import re
 
     # Common invalid package name patterns and their fixes
     invalid_patterns = {
@@ -1601,7 +1738,6 @@ def _handle_compound_technology_name(tech_name: str) -> dict[str, list[str]]:
 
 def _handle_parenthetical_technology_name(tech_name: str) -> dict[str, list[str]]:
     """Handle parenthetical names like 'Python (Flask/FastAPI)'."""
-    import re
 
     # Extract the main technology before parentheses
     match = re.match(r"^([^(]+)", tech_name)
@@ -2536,7 +2672,7 @@ def initialize_git_repo(
             )
 
         # Create comprehensive README
-        readme_content = f"""# {project_name.replace('_', ' ').replace('-', ' ').title()}
+        readme_content = f"""# {project_name.replace("_", " ").replace("-", " ").title()}
 
 {project_description}
 
@@ -2573,7 +2709,7 @@ cp .env.example .env
 
 5. Run the application:
 ```bash
-poetry run python -m {project_name.replace('-', '_')}
+poetry run python -m {project_name.replace("-", "_")}
 ```
 
 ## 🧪 Testing

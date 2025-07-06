@@ -160,7 +160,7 @@ The new workflow eliminates artificial constraints and provides intelligent, coh
 ## Configuration Files
 
 - **`.config/mypy.ini`**: Type checking configuration with specific error codes disabled for template files
-- **`.config/ruff.toml`**: Linting configuration (line length 100, Python 3.11 target)
+- **`.config/ruff.toml`**: Linting configuration (line length 100, Python 3.11 target)  
 - **`pyproject.toml`**: Poetry configuration with tool settings for mypy and ruff
 - **`.vscode/settings.json`**: Extensive VS Code configuration for Python development
 
@@ -175,9 +175,62 @@ The project requires environment variables for AI provider API keys:
 
 Copy `.env.example` to `.env` and fill in your API keys before running.
 
+## PRD Stage Features
+
+This is the PRD Stage development branch featuring expert AI personas:
+
+### Expert AI Personas
+- **Anya Sharma (Principal UI/UX Lead)**: User experience design and interaction patterns
+- **Ben Carter (Senior Product Lead)**: Market strategy, business objectives, and feature prioritization  
+- **Dr. Chloe Evans (Chief Software Architect)**: Technical architecture and system design
+
+### Enhanced Workflow
+1. Project vision collection with comprehensive problem description
+2. Multi-expert AI consultation for holistic product analysis
+3. Integrated requirements synthesis for unified PRD generation
+4. Strategic project generation based on expert recommendations
+5. Auto-generated TaskMaster/ directory with PRD documentation
+
+## Core Architecture Patterns
+
+### AI Provider Management
+- Multiple provider support with automatic fallback mechanisms
+- Provider-specific optimizations and token management
+- Dynamic model selection based on task requirements
+
+### Template System Architecture  
+- Dynamic template generation based on AI recommendations
+- No hardcoded project types - fully adaptive to AI suggestions
+- Supports hybrid project structures (e.g., web apps that can be packaged as desktop)
+
+### Installation System
+- Universal technology installation supporting 50+ technologies
+- Dynamic mapping between AI recommendations and package managers
+- Separate handling for Python (Poetry) and Node.js (npm) dependencies
+
+## Development Instructions from Cursor/Copilot Rules
+
+### Code Style Requirements
+- Maximum line length of 88 characters (Black default)
+- Use Google-style docstrings format for all functions and classes
+- Include type hints for all function parameters and return values
+- Use explicit exception handling with specific exception types
+
+### Testing Standards
+- All code should have corresponding unit tests using pytest
+- Use pytest fixtures for test setup (defined in `tests/conftest.py`)
+- Target high test coverage (aim for 80%+)
+- Mock external API calls and file system operations
+
+### Import Organization
+1. Standard library imports
+2. Related third-party imports  
+3. Local application/library specific imports
+- Sort imports alphabetically within each group
+
 ## Recommended Memory Management
 
 Consistently keep in memory:
 - This CLAUDE.md file
 - The main README.md in the root folder
-- The ABOUT.md files in most folders directly under the root folder
+- The aboutthisfolder.md files in most folders directly under the root folder

@@ -161,43 +161,113 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
     console.print(f"\n{cli_state.get_step_header('Project Directory')}")
     cli_state.print_separator(console)
 
-    # Default to ~/Projects directory for better organization
-    projects_dir = os.path.expanduser("~/Projects")
-    os.makedirs(projects_dir, exist_ok=True)
-    default_dir = os.path.join(
-        projects_dir, project_name.replace(" ", "_").replace("-", "_").lower()
+    # Offer choice between local and remote directories
+    console.print("[bold cyan]Choose project location:[/bold cyan]")
+    console.print("  [cyan]1.[/cyan] Local directory (default)")
+    console.print(
+        "  [cyan]2.[/cyan] Remote directory (Raspberry Pi via Cloudflare tunnel)"
     )
-    console.print(f"[dim]Default location: {default_dir}[/dim]")
 
-    # Check if directory already exists
-    if os.path.exists(default_dir):
-        console.print(
-            f"[yellow]{cli_state.warning_icon} Warning: Directory already exists![/yellow]"
+    location_choice = Prompt.ask(
+        "[bold cyan]Select location[/bold cyan]", choices=["1", "2"], default="1"
+    )
+
+    if location_choice == "1":
+        # Local directory option (existing logic)
+        projects_dir = os.path.expanduser("~/Projects")
+        os.makedirs(projects_dir, exist_ok=True)
+        default_dir = os.path.join(
+            projects_dir, project_name.replace(" ", "_").replace("-", "_").lower()
         )
-        if not Confirm.ask(
-            "Do you want to overwrite the existing directory?", default=False
-        ):
-            console.print("[dim]Enter a different path:[/dim]")
-            while True:
-                user_input = input("> ")
-                if user_input and not os.path.exists(user_input):
-                    project_dir = user_input
-                    break
-                elif user_input and os.path.exists(user_input):
-                    console.print(
-                        f"[red]{cli_state.error_icon} That directory also exists. Try another:[/red]"
-                    )
-                else:
-                    console.print(
-                        f"[red]{cli_state.error_icon} Please enter a valid path:[/red]"
-                    )
+        console.print(f"\n[dim]Default local location: {default_dir}[/dim]")
+
+        # Check if directory already exists
+        if os.path.exists(default_dir):
+            console.print(
+                f"[yellow]{cli_state.warning_icon} Warning: Directory already exists![/yellow]"
+            )
+            if not Confirm.ask(
+                "Do you want to overwrite the existing directory?", default=False
+            ):
+                console.print("[dim]Enter a different path:[/dim]")
+                while True:
+                    user_input = input("> ")
+                    if user_input and not os.path.exists(user_input):
+                        project_dir = user_input
+                        break
+                    elif user_input and os.path.exists(user_input):
+                        console.print(
+                            f"[red]{cli_state.error_icon} That directory also exists. Try another:[/red]"
+                        )
+                    else:
+                        console.print(
+                            f"[red]{cli_state.error_icon} Please enter a valid path:[/red]"
+                        )
+            else:
+                project_dir = default_dir
         else:
-            project_dir = default_dir
+            console.print("Press Enter to accept the default or type a new path:")
+            user_input = input("> ")
+            project_dir = user_input if user_input else default_dir
+
     else:
-        console.print("Press Enter to accept the default or type a new path:")
-        user_input = input("> ")
-        project_dir = user_input if user_input else default_dir
+        # Remote directory option (Raspberry Pi)
+        remote_project_name = project_name.replace(" ", "_").replace("-", "_").lower()
+        remote_path = f"/home/mail2mick/Projects/{remote_project_name}"
+
+        console.print("\n[bold cyan]Remote Directory Setup[/bold cyan]")
+        console.print(
+            "[dim]Remote host: manjarodell-to-pi (via Cloudflare tunnel)[/dim]"
+        )
+        console.print(f"[dim]Default remote location: {remote_path}[/dim]")
+
+        # Ask if they want to use the default remote path
+        use_default_remote = Confirm.ask("Use default remote path?", default=True)
+
+        if not use_default_remote:
+            custom_remote = enhanced_input(
+                "Enter custom remote path (e.g., /home/mail2mick/custom/path)"
+            )
+            remote_path = custom_remote
+
+        # Store as SFTP URL for later use
+        project_dir = f"sftp://mail2mick@manjarodell-to-pi:8850{remote_path}"
+
+        console.print(
+            f"\n[green]{cli_state.success_icon} Remote directory configured:[/green]"
+        )
+        console.print(f"  [cyan]Path:[/cyan] {remote_path}")
+        console.print("  [cyan]Access:[/cyan] SSH via Cloudflare tunnel")
+        console.print(
+            "\n[dim]Note: Ensure your Cloudflare tunnel is active for remote operations.[/dim]"
+        )
+
     project_info["project_dir"] = project_dir
+    project_info["is_remote"] = str(location_choice == "2")
+
+    # Detect target architecture
+    if location_choice == "2":
+        # For Raspberry Pi, we know it's ARM64
+        project_info["target_architecture"] = "arm64"
+        project_info["target_os"] = "raspberry_pi_os"
+        console.print(
+            f"\n[yellow]{cli_state.warning_icon} Target Architecture:[/yellow] ARM64 (Raspberry Pi)"
+        )
+        console.print(
+            "[dim]Note: Some packages may require compilation or have limited support on ARM64.[/dim]"
+        )
+    else:
+        # For local, detect current system
+        import platform
+
+        machine = platform.machine().lower()
+        if machine in ["aarch64", "arm64"]:
+            project_info["target_architecture"] = "arm64"
+        elif machine in ["x86_64", "amd64"]:
+            project_info["target_architecture"] = "x86_64"
+        else:
+            project_info["target_architecture"] = machine
+        project_info["target_os"] = platform.system().lower()
 
     # Step 3: Author Information 🔧
     console.print(f"\n{cli_state.get_step_header('Author Information (Optional)')}")
@@ -377,6 +447,7 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
             project_info["project_name"],
             project_info["project_description"],
             project_info.get("context", {}),
+            project_info,
         )
 
         anya_success, anya_response = anya_provider.generate_response(anya_prompt)
@@ -422,6 +493,7 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
             project_info["project_description"],
             project_info.get("context", {}),
             anya_response,
+            project_info,
         )
 
         ben_success, ben_response = ben_provider.generate_response(ben_prompt)
@@ -470,6 +542,7 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
             project_info.get("context", {}),
             anya_response,
             ben_response,
+            project_info,
         )
 
         chloe_success, chloe_response = chloe_provider.generate_response(chloe_prompt)
@@ -529,6 +602,7 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
             anya_response,
             ben_response,
             chloe_response,
+            project_info,
         )
 
         synthesis_success, prd_response = synthesis_provider.generate_response(

@@ -21,7 +21,6 @@ PERPLEXITY_API_KEY=your_key_here
 DEEPSEEK_API_KEY=your_key_here
 GOOGLE_API_KEY=your_key_here
 BRIGHTDATA_API_KEY=your_key_here
-PEXELS_API_KEY=your_key_here
 
 # AI Model Names
 OPENAI_MODEL=o4-mini-2025-04-16

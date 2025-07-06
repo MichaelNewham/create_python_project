@@ -44,11 +44,17 @@ Stats: $commit_stats
 
 Focus on the main operation (add/update/delete/refactor)"
     
+    # Try DeepSeek API
     if [ -f "${PROJECT_DIR}/scripts/testing/deepseek_commit_message.py" ]; then
-        poetry run python "${PROJECT_DIR}/scripts/testing/deepseek_commit_message.py" "$prompt" 2>/dev/null || echo "Update project files"
-    else
-        echo "Update project files"
+        local deepseek_result=$(poetry run python "${PROJECT_DIR}/scripts/testing/deepseek_commit_message.py" "$prompt" 2>/dev/null)
+        if [ "$deepseek_result" != "Update project files" ] && [ -n "$deepseek_result" ]; then
+            echo "$deepseek_result"
+            return
+        fi
     fi
+    
+    # Default fallback
+    echo "Update project files"
 }
 
 log_step "=== Starting AI Commit Workflow ==="

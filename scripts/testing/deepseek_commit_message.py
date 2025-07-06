@@ -21,7 +21,7 @@ def main():
     load_dotenv()
 
     api_key = os.environ.get("DEEPSEEK_API_KEY")
-    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-reasoner")
+    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 
     if not api_key:
         print("Update project files")
@@ -36,17 +36,10 @@ def main():
         data = {
             "model": model,
             "messages": [
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a git commit message generator. Output ONLY the commit message text with no explanations, "
-                        "no formatting, no markdown, and no additional text. Do not start with phrases like 'Here is a commit message' "
-                        "or explain your reasoning. Just output the exact text that should be used for the git commit."
-                    ),
-                },
-                {"role": "user", "content": prompt},
+                {"role": "user", "content": f"Create git commit message: {prompt}"},
             ],
-            "max_tokens": 300,
+            "max_tokens": 30,
+            "temperature": 0.1,
         }
 
         response = requests.post(
@@ -57,8 +50,25 @@ def main():
 
         if response.status_code == 200:
             result = response.json()
-            commit_message = result["choices"][0]["message"]["content"].strip()
-            print(commit_message)
+            message = result["choices"][0]["message"]
+            commit_message = message.get("content", "").strip()
+
+            # Clean up the message - take only the first line and limit length
+            if commit_message:
+                commit_message = commit_message.split("\n")[0].strip()
+                # Remove common prefixes
+                prefixes = ["Here is", "The commit message", "Generated:", "Message:"]
+                for prefix in prefixes:
+                    if commit_message.startswith(prefix):
+                        commit_message = (
+                            commit_message[len(prefix) :].strip().lstrip(":")
+                        )
+                # Limit to reasonable length
+                if len(commit_message) > 80:
+                    commit_message = commit_message[:80].strip()
+                print(commit_message)
+            else:
+                print("Update project files")
         else:
             print("Update project files")
     except Exception:

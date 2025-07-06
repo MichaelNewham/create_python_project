@@ -81,16 +81,14 @@ class OpenAIProvider(AIProvider):
     def _get_display_name(self) -> str:
         """Get a user-friendly display name for the model."""
         model = self.model or "gpt-4o-2025-05-13"
-        if "gpt-4o-2025" in model.lower():
-            return "GPT-4o (May 2025)"
+        if "o3-2025-04-16" in model.lower():
+            return "o3 Reasoning Model"
         elif "o4-mini" in model.lower():
             return "GPT-4o-mini"
         elif "o4" in model.lower() or "gpt-4o" in model.lower():
             return "GPT-4o"
         elif "gpt-4" in model.lower():
             return "GPT-4"
-        elif "gpt-3.5" in model.lower():
-            return "GPT-3.5 Turbo"
         else:
             return model
 
@@ -119,11 +117,11 @@ class OpenAIProvider(AIProvider):
             }
 
             # Only add temperature for models that support it
-            if "o4-mini" not in (self.model or "").lower():
+            if "o3-2025-04-16" not in (self.model or "").lower():
                 completion_params["temperature"] = 0.7
 
             # Use appropriate token parameter based on model
-            if "o4-mini" in (self.model or "").lower():
+            if "o3-2025-04-16" in (self.model or "").lower():
                 completion_params["max_completion_tokens"] = 2500
             else:
                 completion_params["max_tokens"] = 2500

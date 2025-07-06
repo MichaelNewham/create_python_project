@@ -9,33 +9,45 @@ Documentation for the testing directory.
 testing/
 ├── deepseek_commit_message.py
 ├── .doc_history
+├── fallback_commit_message.py
+├── __pycache__
+├── show_updated_terminal_flow.py
 ├── test_ai_provider_selection.py
 ├── test_ai_providers.py
 ├── test_all_providers.py
 ├── test_anthropic_api.py
 ├── test_json_parsing.py
 ├── test_mcp
+├── test_project_directory_step.py
+├── test_remote_creation.py
+├── test_remote_directory_simple.py
 ```
 
 ## Contents Description
 
 - `deepseek_commit_message.py`: !/usr/bin/env python3
-- `.doc_history`: ASCII text
+- `.doc_history`: ASCII text, with very long lines (366)
+- `fallback_commit_message.py`: !/usr/bin/env python3
+- `__pycache__/`: Directory containing 9 items
+- `show_updated_terminal_flow.py`: !/usr/bin/env python3
 - `test_ai_provider_selection.py`: !/usr/bin/env python3
 - `test_ai_providers.py`: !/usr/bin/env python3
 - `test_all_providers.py`: !/usr/bin/env python3
 - `test_anthropic_api.py`: !/usr/bin/env python3
 - `test_json_parsing.py`: !/usr/bin/env python3
 - `test_mcp/`: Directory containing 1 items
+- `test_project_directory_step.py`: !/usr/bin/env python3
+- `test_remote_creation.py`: !/usr/bin/env python3
+- `test_remote_directory_simple.py`: !/usr/bin/env python3
 
 ## Change History
 
-test_anthropic_api.py
-test_json_parsing.py
-test_mcp
-Sat 07 Jun 2025 00:06:21 IST: ADDED: deepseek_commit_message.py test_ai_provider_selection.py test_ai_providers.py test_all_providers.py test_anthropic_api.py test_json_parsing.py test_mcp 
-Sat 07 Jun 2025 00:06:21 IST: REMOVED:  04:26 39:00 FILES:deepseek_commit_message.py IST: IST: REMOVED: 
+test_project_directory_step.py
+test_remote_creation.py
+test_remote_directory_simple.py
+Mon 07 Jul 2025 00:52:46 IST: ADDED: deepseek_commit_message.py fallback_commit_message.py __pycache__ show_updated_terminal_flow.py test_ai_provider_selection.py test_ai_providers.py test_all_providers.py test_anthropic_api.py test_json_parsing.py test_mcp test_project_directory_step.py test_remote_creation.py test_remote_directory_simple.py 
+Mon 07 Jul 2025 00:52:46 IST: REMOVED:        01:01 04:26 06:21 07:22 39:00 42:00 43:34 46:17 FILES:deepseek_commit_message.py IST: IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-06-07 00:06:19
+This documentation was automatically generated on: 2025-07-07 00:52:46

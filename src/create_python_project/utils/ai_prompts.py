@@ -6,8 +6,55 @@ This module contains prompt templates for interacting with AI providers.
 """
 
 
+def get_architecture_context(project_info: dict) -> str:
+    """
+    Generate architecture context string for AI prompts.
+
+    Args:
+        project_info: Dictionary containing project information including architecture
+
+    Returns:
+        Formatted architecture context string
+    """
+    arch = project_info.get("target_architecture", "x86_64")
+    os_type = project_info.get("target_os", "linux")
+    is_remote = project_info.get("is_remote", False)
+
+    if arch == "arm64":
+        if is_remote:
+            return """
+**TARGET PLATFORM: ARM64 (Raspberry Pi)**
+- Architecture: ARM64/aarch64
+- Operating System: Raspberry Pi OS
+- Remote deployment via SSH/Cloudflare tunnel
+- IMPORTANT: Some Python packages may not have pre-built wheels for ARM64
+- IMPORTANT: Native dependencies may require compilation
+- IMPORTANT: Consider lightweight alternatives for resource-constrained environment
+- IMPORTANT: Some technologies (e.g., certain databases, ML frameworks) have limited ARM support
+"""
+        else:
+            return f"""
+**TARGET PLATFORM: ARM64 (Local)**
+- Architecture: ARM64/aarch64
+- Operating System: {os_type}
+- IMPORTANT: Some Python packages may not have pre-built wheels for ARM64
+- IMPORTANT: Native dependencies may require compilation
+- Consider ARM-optimized alternatives where available
+"""
+    else:
+        return f"""
+**TARGET PLATFORM: x86_64**
+- Architecture: {arch}
+- Operating System: {os_type}
+- Standard x86_64 package support available
+"""
+
+
 def get_project_type_prompt(
-    project_name: str, project_description: str, context: dict | None = None
+    project_name: str,
+    project_description: str,
+    context: dict | None = None,
+    project_info: dict | None = None,
 ) -> str:
     """
     Get a prompt for determining the project type with rich context.
@@ -16,11 +63,13 @@ def get_project_type_prompt(
         project_name: Name of the project
         project_description: Description of the project
         context: Dictionary with problem, users, inspiration
+        project_info: Full project info including architecture
 
     Returns:
         Formatted prompt for AI
     """
     context = context or {}
+    project_info = project_info or {}
 
     context_section = ""
     if context:
@@ -31,12 +80,16 @@ def get_project_type_prompt(
 - Inspiration/Examples: {context.get('inspiration', 'Not specified')}
 """
 
+    # Add architecture context
+    arch_context = get_architecture_context(project_info)
+
     return f"""
 You are an expert Python developer tasked with determining the most suitable project type for the following project:
 
 **Project Name:** {project_name}
 **Project Description:** {project_description}
 {context_section}
+{arch_context}
 
 Please analyze all the information and select the most appropriate project type from these categories:
 
@@ -67,7 +120,10 @@ For example: "cli: This project would be best as a command-line tool because it 
 
 
 def get_comprehensive_analysis_prompt(
-    project_name: str, project_description: str, context: dict | None = None
+    project_name: str,
+    project_description: str,
+    context: dict | None = None,
+    project_info: dict | None = None,
 ) -> str:
     """
     Get a prompt for comprehensive project analysis including architecture and tech stack.
@@ -76,11 +132,13 @@ def get_comprehensive_analysis_prompt(
         project_name: Name of the project
         project_description: Description of the project
         context: Dictionary with problem, users, inspiration
+        project_info: Full project info including architecture
 
     Returns:
         Formatted prompt for AI
     """
     context = context or {}
+    project_info = project_info or {}
 
     context_section = ""
     if context:
@@ -91,12 +149,16 @@ def get_comprehensive_analysis_prompt(
 - Inspiration/Examples: {context.get('inspiration', 'Not specified')}
 """
 
+    # Add architecture context
+    arch_context = get_architecture_context(project_info)
+
     return f"""
 You are an expert software architect tasked with designing the complete solution for the following project:
 
 **Project Name:** {project_name}
 **Project Description:** {project_description}
 {context_section}
+{arch_context}
 
 Please provide a comprehensive analysis and design recommendation in the following JSON format:
 
@@ -164,6 +226,7 @@ Focus on:
 3. Use ONLY real, installable package names or mark as system/manual
 4. Consider the target users' technical expertise level
 5. Ensure technologies support the key features needed
+6. For ARM64 targets: Prioritize packages with ARM64 wheels, avoid heavy ML frameworks without ARM support, consider lightweight alternatives
 
 IMPORTANT: Respond with ONLY the valid JSON object. Do not include any markdown formatting, code blocks, or additional text. Start your response with {{ and end with }}.
 """
@@ -338,7 +401,10 @@ Be selective and focus on the most relevant packages for this specific project. 
 
 
 def get_anya_ux_prompt(
-    project_name: str, project_description: str, context: dict | None = None
+    project_name: str,
+    project_description: str,
+    context: dict | None = None,
+    project_info: dict | None = None,
 ) -> str:
     """
     Get prompt for Anya Sharma, the UX Lead persona.
@@ -347,11 +413,13 @@ def get_anya_ux_prompt(
         project_name: Name of the project
         project_description: Description of the project
         context: Dictionary with problem, users, inspiration
+        project_info: Full project info including architecture
 
     Returns:
         Formatted prompt for Anya's perspective
     """
     context = context or {}
+    project_info = project_info or {}
 
     context_section = ""
     if context:
@@ -361,6 +429,9 @@ def get_anya_ux_prompt(
 - Target users: {context.get('users', 'Not specified')}
 - Inspiration/Examples: {context.get('inspiration', 'Not specified')}
 """
+
+    # Add architecture context
+    arch_context = get_architecture_context(project_info)
 
     return f"""
 You are Anya Sharma, Principal UI/UX Lead at Global Product Innovation Lab, Innovatech Corp. You're an internationally acclaimed UI/UX visionary with over 18 years of experience, celebrated for transforming complex user challenges into intuitive, engaging, and commercially successful digital experiences.
@@ -385,6 +456,7 @@ You're the first expert in this collaborative product requirements gathering ses
 **Project Name:** {project_name}
 **Project Description:** {project_description}
 {context_section}
+{arch_context}
 
 As the UX Lead, you need to ask 5-7 probing questions about:
 - User personas and their specific needs
@@ -392,6 +464,7 @@ As the UX Lead, you need to ask 5-7 probing questions about:
 - Accessibility requirements
 - Interface preferences and interaction patterns
 - Success metrics from a user perspective
+- For ARM64/Raspberry Pi: Performance expectations, display limitations, interaction methods (touch/keyboard/remote)
 
 After asking your questions, provide a brief analysis (2-3 paragraphs) summarizing:
 1. Key user experience insights
@@ -423,6 +496,7 @@ def get_ben_product_prompt(
     project_description: str,
     context: dict | None = None,
     anya_analysis: str = "",
+    project_info: dict | None = None,
 ) -> str:
     """
     Get prompt for Ben Carter, the Product Lead persona.
@@ -432,11 +506,13 @@ def get_ben_product_prompt(
         project_description: Description of the project
         context: Dictionary with problem, users, inspiration
         anya_analysis: Previous analysis from Anya (UX Lead)
+        project_info: Full project info including architecture
 
     Returns:
         Formatted prompt for Ben's perspective
     """
     context = context or {}
+    project_info = project_info or {}
 
     context_section = ""
     if context:
@@ -446,6 +522,9 @@ def get_ben_product_prompt(
 - Target users: {context.get('users', 'Not specified')}
 - Inspiration/Examples: {context.get('inspiration', 'Not specified')}
 """
+
+    # Add architecture context
+    arch_context = get_architecture_context(project_info)
 
     return f"""
 You are Ben Carter, Senior Product Lead at Emerging Markets & Platform Expansion, TechSolutions Global. You're a highly accomplished, data-driven Product Leader with 15+ years of experience in defining, launching, and scaling innovative software products that capture significant market share and achieve ambitious business objectives.
@@ -470,6 +549,7 @@ You're the second expert in this collaborative product requirements gathering se
 **Project Name:** {project_name}
 **Project Description:** {project_description}
 {context_section}
+{arch_context}
 
 **Previous Analysis from Anya (UX Lead):**
 {anya_analysis}
@@ -480,6 +560,7 @@ As the Product Lead, building on Anya's UX insights, you need to ask 5-7 probing
 - Feature prioritization and MVP scope
 - Success metrics and KPIs
 - Go-to-market strategy and user acquisition
+- For ARM64/Raspberry Pi: Edge computing use cases, IoT market opportunities, cost-efficiency benefits
 
 After asking your questions, provide a brief analysis (2-3 paragraphs) summarizing:
 1. Product strategy recommendations
@@ -515,6 +596,7 @@ def get_chloe_architect_prompt(
     context: dict | None = None,
     anya_analysis: str = "",
     ben_analysis: str = "",
+    project_info: dict | None = None,
 ) -> str:
     """
     Get prompt for Dr. Chloe Evans, the Chief Architect persona.
@@ -525,11 +607,13 @@ def get_chloe_architect_prompt(
         context: Dictionary with problem, users, inspiration
         anya_analysis: Previous analysis from Anya (UX Lead)
         ben_analysis: Previous analysis from Ben (Product Lead)
+        project_info: Full project info including architecture
 
     Returns:
         Formatted prompt for Dr. Chloe's perspective
     """
     context = context or {}
+    project_info = project_info or {}
 
     context_section = ""
     if context:
@@ -539,6 +623,9 @@ def get_chloe_architect_prompt(
 - Target users: {context.get('users', 'Not specified')}
 - Inspiration/Examples: {context.get('inspiration', 'Not specified')}
 """
+
+    # Add architecture context
+    arch_context = get_architecture_context(project_info)
 
     return f"""
 You are Dr. Chloe Evans, Chief Software Architect & Fellow at Advanced Technology Group, Quantum Systems Inc. You're a distinguished Chief Software Architect and Engineering Fellow with over 20 years of unparalleled experience in designing and delivering highly scalable, resilient, and secure enterprise-grade software systems.
@@ -563,6 +650,7 @@ You're the third expert in a collaborative product requirements gathering sessio
 **Project Name:** {project_name}
 **Project Description:** {project_description}
 {context_section}
+{arch_context}
 
 **Previous Analysis from Anya (UX Lead):**
 {anya_analysis}
@@ -576,6 +664,7 @@ As the Chief Architect, synthesizing insights from both UX and Product perspecti
 - Security and compliance considerations
 - Performance requirements and SLAs
 - Technology stack preferences and team capabilities
+- For ARM64/Raspberry Pi: Hardware resource constraints, package compatibility, compilation requirements, edge deployment considerations
 
 After asking your questions, provide a brief analysis (2-3 paragraphs) summarizing:
 1. Recommended system architecture
@@ -612,6 +701,7 @@ def get_product_instigator_prompt(
     anya_analysis: str = "",
     ben_analysis: str = "",
     chloe_analysis: str = "",
+    project_info: dict | None = None,
 ) -> str:
     """
     Get prompt for Product Instigator (Claude Opus4) to synthesize all expert inputs into a comprehensive PRD.
@@ -623,11 +713,13 @@ def get_product_instigator_prompt(
         anya_analysis: Analysis from Anya (UX Lead)
         ben_analysis: Analysis from Ben (Product Lead)
         chloe_analysis: Analysis from Dr. Chloe (Chief Architect)
+        project_info: Full project info including architecture
 
     Returns:
         Formatted prompt for final PRD synthesis
     """
     context = context or {}
+    project_info = project_info or {}
 
     context_section = ""
     if context:
@@ -637,6 +729,9 @@ def get_product_instigator_prompt(
 - Target users: {context.get('users', 'Not specified')}
 - Inspiration/Examples: {context.get('inspiration', 'Not specified')}
 """
+
+    # Add architecture context
+    arch_context = get_architecture_context(project_info)
 
     return f"""
 You are the Product Instigator, responsible for synthesizing all expert analyses into a comprehensive Product Requirements Document (PRD) that meets TaskMaster AI standards.
@@ -651,6 +746,7 @@ These three experts have provided their domain-specific analyses below. Your rol
 **Project Name:** {project_name}
 **Project Description:** {project_description}
 {context_section}
+{arch_context}
 
 **Expert Analyses:**
 

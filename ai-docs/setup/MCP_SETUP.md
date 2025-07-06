@@ -79,7 +79,6 @@ The following keys are used by various MCP servers in the project:
 | `DEEPSEEK_API_KEY` | DeepSeek models | [DeepSeek Platform](https://platform.deepseek.com/) |
 | `GOOGLE_API_KEY` | Google AI services | [Google AI Studio](https://aistudio.google.com/) |
 | `BRIGHTDATA_API_KEY` | Web scraping | [Bright Data](https://brightdata.com/) |
-| `PEXELS_API_KEY` | Stock photos API | [Pexels API](https://www.pexels.com/api/) |
 | `SMITHERY_CLI_KEY` | Smithery CLI access | [Smithery Dashboard](https://smithery.dev/) |
 
 ## Troubleshooting

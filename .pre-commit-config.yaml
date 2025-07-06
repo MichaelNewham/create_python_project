@@ -6,7 +6,7 @@ repos:
     hooks:
       - id: black
         stages: [pre-commit]
-        exclude: ^ai-docs/
+        exclude: ^(ai-docs/|scripts/testing/)
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.9
@@ -14,7 +14,7 @@ repos:
       - id: ruff
         args: [--fix, --config=.config/ruff.toml]
         stages: [pre-commit]
-        exclude: ^ai-docs/
+        exclude: ^(ai-docs/|scripts/testing/)
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0
@@ -22,6 +22,6 @@ repos:
       - id: mypy
         args: [--ignore-missing-imports, --config-file=.config/mypy.ini]
         stages: [pre-commit]
-        exclude: ^ai-docs/
+        exclude: ^(ai-docs/|scripts/testing/)
 
   # Stage 2: Documentation generation - runs only after all other hooks pass

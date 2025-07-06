@@ -1,0 +1,47 @@
+================================================================
+                AI-ASSISTED COMMIT WORKFLOW                   
+================================================================
+🧹 Cleaning workspace and staging files...
+✅ Files staged successfully
+📚 Updating project documentation...
+✅ Documentation updated and staged
+🔍 Running code quality checks...
+  • Black (formatting)...
+ 🔧
+  • Ruff (linting & imports)...
+ 🔧
+  • MyPy (type checking)...
+ ✅
+✅ All quality checks passed
+🤖 Generating AI commit message...
+Generated: "Fix type checking errors"
+Edit this message? (y/n): y
+💾 Committing changes...
+black....................................................................Failed
+- hook id: black
+- files were modified by this hook
+
+reformatted debug_deepseek.py
+reformatted scripts/testing/fallback_commit_message.py
+reformatted scripts/testing/deepseek_commit_message.py
+reformatted src/create_python_project/utils/arm_compatibility.py
+
+All done! ✨ 🍰 ✨
+4 files reformatted, 9 files left unchanged.
+
+ruff.....................................................................Failed
+- hook id: ruff
+- files were modified by this hook
+
+Found 2 errors (2 fixed, 0 remaining).
+
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+scripts/testing/test_arm64_impact.py:140: error: Value of type "Collection[str]" is not indexable  [index]
+Found 1 error in 1 file (checked 13 source files)
+
+
+ *  The terminal process "/usr/bin/zsh '-c', '/home/michaelnewham/Projects/create_python_project/scripts/ai_commit_workflow.sh'" terminated with exit code: 1. 
+ *  Terminal will be reused by tasks, press any key to close it. 

@@ -8,28 +8,24 @@ Documentation for the utils directory.
 ```
 utils/
 ├── .doc_history
-├── download_pexels_image.sh
 ├── fix_lint_issues.sh
 ├── fix_specific_lint_issues.py
-├── pexels_instructions.sh
 ```
 
 ## Contents Description
 
 - `.doc_history`: ASCII text
-- `download_pexels_image.sh`: Script to download an image from Pexels using curl
 - `fix_lint_issues.sh`: Quick script to fix common linting issues in the codebase
 - `fix_specific_lint_issues.py`: !/usr/bin/env python
-- `pexels_instructions.sh`: Get image location from Pexels API
 
 ## Change History
 
-fix_lint_issues.sh
+Mon 07 Jul 2025 00:46:17 IST: REMOVED:       01:02 04:26 06:21 07:22 39:01 42:01 43:34 FILES:download_pexels_image.sh IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
+Mon 07 Jul 2025 00:52:46 IST: FILES:fix_lint_issues.sh
 fix_specific_lint_issues.py
-pexels_instructions.sh
-Sat 07 Jun 2025 00:06:21 IST: ADDED: download_pexels_image.sh fix_lint_issues.sh fix_specific_lint_issues.py pexels_instructions.sh 
-Sat 07 Jun 2025 00:06:21 IST: REMOVED:  04:26 39:01 FILES:download_pexels_image.sh IST: IST: REMOVED: 
+Mon 07 Jul 2025 00:52:47 IST: ADDED: fix_lint_issues.sh fix_specific_lint_issues.py 
+Mon 07 Jul 2025 00:52:47 IST: REMOVED:        01:02 04:26 06:21 07:22 39:01 42:01 43:34 46:17 FILES:download_pexels_image.sh IST: IST: IST: IST: IST: IST: IST: IST: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: REMOVED: 
 
 ## Last Updated
 
-This documentation was automatically generated on: 2025-06-07 00:06:19
+This documentation was automatically generated on: 2025-07-07 00:52:46
