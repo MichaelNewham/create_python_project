@@ -86,13 +86,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Test Coverage",
-            "type": "shell",
-            "command": "poetry run pytest --cov=create_python_project tests/",
-            "problemMatcher": [],
-            "group": "test"
-        },
-        {
             "label": "Update Docs",
             "type": "shell",
             "command": "${workspaceFolder}/scripts/update_documentation.sh",

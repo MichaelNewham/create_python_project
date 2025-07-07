@@ -18,11 +18,9 @@ prompt-toolkit = "^3.0.51"
 google-generativeai = "^0.8.5"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0.0"
 black = "^24.0.0"
 detect-secrets = "^1.5.0"
 pdoc = "^15.0.3"
-pytest-cov = "^6.1.1"
 pdoc3 = "^0.11.6"
 types-requests = "^2.32.0.20250328"
 types-wtforms = "^3.2.1.20250401"
@@ -87,4 +85,3 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "src/create_python_project/utils/templates.py" = ["E501", "F821"]
-"tests/*" = ["E501"]
