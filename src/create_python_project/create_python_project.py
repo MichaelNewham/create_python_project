@@ -243,7 +243,7 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
         )
 
     project_info["project_dir"] = project_dir
-    project_info["is_remote"] = str(location_choice == "2")
+    project_info["is_remote"] = location_choice == "2"
 
     # Detect target architecture
     if location_choice == "2":
@@ -307,7 +307,7 @@ def get_project_info() -> tuple[bool, dict[str, Any]]:
 
 def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str]:
     """
-    Conduct a multi-expert AI consultation to generate a comprehensive PRD.
+    Conduct enhanced multi-expert AI consultation with intelligent context gathering.
 
     Args:
         project_info: Dictionary containing project information
@@ -318,46 +318,46 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
     # Get available project types
     project_types = config.get_project_types()
 
-    # Step 4: Project Context & Inspiration 🔧
-    console.print(f"\n{cli_state.get_step_header('Project Context & Inspiration')}")
+    # Step 4: Enhanced Context Gathering 🔧
+    console.print(f"\n{cli_state.get_step_header('Enhanced Context Gathering')}")
     cli_state.print_separator(console)
 
     console.print(
-        "[italic]Help our expert AI team understand your vision by sharing context and inspiration.[/italic]"
+        "[italic]Our enhanced AI system will gather comprehensive context through intelligent questioning.[/italic]"
     )
-
-    # Three key contextual questions
-    context_info = {}
 
     # Import the enhanced_input function from our CLI utilities
     from create_python_project.utils.cli import enhanced_input
 
-    console.print("\n[bold cyan]1. What problem are you solving?[/bold cyan]")
+    # Get the initial problem description
+    console.print("\n[bold cyan]What problem are you solving?[/bold cyan]")
     problem = enhanced_input("Describe the main problem or need your project addresses")
-    context_info["problem"] = problem
 
-    console.print("\n[bold cyan]2. Who will use this?[/bold cyan]")
-    users = enhanced_input(
-        "Who are the end users? (developers, consumers, businesses, systems, etc.)"
-    )
-    context_info["users"] = users
-
-    console.print("\n[bold cyan]3. What inspired this project?[/bold cyan]")
-    console.print(
-        "[dim]Share websites, apps, or services you admire (URLs welcome):[/dim]"
-    )
-    inspiration = enhanced_input(
-        "Examples, similar apps, or websites that inspired you"
-    )
-    context_info["inspiration"] = inspiration
-
-    # Combine original description with context
+    # Update project description if not already set
     if not project_info.get("project_description"):
         project_info["project_description"] = problem
     else:
-        project_info["project_description"] += f"\n\nContext: {problem}"
+        project_info["project_description"] += f"\n\nProblem: {problem}"
 
-    project_info["context"] = context_info
+    # Conduct intelligent context gathering
+    from create_python_project.utils.intelligent_context import (
+        conduct_intelligent_context_gathering,
+    )
+
+    context_success, context_data = conduct_intelligent_context_gathering(
+        project_info["project_name"], project_info["project_description"], project_info
+    )
+
+    if not context_success:
+        console.print(
+            f"[bold red]{cli_state.error_icon} Enhanced context gathering failed. Falling back to basic consultation.[/bold red]"
+        )
+        # Fallback to basic context gathering
+        context_info = {"problem": problem, "users": "", "inspiration": ""}
+        project_info["context"] = context_info
+    else:
+        # Store enhanced context data
+        project_info["enhanced_context"] = context_data
 
     # Check AI providers availability with visual feedback
     with console.status("[bold cyan]Checking available AI providers...[/bold cyan]"):
@@ -372,16 +372,23 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
         )
         return manual_project_type_selection(project_types)
 
-    # Step 5: Expert Consultation Phase 🤖
+    # Step 5: Enhanced Expert Consultation Phase 🤖
     console.print(
-        f"\n{cli_state.get_step_header('Expert Consultation Phase', cli_state.ai_icon)}"
+        f"\n{cli_state.get_step_header('Enhanced Expert Consultation Phase', cli_state.ai_icon)}"
     )
     cli_state.print_separator(console)
 
-    console.print("[bold cyan]🎯 PRD Stage: Multi-Expert Consultation[/bold cyan]")
     console.print(
-        "[italic]Three expert AI personas will analyze your project, then Claude Opus4 will synthesize their insights into a comprehensive PRD.[/italic]"
+        "[bold cyan]🎯 Enhanced PRD Stage: Multi-Expert Consultation[/bold cyan]"
     )
+    if project_info.get("enhanced_context"):
+        console.print(
+            "[italic]Three expert AI personas will analyze your structured preference data and contextual insights, then Claude Opus4 will synthesize their findings into a comprehensive PRD.[/italic]"
+        )
+    else:
+        console.print(
+            "[italic]Three expert AI personas will analyze your project using traditional methods, then Claude Opus4 will synthesize their insights into a comprehensive PRD.[/italic]"
+        )
 
     # Display expert team
     from rich.table import Table
@@ -437,18 +444,39 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
     with Progress(
         SpinnerColumn(),
         TextColumn(
-            "[bold cyan]👥 Anya analyzing user experience requirements...[/bold cyan]"
+            "[bold cyan]👥 Anya analyzing structured preference data...[/bold cyan]"
         ),
         console=console,
     ) as progress:
         task = progress.add_task("UX Analysis", total=None)
 
-        anya_prompt = ai_prompts.get_anya_ux_prompt(
-            project_info["project_name"],
-            project_info["project_description"],
-            project_info.get("context", {}),
-            project_info,
-        )
+        # Use enhanced prompt if we have structured context, otherwise fallback to basic
+        if project_info.get("enhanced_context"):
+            from create_python_project.utils.intelligent_context import (
+                IntelligentContextGatherer,
+            )
+
+            gatherer = IntelligentContextGatherer(
+                project_info["project_name"],
+                project_info["project_description"],
+                project_info,
+            )
+            gatherer.context_data = project_info["enhanced_context"]
+            structured_context = gatherer.get_structured_context_summary()
+
+            anya_prompt = ai_prompts.get_enhanced_anya_ux_prompt(
+                project_info["project_name"],
+                project_info["project_description"],
+                structured_context,
+                project_info,
+            )
+        else:
+            anya_prompt = ai_prompts.get_anya_ux_prompt(
+                project_info["project_name"],
+                project_info["project_description"],
+                project_info.get("context", {}),
+                project_info,
+            )
 
         anya_success, anya_response = anya_provider.generate_response(anya_prompt)
         progress.update(task, completed=True)
@@ -483,18 +511,30 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
 
     with Progress(
         SpinnerColumn(),
-        TextColumn("[bold cyan]📈 Ben analyzing product strategy...[/bold cyan]"),
+        TextColumn(
+            "[bold cyan]📈 Ben analyzing product strategy with preference insights...[/bold cyan]"
+        ),
         console=console,
     ) as progress:
         task = progress.add_task("Product Analysis", total=None)
 
-        ben_prompt = ai_prompts.get_ben_product_prompt(
-            project_info["project_name"],
-            project_info["project_description"],
-            project_info.get("context", {}),
-            anya_response,
-            project_info,
-        )
+        # Use enhanced prompt if we have structured context, otherwise fallback to basic
+        if project_info.get("enhanced_context"):
+            ben_prompt = ai_prompts.get_enhanced_ben_product_prompt(
+                project_info["project_name"],
+                project_info["project_description"],
+                structured_context,
+                anya_response,
+                project_info,
+            )
+        else:
+            ben_prompt = ai_prompts.get_ben_product_prompt(
+                project_info["project_name"],
+                project_info["project_description"],
+                project_info.get("context", {}),
+                anya_response,
+                project_info,
+            )
 
         ben_success, ben_response = ben_provider.generate_response(ben_prompt)
         progress.update(task, completed=True)
@@ -530,20 +570,31 @@ def conduct_expert_consultation(project_info: dict[str, Any]) -> tuple[bool, str
     with Progress(
         SpinnerColumn(),
         TextColumn(
-            "[bold cyan]🏗️ Dr. Chloe analyzing technical architecture...[/bold cyan]"
+            "[bold cyan]🏗️ Dr. Chloe analyzing technical architecture with team insights...[/bold cyan]"
         ),
         console=console,
     ) as progress:
         task = progress.add_task("Architecture Analysis", total=None)
 
-        chloe_prompt = ai_prompts.get_chloe_architect_prompt(
-            project_info["project_name"],
-            project_info["project_description"],
-            project_info.get("context", {}),
-            anya_response,
-            ben_response,
-            project_info,
-        )
+        # Use enhanced prompt if we have structured context, otherwise fallback to basic
+        if project_info.get("enhanced_context"):
+            chloe_prompt = ai_prompts.get_enhanced_chloe_architect_prompt(
+                project_info["project_name"],
+                project_info["project_description"],
+                structured_context,
+                anya_response,
+                ben_response,
+                project_info,
+            )
+        else:
+            chloe_prompt = ai_prompts.get_chloe_architect_prompt(
+                project_info["project_name"],
+                project_info["project_description"],
+                project_info.get("context", {}),
+                anya_response,
+                ben_response,
+                project_info,
+            )
 
         chloe_success, chloe_response = chloe_provider.generate_response(chloe_prompt)
         progress.update(task, completed=True)

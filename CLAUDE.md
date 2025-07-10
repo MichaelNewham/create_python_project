@@ -191,6 +191,75 @@ This is the PRD Stage development branch featuring expert AI personas:
 4. Strategic project generation based on expert recommendations
 5. Auto-generated TaskMaster/ directory with PRD documentation
 
+## PRD Enhancement Proposal (July 2025)
+
+### Intelligent Context Gathering System - Next Evolution
+
+**Core Innovation**: Replace broad questions with adaptive, AI-driven context gathering using structured feedback mechanisms.
+
+### **Current Challenge**:
+`Question → Answer → PRD` (too big a leap - insufficient nuanced refinement)
+
+### **Proposed Enhancement**:
+`Question → Answer → Interactive Table → Refined Understanding → Next Persona → Final PRD`
+
+### Key Improvements Planned:
+
+#### 1. **Project Instigator AI Persona**
+- **Role**: Strategic project consultant and context architect
+- **Capability**: Generates contextually relevant questions (target: 9 strategic areas)
+- **Innovation**: Adaptive questioning based on project domain and user sophistication
+
+#### 2. **Interactive Preference Tables**
+- **Structure**: 5-point rating scales for key decisions
+- **Categories**: UX workflows, technical complexity, business priorities, timeline trade-offs
+- **Benefit**: Replace vague preferences with structured, actionable feedback
+
+#### 3. **Progressive Expert Refinement**
+- **Anya (UX Lead)**: Generates preference tables for user workflow decisions
+- **Ben (Product Lead)**: Builds on UX insights with business priority tables
+- **Dr. Chloe (Architect)**: Technical feasibility reality checks with complexity ratings
+- **Product Instigator**: Synthesizes structured feedback into targeted PRD
+
+#### 4. **Multimodal Context Support**
+- **Input Types**: Screenshots, documents, URLs, structured text
+- **Processing**: AI analysis of mockups, wireframes, competitor sites
+- **Integration**: Rich context feeding into expert consultation
+
+#### 5. **Context Quality Assessment**
+- **Completeness**: Evaluate gathered information sufficiency
+- **Gap Identification**: Highlight missing critical information
+- **Adaptive Follow-up**: Generate additional questions for incomplete areas
+
+### Implementation Architecture:
+
+#### **New Modules**:
+- `utils/multimodal_input.py`: Screenshot, document, URL analysis
+- `utils/context_analyzer.py`: Context quality assessment
+- `utils/question_generator.py`: Adaptive question generation
+
+#### **Enhanced Workflow**:
+1. **Initial Analysis**: AI analyzes project description, identifies domain/complexity
+2. **Strategic Questions**: 9 contextually relevant questions across key areas
+3. **Multimodal Input**: Support for visual/document context per question
+4. **Structured Feedback**: Interactive preference tables replace open-ended responses
+5. **Expert Consultation**: Enriched context enables focused expert analysis
+6. **Targeted PRD**: Accurate, personalized requirements based on structured preferences
+
+### Expected Impact:
+
+#### **Enhanced Accuracy**:
+- **Structured Feedback**: Replace vague "I want X" with specific preference ratings
+- **Reality Checks**: Technical feasibility vs. wishful thinking validation
+- **Scope Management**: Force trade-off decisions early in the process
+
+#### **Professional Experience**:
+- **Strategic Consultation**: Feels like working with experienced product consultant
+- **Comprehensive Discovery**: Thorough exploration of all project dimensions
+- **Informed Decisions**: All stakeholders understand project scope and implications
+
+This enhancement transforms the PRD Stage from basic expert consultation to comprehensive product discovery, ensuring every project starts with deep strategic understanding and realistic technical alignment.
+
 ## Core Architecture Patterns
 
 ### AI Provider Management
@@ -234,3 +303,4 @@ Consistently keep in memory:
 - This CLAUDE.md file
 - The main README.md in the root folder
 - The aboutthisfolder.md files in most folders directly under the root folder
+- **The handover document** at `ai-docs/handover.md` for latest implementation updates and testing priorities

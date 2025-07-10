@@ -210,14 +210,13 @@ Or, clone this project locally, complete setup, and push to the Pi.
         template_manager = ProjectTemplateManager(project_dir, project_name, tech_stack)
         template_manager.create_project_structure(project_type)
 
-        # Create IDE configurations for both VS Code and Cursor
+        # Create IDE configurations for VS Code
         from .ide_config import IDEConfigManager
 
         ide_manager = IDEConfigManager(
             project_dir, project_name, project_type, tech_stack
         )
         ide_manager.create_vscode_config()
-        ide_manager.create_cursor_config()
 
         # Create GitHub folder with Copilot configuration
         _create_github_folder(project_dir, project_name, project_type, tech_stack)
@@ -229,7 +228,16 @@ Or, clone this project locally, complete setup, and push to the Pi.
         _create_environment_files(project_dir, project_type, tech_stack)
 
         # Create project-specific structures based on AI analysis
-        _create_ai_driven_structures(project_dir, package_name, tech_stack, ai_analysis)
+        expert_consultation = kwargs.get("expert_consultation", {})
+        project_description = kwargs.get("project_description", "")
+        _create_ai_driven_structures(
+            project_dir,
+            package_name,
+            tech_stack,
+            ai_analysis,
+            expert_consultation,
+            project_description,
+        )
 
         # Initialize git and pre-commit hooks
         _initialize_development_tools(project_dir)
@@ -243,7 +251,13 @@ Or, clone this project locally, complete setup, and push to the Pi.
 def _create_workspace_file(
     project_dir: str, project_name: str, project_type: str, tech_stack: dict[Any, Any]
 ):
-    """Create VS Code workspace file for easy project opening."""
+    """Create VS Code workspace file for easy project opening with auto-installing extensions."""
+    # Get extension recommendations for this project
+    from .extension_config import get_extensions_for_project
+
+    tech_choices = _extract_tech_choices_dict(tech_stack)
+    extensions = get_extensions_for_project(project_type, tech_choices)
+
     workspace_config = {
         "folders": [{"name": project_name.replace("_", " ").title(), "path": "."}],
         "settings": {
@@ -267,6 +281,7 @@ def _create_workspace_file(
             },
             "mcp.envFile": "${workspaceFolder}/.env",
         },
+        "extensions": {"recommendations": extensions},
     }
 
     # Add project-specific folders based on tech stack
@@ -737,101 +752,135 @@ def _get_dynamic_project_dependencies(tech_stack: dict[Any, Any]) -> str:
 def _create_environment_files(
     project_dir: str, project_type: str, tech_stack: dict[Any, Any]
 ):
-    """Create .env template and .gitignore based on tech stack."""
-    env_lines = ["# Environment variables", "DEBUG=True", ""]
+    """Create symlink to shared .env and .env.example with sanitized keys."""
+    import os
 
-    # Extract technologies
+    # Path to shared .env file
+    shared_env_path = "/home/michaelnewham/Projects/.env"
+    project_env_path = os.path.join(project_dir, ".env")
+
+    # Create symlink to shared .env file
+    try:
+        if os.path.exists(shared_env_path):
+            # Remove existing .env if it exists
+            if os.path.exists(project_env_path):
+                os.remove(project_env_path)
+            # Create symlink
+            os.symlink(shared_env_path, project_env_path)
+        else:
+            print(f"Warning: Shared .env file not found at {shared_env_path}")
+    except Exception as e:
+        print(f"Warning: Failed to create .env symlink: {e}")
+
+    # Create .env.example by reading shared .env and sanitizing API keys
+    env_example_lines = []
+
+    if os.path.exists(shared_env_path):
+        with open(shared_env_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    # Extract variable name and sanitize value
+                    if "=" in line:
+                        var_name, _ = line.split("=", 1)
+                        # Sanitize API keys and tokens
+                        if any(
+                            key_word in var_name.upper()
+                            for key_word in ["KEY", "TOKEN", "SECRET"]
+                        ):
+                            env_example_lines.append(
+                                f"{var_name}=your-{var_name.lower().replace('_', '-')}"
+                            )
+                        elif "MODEL" in var_name.upper():
+                            # Keep model names as they're not sensitive
+                            env_example_lines.append(line)
+                        elif "URL" in var_name.upper():
+                            # Keep URL structure but sanitize credentials
+                            if "UPSTASH" in var_name:
+                                env_example_lines.append(f"{var_name}=your-upstash-url")
+                            else:
+                                env_example_lines.append(line)
+                        else:
+                            env_example_lines.append(line)
+                    else:
+                        env_example_lines.append(line)
+                else:
+                    env_example_lines.append(line)
+    else:
+        # Fallback .env.example content if shared .env doesn't exist
+        env_example_lines = [
+            "# API Keys for AI Providers",
+            "OPENAI_API_KEY=your-openai-api-key",
+            "ANTHROPIC_API_KEY=your-anthropic-api-key",
+            "PERPLEXITY_API_KEY=your-perplexity-api-key",
+            "DEEPSEEK_API_KEY=your-deepseek-api-key",
+            "GOOGLE_API_KEY=your-google-api-key",
+            "",
+            "# AI Model Names",
+            "OPENAI_MODEL=o3-pro",
+            "ANTHROPIC_MODEL=claude-sonnet-4-20250514",
+            "PERPLEXITY_MODEL=sonar",
+            "DEEPSEEK_MODEL=deepseek-chat",
+            "GEMINI_MODEL=gemini-2.5-flash-preview-05-20",
+            "",
+            "# GitHub MCP API Key",
+            "GITHUB_PERSONAL_ACCESS_TOKEN=your-github-personal-access-token",
+            "",
+        ]
+
+    # Add project-specific environment variables based on tech stack
     backend = _extract_tech_choice(tech_stack, "Backend Framework")
     database = _extract_tech_choice(tech_stack, "Database")
-    auth = _extract_tech_choice(tech_stack, "Authentication")
+    _extract_tech_choice(tech_stack, "Authentication")
 
     # Backend-specific env vars
     if backend == "Django":
-        env_lines.extend(
+        env_example_lines.extend(
             [
+                "",
                 "# Django",
                 "SECRET_KEY=your-secret-key-here",
                 "ALLOWED_HOSTS=localhost,127.0.0.1",
-                "",
+                "DEBUG=True",
             ]
         )
     elif backend == "Flask":
-        env_lines.extend(
+        env_example_lines.extend(
             [
+                "",
                 "# Flask",
                 "FLASK_APP=app.py",
                 "FLASK_ENV=development",
                 "SECRET_KEY=your-secret-key-here",
-                "",
             ]
         )
     elif backend == "FastAPI":
-        env_lines.extend(["# FastAPI", "APP_NAME=YourAppName", "API_VERSION=v1", ""])
+        env_example_lines.extend(
+            ["", "# FastAPI", "APP_NAME=YourAppName", "API_VERSION=v1"]
+        )
 
     # Database configuration
     if database == "PostgreSQL":
-        env_lines.extend(
+        env_example_lines.extend(
             [
+                "",
                 "# Database",
                 "DATABASE_URL=postgresql://user:password@localhost:5432/dbname",
                 "DB_HOST=localhost",
                 "DB_PORT=5432",
                 "DB_NAME=your_db_name",
                 "DB_USER=postgres",
-                "DB_PASSWORD=postgres",
-                "",
+                "DB_PASSWORD=your-db-password",
             ]
         )
     elif database == "MongoDB":
-        env_lines.extend(
-            ["# Database", "MONGODB_URI=mongodb://localhost:27017/your_db_name", ""]
+        env_example_lines.extend(
+            ["", "# Database", "MONGODB_URI=mongodb://localhost:27017/your_db_name"]
         )
-    elif database == "SQLite":
-        env_lines.extend(["# Database", "DATABASE_URL=sqlite:///./app.db", ""])
-
-    # OAuth configuration
-    if "OAuth" in str(auth) or "Allauth" in str(auth):
-        env_lines.extend(
-            [
-                "# OAuth",
-                "GOOGLE_CLIENT_ID=your-google-client-id",
-                "GOOGLE_CLIENT_SECRET=your-google-client-secret",
-                "GITHUB_CLIENT_ID=your-github-client-id",
-                "GITHUB_CLIENT_SECRET=your-github-client-secret",
-                "",
-            ]
-        )
-
-    # Redis/Celery configuration
-    if "Celery" in str(tech_stack) or "Redis" in str(tech_stack):
-        env_lines.extend(
-            [
-                "# Redis/Celery",
-                "REDIS_URL=redis://localhost:6379/0",
-                "CELERY_BROKER_URL=redis://localhost:6379/0",
-                "CELERY_RESULT_BACKEND=redis://localhost:6379/0",
-                "",
-            ]
-        )
-
-    # MCP Configuration
-    env_lines.extend(
-        [
-            "# MCP Configuration",
-            "GITHUB_PERSONAL_ACCESS_TOKEN=your-github-pat",
-            "PERPLEXITY_API_KEY=your-perplexity-key",
-            "ANTHROPIC_API_KEY=your-anthropic-key",
-            "",
-        ]
-    )
 
     # Write .env.example
     with open(os.path.join(project_dir, ".env.example"), "w", encoding="utf-8") as f:
-        f.write("\n".join(env_lines))
-
-    # Create .env.template (same content for now)
-    with open(os.path.join(project_dir, ".env.template"), "w", encoding="utf-8") as f:
-        f.write("\n".join(env_lines))
+        f.write("\n".join(env_example_lines))
 
     # Enhanced .gitignore
     gitignore_content = """# Python
@@ -869,7 +918,6 @@ venv.bak/
 # IDE
 .idea/
 .vscode/mcp.json
-.cursor/mcp.json
 *.swp
 *.swo
 *~
@@ -930,6 +978,8 @@ def _create_ai_driven_structures(
     package_name: str,
     tech_stack: dict[Any, Any],
     ai_analysis: list[str],
+    expert_consultation: dict[str, Any] | None = None,
+    project_description: str = "",
 ):
     """Create additional project structures based on AI analysis."""
 
@@ -947,6 +997,26 @@ def _create_ai_driven_structures(
     # Create documentation structure
     docs_dir = os.path.join(project_dir, "docs")
     os.makedirs(docs_dir, exist_ok=True)
+
+    # Create comprehensive project analysis documentation
+    _create_project_analysis_doc(
+        docs_dir,
+        package_name,
+        tech_stack,
+        ai_analysis,
+        project_dir,
+        expert_consultation,
+    )
+
+    # Create CONTRIBUTING.md
+    _create_contributing_doc(docs_dir, project_name, package_name, tech_stack)
+
+    # Create CHANGELOG.md
+    _create_changelog_doc(docs_dir, project_name)
+
+    # Create API documentation if applicable
+    if _should_create_api_docs(tech_stack, project_description):
+        _create_api_docs_structure(docs_dir, project_name, package_name, tech_stack)
 
     # Create TaskMaster directory for PRD files
     taskmaster_dir = os.path.join(project_dir, "TaskMaster")
@@ -1216,6 +1286,22 @@ def _extract_tech_choice(tech_stack: dict[Any, Any], category_name: str) -> str:
                     if option.get("recommended", False):
                         return str(option["name"])
     return ""
+
+
+def _extract_tech_choices_dict(tech_stack: dict[Any, Any]) -> dict[str, str]:
+    """Extract all recommended technologies as a dictionary mapping category names to choices."""
+    tech_choices: dict[str, str] = {}
+
+    if isinstance(tech_stack, dict) and "categories" in tech_stack:
+        for category in tech_stack["categories"]:
+            category_name = category.get("name", "")
+            if category_name:
+                for option in category.get("options", []):
+                    if option.get("recommended", False):
+                        tech_choices[category_name] = str(option["name"])
+                        break
+
+    return tech_choices
 
 
 def get_installation_commands_from_tech_stack(tech_stack: dict) -> dict[str, list[str]]:
@@ -2671,17 +2757,29 @@ def initialize_git_repo(
                 capture_output=True,
             )
 
+        # Generate tech stack summary for README
+        tech_stack_summary = _generate_tech_stack_summary(tech_stack)
+
         # Create comprehensive README
         readme_content = f"""# {project_name.replace("_", " ").replace("-", " ").title()}
 
-{project_description}
+{project_description if project_description else f"AI-powered {project_type} application created with intelligent technology stack selection."}
+
+## 🎯 Project Overview
+
+This project was created using **Create Python Project** with AI-driven architecture decisions. The technology stack and project structure were designed by AI experts to meet specific project requirements.
+
+### 🔧 Technology Stack
+
+{tech_stack_summary}
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.11+
-- Poetry
+- Poetry (dependency management)
 - Git
+- Node.js (for frontend/MCP servers)
 
 ### Installation
 
@@ -2691,23 +2789,28 @@ git clone {"git@github.com:" + github_username + "/" + project_name + ".git" if 
 cd {project_name}
 ```
 
-2. Install dependencies:
+2. Install Python dependencies:
 ```bash
 poetry install
 ```
 
-3. Set up pre-commit hooks:
+3. Install Node.js dependencies (if applicable):
+```bash
+npm install
+```
+
+4. Set up pre-commit hooks:
 ```bash
 poetry run pre-commit install
 ```
 
-4. Copy environment variables:
+5. Configure environment:
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
-5. Run the application:
+6. Run the application:
 ```bash
 poetry run python -m {project_name.replace("-", "_")}
 ```
@@ -2740,7 +2843,33 @@ poetry run python scripts/commit_workflow.py
 
 ## 📚 Documentation
 
-Documentation is available in the `docs/` directory.
+- **Project Architecture**: See `docs/PROJECT_ANALYSIS.md` for detailed AI-driven design decisions
+- **Tech Stack Reasoning**: Comprehensive analysis of technology choices and alternatives
+- **Expert Consultation**: AI persona insights that shaped the project structure
+
+## 🏗️ Project Structure
+
+```
+{project_name}/
+├── src/{project_name.replace("-", "_")}/     # Main application code
+├── tests/                    # Test suite
+├── docs/                     # Project documentation
+├── scripts/                  # Development automation
+├── .vscode/                  # VS Code configuration
+├── TaskMaster/               # PRD and project management
+├── .env.example              # Environment template
+└── README.md                 # This file
+```
+
+## 🤖 AI-Generated Features
+
+This project includes:
+- ✅ AI-curated technology stack
+- ✅ Expert-designed architecture
+- ✅ Automated development tools
+- ✅ VS Code workspace configuration
+- ✅ Pre-commit hooks and code quality
+- ✅ Professional documentation
 
 ## 🤝 Contributing
 
@@ -2769,12 +2898,367 @@ This project is licensed under the MIT License.
         return False, f"Failed to initialize Git repository: {str(e)}"
 
 
+def _generate_tech_stack_summary(tech_stack: dict[str, Any] | None) -> str:
+    """Generate a formatted tech stack summary for README."""
+    if not tech_stack or not isinstance(tech_stack, dict):
+        return "- Standard Python project setup with Poetry, pytest, and code quality tools"
+
+    if "categories" not in tech_stack:
+        return "- AI-curated technology stack (details in docs/PROJECT_ANALYSIS.md)"
+
+    summary_lines = []
+    for category in tech_stack["categories"]:
+        category_name = category.get("name", "")
+        recommended_techs = []
+
+        for option in category.get("options", []):
+            if option.get("recommended", False):
+                tech_name = option.get("name", "")
+                if tech_name:
+                    recommended_techs.append(tech_name)
+
+        if recommended_techs:
+            summary_lines.append(
+                f"- **{category_name}**: {', '.join(recommended_techs)}"
+            )
+
+    if not summary_lines:
+        return "- AI-curated technology stack (details in docs/PROJECT_ANALYSIS.md)"
+
+    return "\n".join(summary_lines)
+
+
+def _create_project_analysis_doc(
+    docs_dir: str,
+    package_name: str,
+    tech_stack: dict[str, Any],
+    ai_analysis: list[str],
+    project_dir: str,
+    expert_consultation: dict[str, Any] | None = None,
+) -> None:
+    """Create comprehensive project analysis documentation."""
+    import datetime
+
+    # Generate directory tree
+    directory_tree = _generate_directory_tree(project_dir)
+
+    # Generate tech stack analysis
+    tech_stack_analysis = _generate_detailed_tech_stack_analysis(tech_stack)
+
+    # Get current timestamp
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    content = f"""# Project Analysis & Design Decisions
+
+**Generated:** {timestamp}
+**Project:** {package_name}
+**Creation Tool:** Create Python Project (AI-Powered)
+
+## 🎯 Executive Summary
+
+This document provides a comprehensive analysis of the project architecture, technology stack decisions, and AI-driven design rationale for the **{package_name}** project.
+
+## 🤖 AI Analysis Summary
+
+The following insights guided the project creation:
+
+{chr(10).join(f"- {analysis}" for analysis in ai_analysis) if ai_analysis else "- Standard Python project structure with modern development practices"}
+
+## 🏗️ Project Structure
+
+### Directory Tree
+
+```
+{directory_tree}
+```
+
+### Structure Explanation
+
+- **`src/{package_name}/`**: Main application source code following modern Python packaging standards
+- **`tests/`**: Test suite with structure mirroring the source code organization
+- **`docs/`**: Project documentation including this analysis file
+- **`scripts/`**: Development automation tools and helper scripts
+- **`.vscode/`**: VS Code workspace configuration with extension recommendations
+- **`TaskMaster/`**: Product Requirements Documents and AI consultation logs
+- **`.env.example`**: Environment variable template (linked to shared configuration)
+
+## 🔧 Technology Stack Analysis
+
+{tech_stack_analysis}
+
+## 📋 AI Consultation Process
+
+This project was created through a sophisticated AI consultation process involving expert personas:
+
+### Expert Team
+
+1. **👥 Anya Sharma - Principal UI/UX Lead**
+   - Focus: User experience design and interaction patterns
+   - Contribution: User-centered design decisions and interface recommendations
+
+2. **📈 Ben Carter - Senior Product Lead**
+   - Focus: Market strategy, business objectives, and feature prioritization
+   - Contribution: Product strategy and go-to-market considerations
+
+3. **🏗️ Dr. Chloe Evans - Chief Software Architect**
+   - Focus: Technical architecture and system design
+   - Contribution: Technology stack selection and scalability planning
+
+4. **🎯 Product Instigator - Final Synthesis**
+   - Role: Integration of all expert insights into cohesive project plan
+   - Powered by: Advanced AI reasoning for optimal decision synthesis
+
+*Note: Full expert consultation details are available in the TaskMaster directory.*
+
+{_generate_expert_consultation_summary(expert_consultation) if expert_consultation else ""}
+
+## 🚀 Development Workflow
+
+### Automated Tools Included
+
+- **Code Quality**: Black formatting, Ruff linting, MyPy type checking
+- **Git Integration**: Pre-commit hooks, automated commit workflow
+- **Testing**: Pytest with coverage reporting
+- **Environment**: Poetry dependency management, environment variable handling
+- **VS Code Integration**: Workspace configuration, extension recommendations
+
+### Getting Started
+
+1. Open the `.code-workspace` file in VS Code
+2. Install recommended extensions (auto-prompted)
+3. Copy `.env.example` to `.env` and configure
+4. Run `poetry install` to set up dependencies
+5. Use `poetry run python scripts/commit_workflow.py` for commits
+
+## 📊 Project Metadata
+
+- **Creation Method**: AI-driven technology selection
+- **Architecture Pattern**: {_detect_architecture_pattern(tech_stack)}
+- **Primary Language**: Python 3.11+
+- **Dependency Management**: Poetry
+- **Code Quality**: Black + Ruff + MyPy + Pre-commit
+- **Testing Framework**: Pytest with coverage
+- **Documentation**: Markdown with automated generation
+
+## 🔄 Future Considerations
+
+Based on the AI analysis, consider these future enhancements:
+
+- Regular dependency updates through automated tools
+- Continuous integration/deployment pipeline setup
+- Performance monitoring and optimization
+- Security scanning and vulnerability management
+- Documentation maintenance and updates
+
+---
+
+*This document was automatically generated by Create Python Project's AI-driven analysis system.*
+"""
+
+    # Write the documentation file
+    analysis_file = os.path.join(docs_dir, "PROJECT_ANALYSIS.md")
+    with open(analysis_file, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
+def _generate_directory_tree(project_dir: str) -> str:
+    """Generate a directory tree representation."""
+    import os
+
+    def build_tree(
+        directory: str, prefix: str = "", max_depth: int = 3, current_depth: int = 0
+    ) -> list[str]:
+        if current_depth >= max_depth:
+            return []
+
+        items = []
+        try:
+            entries = sorted(os.listdir(directory))
+            # Filter out common files we don't want in the tree
+            filtered_entries = [
+                e
+                for e in entries
+                if not e.startswith(".")
+                or e in [".env.example", ".gitignore", ".vscode"]
+            ]
+
+            for i, entry in enumerate(filtered_entries):
+                if entry.startswith("__pycache__") or entry.endswith(".pyc"):
+                    continue
+
+                path = os.path.join(directory, entry)
+                is_last = i == len(filtered_entries) - 1
+                current_prefix = "└── " if is_last else "├── "
+
+                if os.path.isdir(path):
+                    items.append(f"{prefix}{current_prefix}{entry}/")
+                    if current_depth < max_depth - 1:
+                        extension = "    " if is_last else "│   "
+                        items.extend(
+                            build_tree(
+                                path, prefix + extension, max_depth, current_depth + 1
+                            )
+                        )
+                else:
+                    items.append(f"{prefix}{current_prefix}{entry}")
+        except PermissionError:
+            pass
+
+        return items
+
+    tree_lines = [os.path.basename(project_dir) + "/"]
+    tree_lines.extend(build_tree(project_dir))
+    return "\n".join(tree_lines)
+
+
+def _generate_detailed_tech_stack_analysis(tech_stack: dict[str, Any]) -> str:
+    """Generate detailed technology stack analysis."""
+    if (
+        not tech_stack
+        or not isinstance(tech_stack, dict)
+        or "categories" not in tech_stack
+    ):
+        return """### Standard Python Setup
+
+- **Language**: Python 3.11+ with modern features and type hints
+- **Dependency Management**: Poetry for robust package management
+- **Code Quality**: Black, Ruff, and MyPy for formatting, linting, and type checking
+- **Testing**: Pytest with coverage reporting
+- **Version Control**: Git with pre-commit hooks"""
+
+    analysis_sections = []
+
+    for category in tech_stack["categories"]:
+        category_name = category.get("name", "")
+        if not category_name:
+            continue
+
+        section = f"### {category_name}\n"
+
+        recommended_techs = []
+        alternatives = []
+
+        for option in category.get("options", []):
+            tech_name = option.get("name", "")
+            description = option.get("description", "")
+            is_recommended = option.get("recommended", False)
+
+            if is_recommended:
+                recommended_techs.append(f"**{tech_name}**: {description}")
+            else:
+                alternatives.append(f"- {tech_name}: {description}")
+
+        if recommended_techs:
+            section += "**Selected Technology:**\n"
+            section += "\n".join(f"- {tech}" for tech in recommended_techs)
+            section += "\n\n"
+
+        if alternatives:
+            section += "**Alternatives Considered:**\n"
+            section += "\n".join(alternatives)
+            section += "\n"
+
+        analysis_sections.append(section)
+
+    return (
+        "\n".join(analysis_sections)
+        if analysis_sections
+        else "**AI-curated technology stack** - See TaskMaster directory for detailed analysis."
+    )
+
+
+def _detect_architecture_pattern(tech_stack: dict[str, Any]) -> str:
+    """Detect the primary architecture pattern from tech stack."""
+    if not tech_stack or not isinstance(tech_stack, dict):
+        return "Modular Python Package"
+
+    patterns = []
+    tech_names = str(tech_stack).lower()
+
+    if any(framework in tech_names for framework in ["django", "flask", "fastapi"]):
+        patterns.append("Web Application")
+
+    if any(frontend in tech_names for frontend in ["react", "vue", "angular"]):
+        patterns.append("Full-Stack")
+
+    if any(data_tool in tech_names for data_tool in ["pandas", "numpy", "jupyter"]):
+        patterns.append("Data Processing")
+
+    if any(gui in tech_names for gui in ["pyqt", "tkinter", "kivy"]):
+        patterns.append("Desktop Application")
+
+    if any(cli in tech_names for cli in ["click", "typer", "argparse"]):
+        patterns.append("Command-Line Interface")
+
+    return " + ".join(patterns) if patterns else "Modular Python Package"
+
+
+def _generate_expert_consultation_summary(expert_consultation: dict[str, Any]) -> str:
+    """Generate a summary of the expert consultation for documentation."""
+    if not expert_consultation:
+        return ""
+
+    ai_providers = expert_consultation.get("ai_providers_used", {})
+
+    summary = f"""
+### Expert Consultation Summary
+
+**AI Providers Used:**
+- **Anya (UX Lead)**: {ai_providers.get('anya', 'N/A')}
+- **Ben (Product Lead)**: {ai_providers.get('ben', 'N/A')}
+- **Dr. Chloe (Architect)**: {ai_providers.get('chloe', 'N/A')}
+- **Final Synthesis**: {ai_providers.get('synthesis', 'N/A')}
+
+**Key Insights from Expert Team:**
+
+#### User Experience (Anya Sharma)
+{_extract_key_points(expert_consultation.get('anya_analysis', ''))}
+
+#### Product Strategy (Ben Carter)
+{_extract_key_points(expert_consultation.get('ben_analysis', ''))}
+
+#### Technical Architecture (Dr. Chloe Evans)
+{_extract_key_points(expert_consultation.get('chloe_analysis', ''))}
+
+**Comprehensive PRD**: A complete Product Requirements Document has been generated and is available in the TaskMaster directory.
+"""
+
+    return summary
+
+
+def _extract_key_points(analysis_text: str) -> str:
+    """Extract key points from AI analysis text."""
+    if not analysis_text:
+        return "- Analysis details available in TaskMaster directory"
+
+    # Split into lines and extract key points (first few sentences/bullet points)
+    lines = analysis_text.split("\n")
+    key_points = []
+
+    for line in lines[:3]:  # Take first 3 lines as key points
+        line = line.strip()
+        if line and len(line) > 10:  # Ignore very short lines
+            # Clean up and format as bullet point
+            if not line.startswith("-"):
+                line = f"- {line}"
+            key_points.append(line)
+
+    if not key_points:
+        return "- Analysis details available in TaskMaster directory"
+
+    return "\n".join(key_points)
+
+
 def _create_github_folder(
     project_dir: str, project_name: str, project_type: str, tech_stack: dict[str, Any]
 ) -> bool:
     """Create .github folder with Copilot and workflow configuration."""
     github_dir = os.path.join(project_dir, ".github")
     os.makedirs(github_dir, exist_ok=True)
+
+    # Create ISSUE_TEMPLATE directory
+    issue_template_dir = os.path.join(github_dir, "ISSUE_TEMPLATE")
+    os.makedirs(issue_template_dir, exist_ok=True)
 
     # Extract technologies for documentation
     tech_summary = []
@@ -2783,6 +3267,238 @@ def _create_github_folder(
             for option in category.get("options", []):
                 if option.get("recommended", False):
                     tech_summary.append(f"- **{category['name']}**: {option['name']}")
+
+    # Create bug report template
+    bug_report_content = f"""---
+name: Bug Report
+about: Create a report to help us improve
+title: '[BUG] '
+labels: bug
+assignees: ''
+---
+
+**Describe the Bug**
+A clear and concise description of what the bug is.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '...'
+3. Scroll down to '...'
+4. See error
+
+**Expected Behavior**
+A clear and concise description of what you expected to happen.
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+
+**Environment:**
+- OS: [e.g. iOS]
+- Python Version: [e.g. 3.11]
+- Project Version: [e.g. 1.0.0]
+
+**Technology Stack:**
+{chr(10).join(tech_summary) if tech_summary else "Standard Python project"}
+
+**Additional Context**
+Add any other context about the problem here.
+"""
+
+    with open(os.path.join(issue_template_dir, "bug_report.md"), "w") as f:
+        f.write(bug_report_content)
+
+    # Create feature request template
+    feature_request_content = f"""---
+name: Feature Request
+about: Suggest an idea for this project
+title: '[FEATURE] '
+labels: enhancement
+assignees: ''
+---
+
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
+
+**Technology Impact**
+How would this feature interact with our current technology stack?
+{chr(10).join(tech_summary) if tech_summary else "Standard Python project"}
+
+**Additional Context**
+Add any other context or screenshots about the feature request here.
+"""
+
+    with open(os.path.join(issue_template_dir, "feature_request.md"), "w") as f:
+        f.write(feature_request_content)
+
+    # Create documentation template
+    documentation_content = """---
+name: Documentation
+about: Request improvements to documentation
+title: '[DOCS] '
+labels: documentation
+assignees: ''
+---
+
+**What documentation is missing or unclear?**
+A clear and concise description of what documentation needs improvement.
+
+**Suggested content**
+What specific information should be added or clarified?
+
+**Location**
+Where should this documentation be located?
+- [ ] README.md
+- [ ] docs/ directory
+- [ ] Code comments
+- [ ] API documentation
+- [ ] Other:
+
+**Additional Context**
+Add any other context about the documentation request here.
+"""
+
+    with open(os.path.join(issue_template_dir, "documentation.md"), "w") as f:
+        f.write(documentation_content)
+
+    # Create pull request template
+    pr_template_content = """## Description
+Brief description of the changes in this pull request.
+
+## Type of Change
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Code refactoring
+- [ ] Performance improvement
+- [ ] Other (please describe):
+
+## Testing
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] I have tested this change manually
+
+## Code Quality
+- [ ] My code follows the project's coding standards
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have run the linting tools and fixed any issues
+
+## Checklist
+- [ ] I have read the CONTRIBUTING.md document
+- [ ] I have checked that there isn't already a PR that solves this problem
+- [ ] I have only one commit per logical change
+- [ ] I have included tests for my changes
+- [ ] All tests pass
+
+## Screenshots (if applicable)
+Add screenshots to help explain your changes.
+
+## Additional Notes
+Any additional information or context about this PR.
+"""
+
+    with open(os.path.join(github_dir, "PULL_REQUEST_TEMPLATE.md"), "w") as f:
+        f.write(pr_template_content)
+
+    # Create security workflow
+    security_workflow_content = """name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      run: poetry install --no-interaction --no-root
+
+    - name: Run security scan with bandit
+      run: poetry run bandit -r src/ -f json -o bandit-report.json
+      continue-on-error: true
+
+    - name: Run dependency vulnerability scan
+      run: poetry run safety check --json --output safety-report.json
+      continue-on-error: true
+
+    - name: Scan for secrets
+      run: poetry run detect-secrets scan --all-files --baseline .secrets.baseline
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: python
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+"""
+
+    # Create workflows directory
+    workflows_dir = os.path.join(github_dir, "workflows")
+    os.makedirs(workflows_dir, exist_ok=True)
+
+    with open(os.path.join(workflows_dir, "security.yml"), "w") as f:
+        f.write(security_workflow_content)
 
     # Create copilot instructions
     copilot_content = f"""# {project_name} - GitHub Copilot Instructions
@@ -3108,3 +3824,1312 @@ print(f"FAILED: {{','.join(failed)}}")
                 )
 
     return verification_results
+
+
+def _create_contributing_doc(
+    docs_dir: str, project_name: str, package_name: str, tech_stack: dict[str, Any]
+) -> None:
+    """Create CONTRIBUTING.md documentation."""
+
+    # Extract technologies for documentation
+    tech_summary = []
+    if isinstance(tech_stack, dict) and "categories" in tech_stack:
+        for category in tech_stack["categories"]:
+            for option in category.get("options", []):
+                if option.get("recommended", False):
+                    tech_summary.append(f"- **{category['name']}**: {option['name']}")
+
+    contributing_content = f"""# Contributing to {project_name}
+
+Thank you for your interest in contributing to {project_name}! This document provides guidelines and instructions for contributing to this project.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.11 or higher
+- Poetry for dependency management
+- Git for version control
+- Node.js (if working with frontend components)
+
+### Setting Up Development Environment
+
+1. **Fork and Clone**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/{project_name}.git
+   cd {project_name}
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   poetry install --with dev
+   ```
+
+3. **Set Up Pre-commit Hooks**
+   ```bash
+   poetry run pre-commit install
+   ```
+
+4. **Configure Environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+5. **Run Tests**
+   ```bash
+   poetry run pytest
+   ```
+
+## 🛠️ Development Workflow
+
+### Branch Strategy
+
+- **main**: Production-ready code
+- **develop**: Integration branch for features
+- **feature/***: New features
+- **bugfix/***: Bug fixes
+- **hotfix/***: Critical production fixes
+
+### Making Changes
+
+1. **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make Your Changes**
+   - Follow the coding standards below
+   - Add tests for new functionality
+   - Update documentation as needed
+
+3. **Test Your Changes**
+   ```bash
+   # Run all tests
+   poetry run pytest
+
+   # Run linting
+   poetry run black src/
+   poetry run ruff check src/ --fix
+
+   # Type checking
+   poetry run mypy src/
+   ```
+
+4. **Commit Your Changes**
+   ```bash
+   # Use the commit workflow script
+   poetry run python scripts/commit_workflow.py
+   ```
+
+5. **Push and Create PR**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+## 📝 Coding Standards
+
+### Python Style Guide
+
+- Follow PEP 8 conventions
+- Use type hints for all function signatures
+- Write comprehensive docstrings (Google style)
+- Maximum line length: 88 characters (Black default)
+
+### Code Quality
+
+- **Formatting**: Black (configured for 88 characters)
+- **Linting**: Ruff with project-specific configuration
+- **Type Checking**: mypy with strict settings
+- **Testing**: pytest with coverage reporting
+
+### Documentation
+
+- Update README.md for user-facing changes
+- Update docstrings for API changes
+- Add comments for complex logic
+- Update this CONTRIBUTING.md for process changes
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+poetry run pytest
+
+# Run with coverage
+poetry run pytest --cov=src --cov-report=html
+
+# Run specific test file
+poetry run pytest tests/test_specific.py
+
+# Run with verbose output
+poetry run pytest -v
+```
+
+### Writing Tests
+
+- Place tests in `tests/` directory
+- Mirror the `src/` structure in your test files
+- Use descriptive test names
+- Include both positive and negative test cases
+- Mock external dependencies
+
+### Test Coverage
+
+- Maintain test coverage above 80%
+- Write tests for new features
+- Update tests when modifying existing code
+
+## 🔧 Technology Stack
+
+This project uses the following technologies:
+
+{chr(10).join(tech_summary) if tech_summary else "- Standard Python project with Poetry, pytest, and code quality tools"}
+
+## 📋 Pull Request Guidelines
+
+### Before Submitting
+
+- [ ] Tests pass locally
+- [ ] Code follows style guidelines
+- [ ] Documentation is updated
+- [ ] Commit messages are descriptive
+- [ ] PR addresses a single concern
+
+### PR Description
+
+- Provide a clear description of changes
+- Link to related issues
+- Include screenshots for UI changes
+- List any breaking changes
+
+### Review Process
+
+1. Automated checks must pass
+2. Code review by maintainers
+3. Address feedback promptly
+4. Squash commits if requested
+
+## 🐛 Bug Reports
+
+Use the GitHub issue template for bug reports. Include:
+
+- Clear description of the bug
+- Steps to reproduce
+- Expected vs actual behavior
+- Environment details
+- Screenshots if applicable
+
+## 💡 Feature Requests
+
+Use the GitHub issue template for feature requests. Include:
+
+- Problem description
+- Proposed solution
+- Alternative approaches considered
+- Use cases and examples
+
+## 📚 Documentation
+
+### Types of Documentation
+
+- **README.md**: User-facing documentation
+- **docs/**: Technical documentation
+- **Code comments**: Complex logic explanation
+- **API docs**: Auto-generated from docstrings
+
+### Documentation Guidelines
+
+- Write clear, concise documentation
+- Include code examples
+- Keep documentation up to date
+- Use proper markdown formatting
+
+## 🎯 Project Structure
+
+```
+{project_name}/
+├── src/{package_name}/          # Main application code
+├── tests/                       # Test suite
+├── docs/                        # Documentation
+├── scripts/                     # Development scripts
+├── .github/                     # GitHub configuration
+├── .vscode/                     # VS Code settings
+├── TaskMaster/                  # Project management
+└── pyproject.toml              # Project configuration
+```
+
+## 🤝 Code of Conduct
+
+- Be respectful and inclusive
+- Focus on constructive feedback
+- Help others learn and grow
+- Maintain professionalism
+
+## 📞 Getting Help
+
+- **Issues**: Create a GitHub issue
+- **Discussions**: Use GitHub discussions
+- **Documentation**: Check the docs/ directory
+
+## 🏆 Recognition
+
+Contributors will be recognized in:
+- README.md contributors section
+- Release notes for significant contributions
+- GitHub contributor graphs
+
+Thank you for contributing to {project_name}!
+"""
+
+    with open(os.path.join(docs_dir, "CONTRIBUTING.md"), "w") as f:
+        f.write(contributing_content)
+
+
+def _create_changelog_doc(docs_dir: str, project_name: str) -> None:
+    """Create CHANGELOG.md documentation."""
+
+    import datetime
+
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+    changelog_content = f"""# Changelog
+
+All notable changes to {project_name} will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Initial project structure with AI-driven technology stack
+- Comprehensive development environment setup
+- Automated testing and code quality pipeline
+- Documentation and contribution guidelines
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- Integrated security scanning with bandit and safety
+- Secrets detection with detect-secrets
+- Secure development practices and guidelines
+
+## [0.1.0] - {current_date}
+
+### Added
+- Initial release of {project_name}
+- AI-powered project generation and setup
+- Professional development environment
+- Code quality tools and automated workflows
+- Comprehensive documentation and templates
+
+---
+
+## How to Update This Changelog
+
+### Categories
+- **Added**: New features
+- **Changed**: Changes in existing functionality
+- **Deprecated**: Soon-to-be removed features
+- **Removed**: Removed features
+- **Fixed**: Bug fixes
+- **Security**: Security improvements
+
+### Version Format
+- Use [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH)
+- MAJOR: Incompatible API changes
+- MINOR: Backwards-compatible functionality
+- PATCH: Backwards-compatible bug fixes
+
+### Entry Format
+```
+## [Version] - YYYY-MM-DD
+
+### Category
+- Description of change [#issue-number]
+```
+
+### Unreleased Section
+- Keep an "Unreleased" section at the top
+- Move entries to a new version section on release
+- Always maintain the categories structure
+"""
+
+    with open(os.path.join(docs_dir, "CHANGELOG.md"), "w") as f:
+        f.write(changelog_content)
+
+
+def _should_create_api_docs(
+    tech_stack: dict[str, Any], project_description: str
+) -> bool:
+    """
+    Determine if API documentation should be created based on project characteristics.
+
+    Conditions:
+    1. Project is an API (FastAPI, Flask, Django REST)
+    2. Project is a library/framework
+    3. Project has public interfaces
+    """
+    # Check project description for API keywords
+    description_lower = project_description.lower()
+    api_keywords = [
+        "api",
+        "rest",
+        "restful",
+        "endpoint",
+        "service",
+        "microservice",
+        "library",
+        "framework",
+        "package",
+        "module",
+        "interface",
+        "public",
+    ]
+
+    has_api_description = any(keyword in description_lower for keyword in api_keywords)
+
+    # Check tech stack for API-related technologies
+    api_techs = []
+    if isinstance(tech_stack, dict) and "categories" in tech_stack:
+        for category in tech_stack["categories"]:
+            category_name = category.get("name", "").lower()
+
+            # Check for API frameworks
+            if "backend" in category_name or "framework" in category_name:
+                for option in category.get("options", []):
+                    if option.get("recommended", False):
+                        tech_name = option.get("name", "").lower()
+                        if any(
+                            api_tech in tech_name
+                            for api_tech in ["fastapi", "flask", "django", "api"]
+                        ):
+                            api_techs.append(tech_name)
+
+    # Check for library/package indicators
+    is_library = any(
+        keyword in description_lower
+        for keyword in ["library", "package", "framework", "module"]
+    )
+
+    return has_api_description or len(api_techs) > 0 or is_library
+
+
+def _create_api_docs_structure(
+    docs_dir: str, project_name: str, package_name: str, tech_stack: dict[str, Any]
+) -> None:
+    """Create API documentation structure."""
+
+    # Create API docs directory
+    api_docs_dir = os.path.join(docs_dir, "api")
+    os.makedirs(api_docs_dir, exist_ok=True)
+
+    # Extract API-related technologies
+    api_techs = []
+    if isinstance(tech_stack, dict) and "categories" in tech_stack:
+        for category in tech_stack["categories"]:
+            for option in category.get("options", []):
+                if option.get("recommended", False):
+                    tech_name = option.get("name", "")
+                    if any(
+                        api_tech in tech_name.lower()
+                        for api_tech in ["fastapi", "flask", "django", "api"]
+                    ):
+                        api_techs.append(tech_name)
+
+    # Create API documentation index
+    api_index_content = f"""# {project_name} API Documentation
+
+Welcome to the {project_name} API documentation.
+
+## Overview
+
+{project_name} provides a comprehensive API for interacting with the application. This documentation covers all available endpoints, request/response formats, and usage examples.
+
+## Technology Stack
+
+The API is built using:
+{chr(10).join(f"- {tech}" for tech in api_techs) if api_techs else "- Modern Python web framework"}
+
+## Quick Start
+
+### Installation
+
+```bash
+pip install {package_name}
+```
+
+### Basic Usage
+
+```python
+from {package_name} import {package_name.replace('_', ' ').title().replace(' ', '')}
+
+# Initialize the client
+client = {package_name.replace('_', ' ').title().replace(' ', '')}()
+
+# Example usage
+result = client.example_method()
+print(result)
+```
+
+## Documentation Sections
+
+- [**Authentication**](authentication.md) - API authentication methods
+- [**Endpoints**](endpoints.md) - Complete endpoint reference
+- [**Examples**](examples.md) - Code examples and use cases
+- [**Error Handling**](errors.md) - Error codes and handling
+- [**Rate Limiting**](rate-limiting.md) - Rate limiting information
+- [**Changelog**](../CHANGELOG.md) - API version history
+
+## API Reference
+
+### Base URL
+
+```
+https://api.{package_name.replace('_', '-')}.com/v1
+```
+
+### Content Type
+
+All requests and responses use JSON format:
+
+```
+Content-Type: application/json
+```
+
+### Response Format
+
+All API responses follow this structure:
+
+```json
+{{
+  "success": true,
+  "data": {{}},
+  "message": "Success message",
+  "timestamp": "2025-01-08T10:30:00Z"
+}}
+```
+
+## Support
+
+For API support and questions:
+- GitHub Issues: [Create an issue](https://github.com/your-username/{project_name}/issues)
+- Documentation: [docs/](../)
+- Examples: [examples/](examples/)
+
+## License
+
+This API documentation is part of {project_name} and subject to the same license terms.
+"""
+
+    with open(os.path.join(api_docs_dir, "README.md"), "w") as f:
+        f.write(api_index_content)
+
+    # Create authentication documentation
+    auth_content = f"""# Authentication
+
+{project_name} API uses token-based authentication.
+
+## Authentication Methods
+
+### API Key Authentication
+
+Include your API key in the request header:
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \\
+     https://api.{package_name.replace('_', '-')}.com/v1/endpoint
+```
+
+### Python Client
+
+```python
+from {package_name} import {package_name.replace('_', ' ').title().replace(' ', '')}
+
+client = {package_name.replace('_', ' ').title().replace(' ', '')}(api_key="your_api_key")
+```
+
+## Getting an API Key
+
+1. Sign up for an account
+2. Navigate to API settings
+3. Generate a new API key
+4. Store it securely
+
+## Rate Limits
+
+- **Free tier**: 100 requests per hour
+- **Pro tier**: 1,000 requests per hour
+- **Enterprise**: Custom limits
+
+## Error Responses
+
+Authentication errors return HTTP 401:
+
+```json
+{{
+  "success": false,
+  "error": "Invalid API key",
+  "code": "AUTH_001"
+}}
+```
+"""
+
+    with open(os.path.join(api_docs_dir, "authentication.md"), "w") as f:
+        f.write(auth_content)
+
+    # Create endpoints documentation
+    endpoints_content = f"""# API Endpoints
+
+Complete reference for all {project_name} API endpoints.
+
+## Base Information
+
+- **Base URL**: `https://api.{package_name.replace('_', '-')}.com/v1`
+- **Format**: JSON
+- **Authentication**: Bearer token required
+
+## Endpoints
+
+### Health Check
+
+Check API status and connectivity.
+
+```http
+GET /health
+```
+
+**Response:**
+```json
+{{
+  "success": true,
+  "data": {{
+    "status": "healthy",
+    "version": "1.0.0",
+    "timestamp": "2025-01-08T10:30:00Z"
+  }}
+}}
+```
+
+### Example Endpoint
+
+Description of what this endpoint does.
+
+```http
+GET /example
+```
+
+**Parameters:**
+- `param1` (string, required): Description of parameter
+- `param2` (integer, optional): Description of parameter
+
+**Response:**
+```json
+{{
+  "success": true,
+  "data": {{
+    "result": "example_value"
+  }}
+}}
+```
+
+**Error Response:**
+```json
+{{
+  "success": false,
+  "error": "Error description",
+  "code": "ERR_001"
+}}
+```
+
+## Response Codes
+
+- `200 OK`: Success
+- `400 Bad Request`: Invalid request parameters
+- `401 Unauthorized`: Invalid or missing API key
+- `403 Forbidden`: Insufficient permissions
+- `404 Not Found`: Resource not found
+- `429 Too Many Requests`: Rate limit exceeded
+- `500 Internal Server Error`: Server error
+
+## Pagination
+
+Large result sets are paginated:
+
+```json
+{{
+  "success": true,
+  "data": {{
+    "items": [...],
+    "pagination": {{
+      "page": 1,
+      "per_page": 20,
+      "total": 100,
+      "pages": 5
+    }}
+  }}
+}}
+```
+
+Use `?page=2&per_page=50` to navigate pages.
+"""
+
+    with open(os.path.join(api_docs_dir, "endpoints.md"), "w") as f:
+        f.write(endpoints_content)
+
+    # Create examples documentation
+    examples_content = f"""# API Examples
+
+Practical examples for using the {project_name} API.
+
+## Python Examples
+
+### Basic Usage
+
+```python
+import requests
+
+# Set up authentication
+headers = {{
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}}
+
+# Make a request
+response = requests.get(
+    "https://api.{package_name.replace('_', '-')}.com/v1/example",
+    headers=headers
+)
+
+data = response.json()
+print(data)
+```
+
+### Using the Python Client
+
+```python
+from {package_name} import {package_name.replace('_', ' ').title().replace(' ', '')}
+
+# Initialize client
+client = {package_name.replace('_', ' ').title().replace(' ', '')}(api_key="your_api_key")
+
+# Make requests
+try:
+    result = client.get_data()
+    print(f"Success: {{result}}")
+except Exception as e:
+    print(f"Error: {{e}}")
+```
+
+## JavaScript Examples
+
+### Fetch API
+
+```javascript
+const apiKey = 'YOUR_API_KEY';
+const baseUrl = 'https://api.{package_name.replace('_', '-')}.com/v1';
+
+async function fetchData() {{
+    try {{
+        const response = await fetch(`${{baseUrl}}/example`, {{
+            method: 'GET',
+            headers: {{
+                'Authorization': `Bearer ${{apiKey}}`,
+                'Content-Type': 'application/json'
+            }}
+        }});
+
+        const data = await response.json();
+        console.log(data);
+    }} catch (error) {{
+        console.error('Error:', error);
+    }}
+}}
+```
+
+### Node.js with Axios
+
+```javascript
+const axios = require('axios');
+
+const api = axios.create({{
+    baseURL: 'https://api.{package_name.replace('_', '-')}.com/v1',
+    headers: {{
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    }}
+}});
+
+// Make request
+api.get('/example')
+    .then(response => {{
+        console.log(response.data);
+    }})
+    .catch(error => {{
+        console.error('Error:', error.response.data);
+    }});
+```
+
+## cURL Examples
+
+### GET Request
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \\
+     -H "Content-Type: application/json" \\
+     https://api.{package_name.replace('_', '-')}.com/v1/example
+```
+
+### POST Request
+
+```bash
+curl -X POST \\
+     -H "Authorization: Bearer YOUR_API_KEY" \\
+     -H "Content-Type: application/json" \\
+     -d '{{"param1": "value1", "param2": "value2"}}' \\
+     https://api.{package_name.replace('_', '-')}.com/v1/example
+```
+
+## Error Handling
+
+### Python Error Handling
+
+```python
+try:
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Raises HTTPError for bad responses
+    data = response.json()
+except requests.exceptions.HTTPError as e:
+    print(f"HTTP Error: {{e.response.status_code}}")
+    print(f"Response: {{e.response.text}}")
+except requests.exceptions.RequestException as e:
+    print(f"Request Error: {{e}}")
+```
+
+### JavaScript Error Handling
+
+```javascript
+fetch(url, options)
+    .then(response => {{
+        if (!response.ok) {{
+            throw new Error(`HTTP error! status: ${{response.status}}`);
+        }}
+        return response.json();
+    }})
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+```
+
+## Rate Limiting Example
+
+```python
+import time
+import requests
+from requests.exceptions import HTTPError
+
+def make_request_with_retry(url, headers, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 429:  # Rate limited
+                retry_after = int(response.headers.get('Retry-After', 60))
+                print(f"Rate limited. Waiting {{retry_after}} seconds...")
+                time.sleep(retry_after)
+                continue
+            response.raise_for_status()
+            return response.json()
+        except HTTPError as e:
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(2 ** attempt)  # Exponential backoff
+
+    raise Exception("Max retries exceeded")
+```
+"""
+
+    with open(os.path.join(api_docs_dir, "examples.md"), "w") as f:
+        f.write(examples_content)
+
+    # Create error handling documentation
+    errors_content = f"""# Error Handling
+
+Understanding and handling errors in the {project_name} API.
+
+## Error Response Format
+
+All API errors follow this structure:
+
+```json
+{{
+  "success": false,
+  "error": "Human-readable error message",
+  "code": "ERROR_CODE",
+  "details": {{}},
+  "timestamp": "2025-01-08T10:30:00Z"
+}}
+```
+
+## HTTP Status Codes
+
+### 2xx Success
+- `200 OK`: Request successful
+- `201 Created`: Resource created successfully
+- `204 No Content`: Request successful, no content returned
+
+### 4xx Client Errors
+- `400 Bad Request`: Invalid request format or parameters
+- `401 Unauthorized`: Invalid or missing authentication
+- `403 Forbidden`: Insufficient permissions
+- `404 Not Found`: Resource not found
+- `409 Conflict`: Resource conflict
+- `422 Unprocessable Entity`: Validation errors
+- `429 Too Many Requests`: Rate limit exceeded
+
+### 5xx Server Errors
+- `500 Internal Server Error`: Server error
+- `502 Bad Gateway`: Gateway error
+- `503 Service Unavailable`: Service temporarily unavailable
+- `504 Gateway Timeout`: Gateway timeout
+
+## Error Codes
+
+### Authentication Errors (AUTH_xxx)
+- `AUTH_001`: Invalid API key
+- `AUTH_002`: Expired API key
+- `AUTH_003`: Missing API key
+- `AUTH_004`: Insufficient permissions
+
+### Validation Errors (VAL_xxx)
+- `VAL_001`: Missing required parameter
+- `VAL_002`: Invalid parameter format
+- `VAL_003`: Parameter value out of range
+- `VAL_004`: Invalid JSON format
+
+### Rate Limiting Errors (RATE_xxx)
+- `RATE_001`: Rate limit exceeded
+- `RATE_002`: Daily quota exceeded
+- `RATE_003`: Concurrent request limit exceeded
+
+### Resource Errors (RES_xxx)
+- `RES_001`: Resource not found
+- `RES_002`: Resource already exists
+- `RES_003`: Resource locked
+- `RES_004`: Resource deleted
+
+### Server Errors (SRV_xxx)
+- `SRV_001`: Internal server error
+- `SRV_002`: Database connection error
+- `SRV_003`: External service unavailable
+- `SRV_004`: Configuration error
+
+## Error Handling Best Practices
+
+### 1. Always Check Response Status
+
+```python
+response = requests.get(url, headers=headers)
+if response.status_code != 200:
+    error_data = response.json()
+    print(f"Error: {{error_data.get('error')}}")
+    print(f"Code: {{error_data.get('code')}}")
+```
+
+### 2. Implement Retry Logic
+
+```python
+import time
+import random
+
+def make_request_with_retry(url, headers, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, headers=headers)
+
+            if response.status_code == 429:  # Rate limited
+                retry_after = int(response.headers.get('Retry-After', 60))
+                time.sleep(retry_after)
+                continue
+
+            if response.status_code >= 500:  # Server error
+                if attempt < max_retries - 1:
+                    wait_time = (2 ** attempt) + random.uniform(0, 1)
+                    time.sleep(wait_time)
+                    continue
+
+            response.raise_for_status()
+            return response.json()
+
+        except requests.exceptions.RequestException as e:
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(2 ** attempt)
+
+    raise Exception("Max retries exceeded")
+```
+
+### 3. Log Errors Properly
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
+except requests.exceptions.HTTPError as e:
+    error_data = e.response.json()
+    logger.error(
+        f"API Error: {{error_data.get('code')}} - {{error_data.get('error')}}",
+        extra={{'status_code': e.response.status_code, 'response': error_data}}
+    )
+    raise
+```
+
+### 4. Handle Specific Error Types
+
+```python
+def handle_api_error(response):
+    if response.status_code == 401:
+        # Handle authentication error
+        raise AuthenticationError("Invalid API key")
+    elif response.status_code == 403:
+        # Handle permission error
+        raise PermissionError("Insufficient permissions")
+    elif response.status_code == 429:
+        # Handle rate limiting
+        raise RateLimitError("Rate limit exceeded")
+    elif response.status_code >= 500:
+        # Handle server errors
+        raise ServerError("Server error occurred")
+    else:
+        # Handle other errors
+        error_data = response.json()
+        raise APIError(f"API Error: {{error_data.get('error')}}")
+```
+
+## Common Error Scenarios
+
+### Invalid API Key
+```json
+{{
+  "success": false,
+  "error": "Invalid API key provided",
+  "code": "AUTH_001"
+}}
+```
+
+### Missing Required Parameter
+```json
+{{
+  "success": false,
+  "error": "Missing required parameter: 'email'",
+  "code": "VAL_001",
+  "details": {{
+    "parameter": "email",
+    "expected_type": "string"
+  }}
+}}
+```
+
+### Rate Limit Exceeded
+```json
+{{
+  "success": false,
+  "error": "Rate limit exceeded",
+  "code": "RATE_001",
+  "details": {{
+    "limit": 100,
+    "window": "1 hour",
+    "retry_after": 3600
+  }}
+}}
+```
+
+### Resource Not Found
+```json
+{{
+  "success": false,
+  "error": "Resource not found",
+  "code": "RES_001",
+  "details": {{
+    "resource_type": "user",
+    "resource_id": "12345"
+  }}
+}}
+```
+
+## Support
+
+If you encounter persistent errors or need help with error handling:
+
+1. Check the error code in this documentation
+2. Verify your API key and permissions
+3. Check our status page for service issues
+4. Contact support with the error code and request details
+"""
+
+    with open(os.path.join(api_docs_dir, "errors.md"), "w") as f:
+        f.write(errors_content)
+
+    # Create rate limiting documentation
+    rate_limiting_content = f"""# Rate Limiting
+
+Information about rate limits and usage quotas for the {project_name} API.
+
+## Rate Limit Tiers
+
+### Free Tier
+- **Requests**: 100 per hour
+- **Burst**: 10 requests per minute
+- **Daily**: 1,000 requests per day
+
+### Pro Tier
+- **Requests**: 1,000 per hour
+- **Burst**: 100 requests per minute
+- **Daily**: 10,000 requests per day
+
+### Enterprise
+- **Requests**: Custom limits
+- **Burst**: Custom limits
+- **Daily**: Custom limits
+
+## Rate Limit Headers
+
+Every API response includes rate limit information in the headers:
+
+```http
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1641648000
+X-RateLimit-Window: 3600
+```
+
+### Header Descriptions
+
+- `X-RateLimit-Limit`: Maximum requests allowed in the current window
+- `X-RateLimit-Remaining`: Remaining requests in the current window
+- `X-RateLimit-Reset`: Unix timestamp when the window resets
+- `X-RateLimit-Window`: Window duration in seconds
+
+## Rate Limit Exceeded Response
+
+When you exceed the rate limit, you'll receive a 429 status code:
+
+```json
+{{
+  "success": false,
+  "error": "Rate limit exceeded",
+  "code": "RATE_001",
+  "details": {{
+    "limit": 100,
+    "window": "1 hour",
+    "retry_after": 3600
+  }}
+}}
+```
+
+## Best Practices
+
+### 1. Check Rate Limit Headers
+
+```python
+import requests
+import time
+
+def make_request_with_rate_limit_check(url, headers):
+    response = requests.get(url, headers=headers)
+
+    # Check remaining requests
+    remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
+    if remaining < 10:  # Low on requests
+        reset_time = int(response.headers.get('X-RateLimit-Reset', 0))
+        current_time = int(time.time())
+        wait_time = reset_time - current_time
+
+        if wait_time > 0:
+            print(f"Rate limit low. Waiting {{wait_time}} seconds...")
+            time.sleep(wait_time)
+
+    return response
+```
+
+### 2. Implement Exponential Backoff
+
+```python
+import time
+import random
+
+def exponential_backoff_request(url, headers, max_retries=3):
+    for attempt in range(max_retries):
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 429:
+            # Extract retry-after header if available
+            retry_after = response.headers.get('Retry-After')
+            if retry_after:
+                wait_time = int(retry_after)
+            else:
+                # Calculate exponential backoff
+                wait_time = (2 ** attempt) + random.uniform(0, 1)
+
+            print(f"Rate limited. Waiting {{wait_time}} seconds...")
+            time.sleep(wait_time)
+            continue
+
+        return response
+
+    raise Exception("Max retries exceeded due to rate limiting")
+```
+
+### 3. Use Request Queuing
+
+```python
+import time
+from queue import Queue
+from threading import Thread
+
+class RateLimitedRequests:
+    def __init__(self, requests_per_second=1):
+        self.requests_per_second = requests_per_second
+        self.min_interval = 1.0 / requests_per_second
+        self.last_request_time = 0
+        self.queue = Queue()
+        self.worker_thread = Thread(target=self._worker, daemon=True)
+        self.worker_thread.start()
+
+    def _worker(self):
+        while True:
+            request_func, args, kwargs = self.queue.get()
+
+            # Ensure minimum interval between requests
+            current_time = time.time()
+            time_since_last = current_time - self.last_request_time
+            if time_since_last < self.min_interval:
+                time.sleep(self.min_interval - time_since_last)
+
+            try:
+                result = request_func(*args, **kwargs)
+                self.last_request_time = time.time()
+                return result
+            except Exception as e:
+                print(f"Request failed: {{e}}")
+
+    def add_request(self, request_func, *args, **kwargs):
+        self.queue.put((request_func, args, kwargs))
+
+# Usage
+rate_limiter = RateLimitedRequests(requests_per_second=0.5)  # 1 request every 2 seconds
+
+def make_api_call():
+    return requests.get(url, headers=headers)
+
+rate_limiter.add_request(make_api_call)
+```
+
+### 4. Monitor Usage
+
+```python
+class APIUsageMonitor:
+    def __init__(self):
+        self.request_count = 0
+        self.error_count = 0
+        self.rate_limit_hits = 0
+        self.start_time = time.time()
+
+    def log_request(self, response):
+        self.request_count += 1
+
+        if response.status_code == 429:
+            self.rate_limit_hits += 1
+        elif response.status_code >= 400:
+            self.error_count += 1
+
+        # Log rate limit info
+        remaining = response.headers.get('X-RateLimit-Remaining')
+        if remaining:
+            print(f"Requests remaining: {{remaining}}")
+
+    def get_stats(self):
+        runtime = time.time() - self.start_time
+        return {{
+            'total_requests': self.request_count,
+            'errors': self.error_count,
+            'rate_limit_hits': self.rate_limit_hits,
+            'requests_per_second': self.request_count / runtime,
+            'error_rate': self.error_count / self.request_count if self.request_count > 0 else 0
+        }}
+
+# Usage
+monitor = APIUsageMonitor()
+response = requests.get(url, headers=headers)
+monitor.log_request(response)
+```
+
+## Upgrading Your Plan
+
+To increase your rate limits:
+
+1. **Pro Plan**: Higher limits for production applications
+2. **Enterprise Plan**: Custom limits and dedicated support
+3. **Contact Sales**: For very high-volume requirements
+
+## Monitoring Tools
+
+### Rate Limit Dashboard
+- Real-time usage monitoring
+- Historical usage analytics
+- Alert configuration
+- Usage forecasting
+
+### API Analytics
+- Request volume trends
+- Error rate monitoring
+- Performance metrics
+- Geographic usage patterns
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Sudden Rate Limit Hits**
+   - Check for infinite loops in your code
+   - Verify retry logic isn't too aggressive
+   - Monitor concurrent requests
+
+2. **Inconsistent Rate Limits**
+   - Rate limits are per API key
+   - Check if multiple applications use the same key
+   - Verify time zone differences in reset times
+
+3. **Burst Limits**
+   - Spread requests evenly over time
+   - Don't send all requests at once
+   - Use queuing for batch operations
+
+### Getting Help
+
+If you're experiencing rate limiting issues:
+
+1. Check your current usage in the dashboard
+2. Review your application's request patterns
+3. Consider upgrading your plan
+4. Contact support with your API key and usage patterns
+"""
+
+    with open(os.path.join(api_docs_dir, "rate-limiting.md"), "w") as f:
+        f.write(rate_limiting_content)

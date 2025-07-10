@@ -18,7 +18,7 @@ def main():
         return
 
     prompt = sys.argv[1]
-    load_dotenv()
+    load_dotenv(override=True)
 
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
@@ -36,9 +36,9 @@ def main():
         data = {
             "model": model,
             "messages": [
-                {"role": "user", "content": f"Create git commit message: {prompt}"},
+                {"role": "user", "content": f"Generate a concise git commit message (max 50 chars): {prompt}"},
             ],
-            "max_tokens": 30,
+            "max_tokens": 100,
             "temperature": 0.1,
         }
 
