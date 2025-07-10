@@ -36,9 +36,9 @@ def main():
         data = {
             "model": model,
             "messages": [
-                {"role": "user", "content": f"Generate a concise git commit message (max 50 chars): {prompt}"},
+                {"role": "user", "content": prompt},
             ],
-            "max_tokens": 100,
+            "max_tokens": 150,
             "temperature": 0.1,
         }
 
@@ -53,20 +53,36 @@ def main():
             message = result["choices"][0]["message"]
             commit_message = message.get("content", "").strip()
 
-            # Clean up the message - take only the first line and limit length
+            # Clean up the message - handle multi-line messages properly
             if commit_message:
-                commit_message = commit_message.split("\n")[0].strip()
                 # Remove common prefixes
-                prefixes = ["Here is", "The commit message", "Generated:", "Message:"]
+                prefixes = ["Here is", "The commit message", "Generated:", "Message:", "Commit message:"]
                 for prefix in prefixes:
                     if commit_message.startswith(prefix):
                         commit_message = (
                             commit_message[len(prefix) :].strip().lstrip(":")
                         )
-                # Limit to reasonable length
-                if len(commit_message) > 80:
-                    commit_message = commit_message[:80].strip()
-                print(commit_message)
+                
+                # Handle multi-line messages (keep up to 3 lines)
+                lines = commit_message.split("\n")
+                if len(lines) > 3:
+                    lines = lines[:3]
+                
+                # Clean and limit each line
+                cleaned_lines = []
+                for i, line in enumerate(lines):
+                    line = line.strip()
+                    if line:
+                        if i == 0:  # First line (title) - limit to 80 chars
+                            if len(line) > 80:
+                                line = line[:80].strip()
+                        cleaned_lines.append(line)
+                
+                if cleaned_lines:
+                    final_message = "\n".join(cleaned_lines)
+                    print(final_message)
+                else:
+                    print("Update project files")
             else:
                 print("Update project files")
         else:
