@@ -167,6 +167,9 @@ class IntelligentContextGatherer:
             )
             questions = self._get_fallback_questions()
 
+        # Debug information about what we found
+        console.print(f"[dim]Found {len(questions)} questions to process[/dim]")
+
         # Conduct each question iteratively
         for i, question_data in enumerate(questions, 1):
             console.print(f"\n### Question {i}: {question_data['title']}")
@@ -214,10 +217,10 @@ class IntelligentContextGatherer:
         return True
 
     def _parse_questions_from_analysis(self) -> list[dict[str, Any]]:
-        """Parse questions from the AI analysis response."""
+        """Parse questions from the AI analysis response with robust fallback."""
         questions = []
 
-        # This is a simplified parser - in practice, you might want more robust parsing
+        # This is a robust parser that handles various AI response formats
         lines = self.analysis_response.split("\n")
 
         current_question: dict[str, Any] = {}
@@ -226,7 +229,17 @@ class IntelligentContextGatherer:
         for line in lines:
             line = line.strip()
 
-            if "5 Iterative Questions Framework:" in line:
+            # Look for various forms of question framework headers
+            if any(
+                header in line.lower()
+                for header in [
+                    "5 iterative questions framework",
+                    "iterative questions framework",
+                    "question framework",
+                    "questions framework",
+                    "adaptive questions",
+                ]
+            ):
                 in_question_section = True
                 continue
 
@@ -237,11 +250,17 @@ class IntelligentContextGatherer:
 
                 # Start new question
                 current_question = {}
-                # Extract title from "**Question 1: [Title]**"
+                # Extract title from "**Question 1: [Title]**" or "**Question 1: Title**"
                 title_start = line.find("[") + 1
                 title_end = line.find("]")
                 if title_start > 0 and title_end > title_start:
                     current_question["title"] = line[title_start:title_end]
+                else:
+                    # Try to extract title after the colon
+                    colon_pos = line.find(":")
+                    if colon_pos > 0:
+                        title_part = line[colon_pos + 1 :].strip().rstrip("*")
+                        current_question["title"] = title_part
 
             elif in_question_section and line.startswith("Context:"):
                 current_question["context"] = line[8:].strip()
@@ -263,7 +282,50 @@ class IntelligentContextGatherer:
         if current_question and "title" in current_question:
             questions.append(current_question)
 
+        # If we still don't have questions, try a different approach
+        if not questions:
+            # Look for any question patterns in the text
+            questions = self._extract_questions_from_text()
+
         return questions if questions else []
+
+    def _extract_questions_from_text(self) -> list[dict[str, Any]]:
+        """Extract questions from unstructured text when formal parsing fails."""
+        questions = []
+
+        # Common question patterns to look for
+        question_patterns = [
+            ("data sources", "Data Sources & Inputs"),
+            ("core functionality", "Core Functionality"),
+            ("user experience", "User Experience"),
+            ("technical approach", "Technical Approach"),
+            ("deployment", "Deployment & Privacy"),
+            ("privacy", "Privacy & Security"),
+        ]
+
+        # Look for sections that might contain questions
+        lines = self.analysis_response.split("\n")
+
+        for _i, line in enumerate(lines):
+            line_lower = line.lower()
+
+            # Check if this line contains a question pattern
+            for pattern, title in question_patterns:
+                if pattern in line_lower and ("?" in line or "question" in line_lower):
+                    # Found a potential question
+                    question_text = line.strip()
+                    if question_text.endswith("?"):
+                        questions.append(
+                            {
+                                "title": title,
+                                "question": question_text,
+                                "context": f"Based on the project analysis, this helps understand {pattern.replace('_', ' ')}.",
+                                "categories": self._get_default_categories(title),
+                            }
+                        )
+                        break
+
+        return questions
 
     def _get_default_categories(self, question_title: str) -> list[str]:
         """Get default categories based on question title."""

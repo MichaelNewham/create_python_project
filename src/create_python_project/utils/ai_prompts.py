@@ -139,7 +139,13 @@ Question: [Specific question about deployment and privacy]
 Preference Table Categories: [List 6-8 relevant options]
 ```
 
-Analyze this project and provide the strategic question framework.
+CRITICAL INSTRUCTIONS:
+1. You MUST include the "### 5 Iterative Questions Framework:" section exactly as shown above
+2. You MUST format each question with "**Question X: [Title]**" format
+3. You MUST include Context:, Question:, and Preference Table Categories: for each question
+4. The system parser depends on this exact format - deviation will cause fallback to generic questions
+
+Analyze this project and provide the strategic question framework with the required format.
 """
 
 
