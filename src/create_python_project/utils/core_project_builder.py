@@ -982,6 +982,8 @@ def _create_ai_driven_structures(
     project_description: str = "",
 ):
     """Create additional project structures based on AI analysis."""
+    # Derive project_name from package_name for documentation
+    project_name = package_name.replace("_", "-")
 
     # Parse AI analysis for specific needs
     analysis_text = " ".join(ai_analysis).lower()
